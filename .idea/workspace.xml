@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reportes.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/test/java/com/duoc/ms_reportes/MsReportesApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/test/java/com/duoc/ms_reportes/MsReporteApplicationTests.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Exception" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;carlitroxxx&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Benjamin7603/EFT_Full_Stack.git&quot;,
+    &quot;accountId&quot;: &quot;9974ac3b-d532-4999-85b3-f45d7eec579b&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3BUUrsfRNzS6rRDDQ3EIAuLDoHz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.MsEurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.MsUsuariosApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.MsUsuariosApplication">
+    <configuration name="MsEurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-eureka-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_eureka_server.MsEurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsReportesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-reportes" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_reportes.MsReportesApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsUsuariosApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="ms-usuarios" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_usuarios.MsUsuariosApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Spring Boot.MsUsuariosApplication" />
+      <item itemvalue="Spring Boot.MsEurekaServerApplication" />
+      <item itemvalue="Spring Boot.MsReportesApplication" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="" />
+      <created>1774543345629</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1774543345629</updated>
+      <workItem from="1774543347646" duration="990000" />
+      <workItem from="1774545048311" duration="474000" />
+      <workItem from="1774985945993" duration="4449000" />
+      <workItem from="1775071019180" duration="1478000" />
+    </task>
+    <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
+      <option name="closed" value="true" />
+      <created>1774988240120</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1774988240120</updated>
+    </task>
+    <task id="LOCAL-00002" summary="avance ms reportes">
+      <option name="closed" value="true" />
+      <created>1775071054727</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775071054727</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Valid integrado al ms usuario" />
+    <MESSAGE value="avance ms reportes" />
+    <option name="LAST_COMMIT_MESSAGE" value="avance ms reportes" />
+  </component>
+</project>
