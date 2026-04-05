@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,12 +30,12 @@
     &quot;assignee&quot;: &quot;carlitroxxx&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Benjamin7603/EFT_Full_Stack.git",
-    "accountId": "52ca7baa-a604-4a4a-af11-e3a555db4e1c"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Benjamin7603/EFT_Full_Stack.git&quot;,
+    &quot;accountId&quot;: &quot;52ca7baa-a604-4a4a-af11-e3a555db4e1c&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -67,33 +56,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.MsEurekaServerApplication.executor": "Run",
-    "Spring Boot.MsGatewayApplication.executor": "Run",
-    "Spring Boot.MsReportesApplication.executor": "Run",
-    "Spring Boot.MsUsuariosApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.configurations.included.in.services": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.MsEurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.MsGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.MsReportesApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.MsUsuariosApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -173,7 +162,8 @@
       <workItem from="1774545048311" duration="474000" />
       <workItem from="1774985945993" duration="4449000" />
       <workItem from="1775071019180" duration="1478000" />
-      <workItem from="1775353656292" duration="11330000" />
+      <workItem from="1775353656292" duration="11969000" />
+      <workItem from="1775432533740" duration="460000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />
