@@ -5,11 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
-      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reportes.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/test/java/com/duoc/ms_reportes/MsReportesApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/test/java/com/duoc/ms_reportes/MsReporteApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +32,8 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/ms-usuarios" />
+    <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -33,16 +41,23 @@
     &quot;assignee&quot;: &quot;carlitroxxx&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Benjamin7603/EFT_Full_Stack.git&quot;,
-    &quot;accountId&quot;: &quot;9974ac3b-d532-4999-85b3-f45d7eec579b&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Benjamin7603/EFT_Full_Stack.git",
+    "accountId": "52ca7baa-a604-4a4a-af11-e3a555db4e1c"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 3
@@ -52,29 +67,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.MsEurekaServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsUsuariosApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.MsEurekaServerApplication.executor": "Run",
+    "Spring Boot.MsGatewayApplication.executor": "Run",
+    "Spring Boot.MsReportesApplication.executor": "Run",
+    "Spring Boot.MsUsuariosApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.configurations.included.in.services": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -84,11 +103,32 @@
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="MsEurekaServerApplication" value="STOPPED" />
+              <entry key="MsGatewayApplication" value="STOPPED" />
+              <entry key="MsReportesApplication" value="STOPPED" />
+              <entry key="MsUsuariosApplication" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.MsUsuariosApplication">
+  <component name="RunManager" selected="Spring Boot.MsGatewayApplication">
     <configuration name="MsEurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ms-eureka-server" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_eureka_server.MsEurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_gateway.MsGatewayApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -108,6 +148,7 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Spring Boot.MsGatewayApplication" />
       <item itemvalue="Spring Boot.MsUsuariosApplication" />
       <item itemvalue="Spring Boot.MsEurekaServerApplication" />
       <item itemvalue="Spring Boot.MsReportesApplication" />
@@ -132,6 +173,7 @@
       <workItem from="1774545048311" duration="474000" />
       <workItem from="1774985945993" duration="4449000" />
       <workItem from="1775071019180" duration="1478000" />
+      <workItem from="1775353656292" duration="11330000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />

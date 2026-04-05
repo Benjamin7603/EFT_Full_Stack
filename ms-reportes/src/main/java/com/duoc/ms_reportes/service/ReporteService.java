@@ -10,7 +10,9 @@ public class ReporteService {
 
     private final ReporteRepository reporteRepository;
 
-    public ReporteService(ReporteRepository reporteRepository) {this.reporteRepository = reporteRepository;}
+    public ReporteService(ReporteRepository reporteRepository) {
+        this.reporteRepository = reporteRepository;
+    }
 
     public Reporte crearReporteProcesado(Reporte datosEntrada) {
         Reporte nuevoReporte = new Reporte();
@@ -20,6 +22,7 @@ public class ReporteService {
         nuevoReporte.setUrlMedia(datosEntrada.getUrlMedia());
         nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
+        nuevoReporte.setEstado("NUEVO"); // Nos aseguramos que nazca como NUEVO
 
         if ("OFICIAL".equalsIgnoreCase(datosEntrada.getTipoUsuario())) {
             nuevoReporte.setPrioridad("ALTA");
@@ -33,9 +36,10 @@ public class ReporteService {
     public List<Reporte> listarTodos() {
         return reporteRepository.findAll();
     }
+
     public List<Reporte> listarActivos() {
-        // Filtramos los que ya terminaron para no saturar el mapa
-        return reporteRepository.findByEstadoActivo(List.of("CONTROLADO", "RECHAZADO"));
+        // Filtramos para mostrar en el mapa SOLO los que están ocurriendo ahora
+        return reporteRepository.findByEstadoIn(List.of("NUEVO", "EN_PROGRESO"));
     }
 
     public Reporte actualizarEstado(Long id, String nuevoEstado) {

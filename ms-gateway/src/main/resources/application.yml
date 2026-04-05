@@ -1,0 +1,29 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: ms-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        # Regla para el microservicio de Usuarios
+        - id: ms-usuarios
+          uri: lb://ms-usuarios
+          predicates:
+            - Path=/api/usuarios/**
+
+        # Regla para el microservicio de Reportes
+        - id: ms-reportes
+          uri: lb://ms-reportes
+          predicates:
+            - Path=/api/reportes/**
+
+# Configuración para que el Gateway se registre en Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

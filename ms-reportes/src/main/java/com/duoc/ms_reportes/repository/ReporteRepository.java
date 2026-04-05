@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ReporteRepository extends JpaRepository<Reporte, Long> {
-    List<Reporte> findByEstadoActivo(List<String> estadosActivos);
+    // Busca todos los reportes cuyo estado esté DENTRO de la lista que le enviemos
+    List<Reporte> findByEstadoIn(List<String> estados);
 }

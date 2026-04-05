@@ -4,6 +4,7 @@ import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.service.ReporteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class ReporteController {
 
     @Operation(summary = "Enviar un nuevo reporte")
     @PostMapping
-    public Reporte crear(@RequestBody Reporte reporte) {
+    public Reporte crear(@Valid @RequestBody Reporte reporte) {
         return reporteService.crearReporteProcesado(reporte);
     }
 
@@ -42,5 +43,4 @@ public class ReporteController {
     public Reporte actualizarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
         return reporteService.actualizarEstado(id, nuevoEstado);
     }
-
 }
