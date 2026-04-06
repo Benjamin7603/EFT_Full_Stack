@@ -5,13 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
-      <change afterPath="$PROJECT_DIR$/ms-gateway/src/test/resources/application-test.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/java/com/duoc/ms_gateway/MsGatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/java/com/duoc/ms_gateway/MsGatewayApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-gateway/src/test/java/com/duoc/ms_gateway/MsGatewayApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/test/java/com/duoc/ms_gateway/MsGatewayApplicationTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitattributes" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
@@ -160,7 +153,7 @@
           <value>
             <map>
               <entry key="MsEurekaServerApplication" value="STOPPED" />
-              <entry key="MsGatewayApplication" value="FAILED" />
+              <entry key="MsGatewayApplication" value="STOPPED" />
               <entry key="MsReportesApplication" value="STOPPED" />
               <entry key="MsUsuariosApplication" value="STOPPED" />
             </map>
@@ -263,7 +256,7 @@
       <workItem from="1774985945993" duration="4449000" />
       <workItem from="1775071019180" duration="1478000" />
       <workItem from="1775353656292" duration="11969000" />
-      <workItem from="1775432533740" duration="9664000" />
+      <workItem from="1775432533740" duration="10013000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />
