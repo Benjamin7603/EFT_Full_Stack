@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
+      <change afterPath="$PROJECT_DIR$/ms-gateway/src/test/resources/application-test.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/java/com/duoc/ms_gateway/MsGatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/java/com/duoc/ms_gateway/MsGatewayApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/src/test/java/com/duoc/ms_gateway/MsGatewayApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/test/java/com/duoc/ms_gateway/MsGatewayApplicationTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitattributes" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
@@ -62,7 +67,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/ms-usuarios" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -87,6 +92,11 @@
         <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
       </MavenGeneralSettings>
     </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="jdkForImporter" value="openjdk-25" />
+      </MavenImportingSettings>
+    </option>
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -99,8 +109,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven.ms-eureka-server [clean].executor": "Run",
+    "Maven.ms-gateway [clean,install].executor": "Run",
     "Maven.ms-gateway [clean].executor": "Run",
     "Maven.ms-gateway [compile].executor": "Run",
+    "Maven.ms-gateway [install].executor": "Run",
     "Maven.ms-usuarios [clean].executor": "Run",
     "Maven.ms-usuarios [compile].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -124,7 +137,11 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -143,7 +160,7 @@
           <value>
             <map>
               <entry key="MsEurekaServerApplication" value="STOPPED" />
-              <entry key="MsGatewayApplication" value="STOPPED" />
+              <entry key="MsGatewayApplication" value="FAILED" />
               <entry key="MsReportesApplication" value="STOPPED" />
               <entry key="MsUsuariosApplication" value="STOPPED" />
             </map>
@@ -152,7 +169,38 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.MsUsuariosApplication">
+  <component name="RunManager" selected="Spring Boot.MsGatewayApplication">
+    <configuration name="ms-gateway [clean,install]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="install" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" value="pom.xml" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/ms-gateway" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
     <configuration name="MsEurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ms-eureka-server" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_eureka_server.MsEurekaServerApplication" />
@@ -163,6 +211,7 @@
     <configuration name="MsGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ms-gateway" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_gateway.MsGatewayApplication" />
+      <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -182,11 +231,17 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Maven.ms-gateway [clean,install]" />
       <item itemvalue="Spring Boot.MsGatewayApplication" />
       <item itemvalue="Spring Boot.MsUsuariosApplication" />
       <item itemvalue="Spring Boot.MsEurekaServerApplication" />
       <item itemvalue="Spring Boot.MsReportesApplication" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Maven.ms-gateway [clean,install]" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -208,7 +263,7 @@
       <workItem from="1774985945993" duration="4449000" />
       <workItem from="1775071019180" duration="1478000" />
       <workItem from="1775353656292" duration="11969000" />
-      <workItem from="1775432533740" duration="5523000" />
+      <workItem from="1775432533740" duration="9664000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />

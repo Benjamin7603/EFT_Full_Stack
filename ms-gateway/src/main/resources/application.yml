@@ -10,25 +10,18 @@ spring:
         locator:
           enabled: true
       mvc:
+        globalcors:
+          cors-configurations:
+            '[/**]':
+              allowedOrigins: "*"
+              allowedMethods: "*"
+              allowedHeaders: "*"
         routes:
-          # --- RUTAS PARA USUARIOS ---
-          - id: ms-usuarios-base
-            uri: lb://ms-usuarios
-            predicates:
-              - Path=/api/usuarios
-
-          - id: ms-usuarios-detalle
+          - id: ms-usuarios-route
             uri: lb://ms-usuarios
             predicates:
               - Path=/api/usuarios/**
-
-          # --- RUTAS PARA REPORTES ---
-          - id: ms-reportes-base
-            uri: lb://ms-reportes
-            predicates:
-              - Path=/api/reportes
-
-          - id: ms-reportes-detalle
+          - id: ms-reportes-route
             uri: lb://ms-reportes
             predicates:
               - Path=/api/reportes/**
@@ -37,3 +30,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
