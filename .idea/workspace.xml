@@ -6,6 +6,47 @@
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/src/main/java/com/duoc/ms_eureka_server/MsEurekaServerApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-eureka-server/src/test/java/com/duoc/ms_eureka_server/MsEurekaServerApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/java/com/duoc/ms_reportes/model/Reporte.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/java/com/duoc/ms_reportes/repository/ReporteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-reportes/src/test/java/com/duoc/ms_reportes/MsReporteApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/MsUsuariosApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/controller/UsuarioController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/exception/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/model/Usuario.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/repository/UsuarioRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/java/com/duoc/ms_usuarios/service/UsuarioService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/ms-usuarios/src/test/java/com/duoc/ms_usuarios/MsUsuariosApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-usuarios/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/src/main/java/com/duoc/ms_usuarios/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-usuarios/src/main/java/com/duoc/ms_usuarios/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-usuarios/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ms-usuarios/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,33 +97,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.MsEurekaServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsGatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsReportesApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsUsuariosApplication.executor&quot;: &quot;Run&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven.ms-gateway [clean].executor": "Run",
+    "Maven.ms-gateway [compile].executor": "Run",
+    "Maven.ms-usuarios [clean].executor": "Run",
+    "Maven.ms-usuarios [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.MsEurekaServerApplication.executor": "Run",
+    "Spring Boot.MsGatewayApplication.executor": "Run",
+    "Spring Boot.MsReportesApplication.executor": "Run",
+    "Spring Boot.MsUsuariosApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.configurations.included.in.services": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -107,7 +152,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.MsGatewayApplication">
+  <component name="RunManager" selected="Spring Boot.MsUsuariosApplication">
     <configuration name="MsEurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ms-eureka-server" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_eureka_server.MsEurekaServerApplication" />
@@ -163,7 +208,7 @@
       <workItem from="1774985945993" duration="4449000" />
       <workItem from="1775071019180" duration="1478000" />
       <workItem from="1775353656292" duration="11969000" />
-      <workItem from="1775432533740" duration="460000" />
+      <workItem from="1775432533740" duration="5523000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />

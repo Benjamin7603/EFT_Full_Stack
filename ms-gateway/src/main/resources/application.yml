@@ -9,20 +9,30 @@ spring:
       discovery:
         locator:
           enabled: true
-      routes:
-        # Regla para el microservicio de Usuarios
-        - id: ms-usuarios
-          uri: lb://ms-usuarios
-          predicates:
-            - Path=/api/usuarios/**
+      mvc:
+        routes:
+          # --- RUTAS PARA USUARIOS ---
+          - id: ms-usuarios-base
+            uri: lb://ms-usuarios
+            predicates:
+              - Path=/api/usuarios
 
-        # Regla para el microservicio de Reportes
-        - id: ms-reportes
-          uri: lb://ms-reportes
-          predicates:
-            - Path=/api/reportes/**
+          - id: ms-usuarios-detalle
+            uri: lb://ms-usuarios
+            predicates:
+              - Path=/api/usuarios/**
 
-# Configuración para que el Gateway se registre en Eureka
+          # --- RUTAS PARA REPORTES ---
+          - id: ms-reportes-base
+            uri: lb://ms-reportes
+            predicates:
+              - Path=/api/reportes
+
+          - id: ms-reportes-detalle
+            uri: lb://ms-reportes
+            predicates:
+              - Path=/api/reportes/**
+
 eureka:
   client:
     service-url:
