@@ -40,7 +40,9 @@ public class ReporteController {
 
     @Operation(summary = "Actualizar estado del reporte")
     @PatchMapping("/{id}/estado")
-    public Reporte actualizarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
+    public Reporte actualizarEstado(
+            @PathVariable("id") Long id,
+            @RequestParam("nuevoEstado") String nuevoEstado) {
         return reporteService.actualizarEstado(id, nuevoEstado);
     }
 }

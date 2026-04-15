@@ -2,6 +2,7 @@ package com.duoc.ms_reportes.service;
 
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.repository.ReporteRepository;
+import jakarta.persistence.EntityNotFoundException; // <-- Importación agregada para el manejo de errores
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -46,6 +47,6 @@ public class ReporteService {
         return reporteRepository.findById(id).map(reporte -> {
             reporte.setEstado(nuevoEstado);
             return reporteRepository.save(reporte);
-        }).orElse(null);
+        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe.")); // <-- Cambio aplicado aquí
     }
 }
