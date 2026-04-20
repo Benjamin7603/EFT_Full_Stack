@@ -1,18 +1,30 @@
 package com.duoc.ms_reportes.service;
 
+import com.duoc.ms_reportes.client.GeograficoClient;
+import com.duoc.ms_reportes.client.NotificacionClient;
+import com.duoc.ms_reportes.dto.NotificacionDTO;
+import com.duoc.ms_reportes.dto.UbicacionDTO;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.repository.ReporteRepository;
-import jakarta.persistence.EntityNotFoundException; // <-- Importación agregada para el manejo de errores
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class ReporteService {
 
     private final ReporteRepository reporteRepository;
+    private final GeograficoClient geograficoClient;
+    private final NotificacionClient notificacionClient;
 
-    public ReporteService(ReporteRepository reporteRepository) {
+    // Inyección de dependencias por constructor
+    public ReporteService(ReporteRepository reporteRepository,
+                          GeograficoClient geograficoClient,
+                          NotificacionClient notificacionClient) {
         this.reporteRepository = reporteRepository;
+        this.geograficoClient = geograficoClient;
+        this.notificacionClient = notificacionClient;
     }
 
     public Reporte crearReporteProcesado(Reporte datosEntrada) {
@@ -31,7 +43,25 @@ public class ReporteService {
             nuevoReporte.setPrioridad("MEDIA");
         }
 
-        return reporteRepository.save(nuevoReporte);
+        // 1. Guardamos el reporte en la BD
+        Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
+
+        // 2. Enviamos los datos validados a ms-geografico de forma directa
+        UbicacionDTO ubicacion = new UbicacionDTO(
+                reporteGuardado.getId(),
+                reporteGuardado.getLatitud(),
+                reporteGuardado.getLongitud()
+        );
+        geograficoClient.guardarUbicacion(ubicacion);
+
+        // 3. Enviamos los datos validados a ms-notificaciones de forma directa
+        NotificacionDTO alerta = new NotificacionDTO(
+                "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
+                "BRIGADAS_ZONA_SUR"
+        );
+        notificacionClient.enviarAlerta(alerta);
+
+        return reporteGuardado;
     }
 
     public List<Reporte> listarTodos() {
@@ -47,6 +77,6 @@ public class ReporteService {
         return reporteRepository.findById(id).map(reporte -> {
             reporte.setEstado(nuevoEstado);
             return reporteRepository.save(reporte);
-        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe.")); // <-- Cambio aplicado aquí
+        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
 }

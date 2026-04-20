@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/ms-eureka-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-geografico/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-notificaciones/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-reportes/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-usuarios/src/main/java" charset="UTF-8" />
   </component>

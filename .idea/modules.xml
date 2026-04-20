@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" filepath="$PROJECT_DIR$/.idea/EFT_Full_Stack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ms-notificaciones/ms-notificaciones.iml" filepath="$PROJECT_DIR$/ms-notificaciones/ms-notificaciones.iml" />
     </modules>
   </component>
 </project>

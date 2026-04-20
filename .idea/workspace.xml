@@ -5,10 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-eureka-server/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-gateway/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-geografico/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-geografico/src/main/java/com/duoc/ms_geografico/controller/GeograficoController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-geografico/src/main/java/com/duoc/ms_geografico/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-geografico/src/main/java/com/duoc/ms_geografico/model/Ubicacion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-geografico/src/main/java/com/duoc/ms_geografico/repository/UbicacionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/src/main/java/com/duoc/ms_notificaciones/MsNotificacionesApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/src/main/java/com/duoc/ms_notificaciones/controller/NotificacionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/src/main/java/com/duoc/ms_notificaciones/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/src/main/java/com/duoc/ms_notificaciones/model/Notificacion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-notificaciones/src/main/java/com/duoc/ms_notificaciones/repository/NotificacionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/client/GeograficoClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/client/NotificacionClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/dto/NotificacionDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/dto/UbicacionDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/MsReportesApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,52 +96,59 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Maven.ms-eureka-server [clean,install...].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-eureka-server [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-eureka-server [install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-gateway [clean,install...].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-gateway [clean,install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-gateway [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-gateway [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-gateway [install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-reportes [clean,install...].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-reportes [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-reportes [install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-usuarios [clean,install...].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-usuarios [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-usuarios [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.ms-usuarios [install].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.MsEurekaServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsGatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsReportesApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.MsUsuariosApplication.executor&quot;: &quot;Run&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.runner&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven.ms-eureka-server [clean,install...].executor": "Run",
+    "Maven.ms-eureka-server [clean].executor": "Run",
+    "Maven.ms-eureka-server [install].executor": "Run",
+    "Maven.ms-gateway [clean,install...].executor": "Run",
+    "Maven.ms-gateway [clean,install].executor": "Run",
+    "Maven.ms-gateway [clean].executor": "Run",
+    "Maven.ms-gateway [compile].executor": "Run",
+    "Maven.ms-gateway [install].executor": "Run",
+    "Maven.ms-geografico [clean,install...].executor": "Run",
+    "Maven.ms-geografico [install].executor": "Run",
+    "Maven.ms-notificaciones [clean,install...].executor": "Run",
+    "Maven.ms-notificaciones [install].executor": "Run",
+    "Maven.ms-reportes [clean,install...].executor": "Run",
+    "Maven.ms-reportes [clean].executor": "Run",
+    "Maven.ms-reportes [install].executor": "Run",
+    "Maven.ms-usuarios [clean,install...].executor": "Run",
+    "Maven.ms-usuarios [clean].executor": "Run",
+    "Maven.ms-usuarios [compile].executor": "Run",
+    "Maven.ms-usuarios [install].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.MsEurekaServerApplication.executor": "Run",
+    "Spring Boot.MsGatewayApplication.executor": "Run",
+    "Spring Boot.MsGeograficoApplication.executor": "Run",
+    "Spring Boot.MsNotificacionesApplication.executor": "Run",
+    "Spring Boot.MsReportesApplication.executor": "Run",
+    "Spring Boot.MsUsuariosApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.runner",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -131,16 +163,19 @@
         <entry key="SpringBootApplicationConfigurationType">
           <value>
             <map>
-              <entry key="MsEurekaServerApplication" value="FAILED" />
-              <entry key="MsGatewayApplication" value="FAILED" />
-              <entry key="MsUsuariosApplication" value="FAILED" />
+              <entry key="MsEurekaServerApplication" value="STOPPED" />
+              <entry key="MsGatewayApplication" value="STOPPED" />
+              <entry key="MsGeograficoApplication" value="STOPPED" />
+              <entry key="MsNotificacionesApplication" value="STOPPED" />
+              <entry key="MsReportesApplication" value="STOPPED" />
+              <entry key="MsUsuariosApplication" value="STOPPED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.MsEurekaServerApplication">
+  <component name="RunManager" selected="Spring Boot.MsUsuariosApplication">
     <configuration name="ms-gateway [clean,install]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
       <MavenSettings>
         <option name="myGeneralSettings" />
@@ -187,6 +222,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MsGeograficoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-geografico" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_geografico.MsGeograficoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsNotificacionesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-notificaciones" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_notificaciones.MsNotificacionesApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="MsReportesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ms-reportes" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_reportes.MsReportesApplication" />
@@ -203,6 +252,8 @@
     </configuration>
     <list>
       <item itemvalue="Maven.ms-gateway [clean,install]" />
+      <item itemvalue="Spring Boot.MsGeograficoApplication" />
+      <item itemvalue="Spring Boot.MsNotificacionesApplication" />
       <item itemvalue="Spring Boot.MsGatewayApplication" />
       <item itemvalue="Spring Boot.MsUsuariosApplication" />
       <item itemvalue="Spring Boot.MsEurekaServerApplication" />
@@ -241,7 +292,7 @@
       <workItem from="1776286462944" duration="1603000" />
       <workItem from="1776288080947" duration="1247000" />
       <workItem from="1776664244963" duration="756000" />
-      <workItem from="1776665060295" duration="1466000" />
+      <workItem from="1776665060295" duration="9210000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />

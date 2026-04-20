@@ -24,6 +24,14 @@ spring:
           uri: lb://MS-REPORTES
           predicates:
             - Path=/api/reportes/**
+        - id: ms-geografico-route
+          uri: lb://MS-GEOGRAFICO
+          predicates:
+            - Path=/api/geografico/**
+        - id: ms-notificaciones-route
+          uri: lb://MS-NOTIFICACIONES
+          predicates:
+            - Path=/api/notificaciones/**
 
 eureka:
   client:

@@ -8,6 +8,8 @@
         <option value="$PROJECT_DIR$/ms-usuarios/pom.xml" />
         <option value="$PROJECT_DIR$/ms-eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/ms-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-geografico/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-notificaciones/pom.xml" />
       </list>
     </option>
   </component>
