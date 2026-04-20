@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="048cace4-5905-4675-bd4c-31b796ddef69" name="Changes" comment="avance ms reportes">
-      <change afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/exception/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/controller/ReporteController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/java/com/duoc/ms_reportes/service/ReporteService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ms-reportes/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ms-gateway/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +67,6 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="3BUUrsfRNzS6rRDDQ3EIAuLDoHz" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -132,8 +126,21 @@
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="MsEurekaServerApplication" value="FAILED" />
+              <entry key="MsGatewayApplication" value="FAILED" />
+              <entry key="MsUsuariosApplication" value="FAILED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.MsReportesApplication">
+  <component name="RunManager" selected="Spring Boot.MsEurekaServerApplication">
     <configuration name="ms-gateway [clean,install]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
       <MavenSettings>
         <option name="myGeneralSettings" />
@@ -233,6 +240,8 @@
       <workItem from="1776286234319" duration="221000" />
       <workItem from="1776286462944" duration="1603000" />
       <workItem from="1776288080947" duration="1247000" />
+      <workItem from="1776664244963" duration="756000" />
+      <workItem from="1776665060295" duration="1466000" />
     </task>
     <task id="LOCAL-00001" summary="Valid integrado al ms usuario">
       <option name="closed" value="true" />

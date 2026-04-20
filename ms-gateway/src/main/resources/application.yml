@@ -9,22 +9,21 @@ spring:
       discovery:
         locator:
           enabled: true
-      mvc:
-        globalcors:
-          cors-configurations:
-            '[/**]':
-              allowedOrigins: "*"
-              allowedMethods: "*"
-              allowedHeaders: "*"
-        routes:
-          - id: ms-usuarios-route
-            uri: lb://ms-usuarios
-            predicates:
-              - Path=/api/usuarios/**
-          - id: ms-reportes-route
-            uri: lb://ms-reportes
-            predicates:
-              - Path=/api/reportes/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: ms-usuarios-route
+          uri: lb://MS-USUARIOS
+          predicates:
+            - Path=/api/usuarios/**
+        - id: ms-reportes-route
+          uri: lb://MS-REPORTES
+          predicates:
+            - Path=/api/reportes/**
 
 eureka:
   client:
@@ -32,5 +31,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-  instance:
-    prefer-ip-address: true
