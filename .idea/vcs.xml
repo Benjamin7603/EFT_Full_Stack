@@ -2,9 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ms-usuarios" vcs="Git" />
-  </component>
-  <component name="VcsProjectSettings">
-    <option name="detectVcsMappingsAutomatically" value="false" />
   </component>
 </project>
