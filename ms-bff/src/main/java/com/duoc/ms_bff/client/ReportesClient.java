@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "ms-reportes")
 public interface ReportesClient {
 
-    @GetMapping("/reportes")
+    @GetMapping("/api/reportes")
     Object obtenerReportes();
 }
