@@ -1,6 +1,6 @@
 services:
   eureka-server:
-    build: ./ms-eureka
+    build: ./ms-eureka-server
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -40,6 +40,8 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
+      - ms-geografico
+      - ms-notificaciones
     networks:
       - incendios-network
 
@@ -64,6 +66,21 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
+    networks:
+      - incendios-network
+
+  ms-bff:
+    build: ./ms-bff
+    container_name: ms-bff
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - ms-gateway
+      - ms-reportes
+      - ms-geografico
     networks:
       - incendios-network
 
