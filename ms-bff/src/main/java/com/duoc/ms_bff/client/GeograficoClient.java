@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "MS-GEOGRAFICO")
+@FeignClient(name = "ms-geografico")
 public interface GeograficoClient {
 
     @GetMapping("/api/geografico/reporte/{idReporte}")

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "MS-REPORTES")
+@FeignClient(name = "ms-reportes")
 public interface ReportesClient {
 
     @GetMapping("/api/reportes")
