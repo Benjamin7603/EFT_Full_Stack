@@ -11,4 +11,4 @@ COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8084
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "echo INICIANDO_APP && ls -la && java -version && java -jar app.jar"]
