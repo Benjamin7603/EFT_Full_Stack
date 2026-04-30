@@ -2,9 +2,9 @@ package com.duoc.ms_bff.controller;
 
 import com.duoc.ms_bff.client.GeograficoClient;
 import com.duoc.ms_bff.client.ReportesClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 public class BffController {
@@ -30,5 +30,22 @@ public class BffController {
     @GetMapping("/bff/geografico/reporte/{idReporte}")
     public Object obtenerUbicacionPorReporte(@PathVariable Long idReporte) {
         return geograficoClient.obtenerUbicacionPorReporte(idReporte);
+    }
+
+    @GetMapping("/bff/incendio/{id}")
+    public Object obtenerIncendioCompleto(@PathVariable Long id) {
+
+        Object reporte = reportesClient.obtenerReportePorId(id);
+        Object ubicacion = geograficoClient.obtenerUbicacionPorReporte(id);
+
+        return Map.of(
+                "reporte", reporte,
+                "ubicacion", ubicacion
+        );
+    }
+
+    @PostMapping("/bff/reportar-incendio")
+    public Object reportarIncendio(@RequestBody Object reporte) {
+        return reportesClient.crearReporte(reporte);
     }
 }

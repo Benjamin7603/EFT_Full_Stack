@@ -79,4 +79,9 @@ public class ReporteService {
             return reporteRepository.save(reporte);
         }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
+
+    public Reporte obtenerPorId(Long id) {
+        return reporteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado"));
+    }
 }

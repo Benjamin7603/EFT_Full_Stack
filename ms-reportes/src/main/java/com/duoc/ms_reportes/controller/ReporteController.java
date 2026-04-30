@@ -45,4 +45,9 @@ public class ReporteController {
             @RequestParam("nuevoEstado") String nuevoEstado) {
         return reporteService.actualizarEstado(id, nuevoEstado);
     }
+
+    @GetMapping("/{id}")
+    public Reporte obtenerPorId(@PathVariable Long id) {
+        return reporteService.obtenerPorId(id);
+    }
 }
