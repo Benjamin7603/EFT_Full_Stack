@@ -6,15 +6,21 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
             allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
       routes:
         - id: ms-usuarios-route
           uri: lb://MS-USUARIOS
@@ -45,7 +51,6 @@ management:
     web:
       exposure:
         include: health
-
   endpoint:
     health:
       show-details: always

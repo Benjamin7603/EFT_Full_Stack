@@ -1,12 +1,12 @@
 package com.duoc.ms_usuarios.controller;
 
 import com.duoc.ms_usuarios.model.Usuario;
-import com.duoc.ms_usuarios.repository.UsuarioRepository;
 import com.duoc.ms_usuarios.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class UsuarioController {
 
     @Operation(summary = "Agregar un nuevo usuario")
     @PostMapping
-    public Usuario agregar(@RequestBody Usuario usuario) {
+    public Usuario agregar(@Valid @RequestBody Usuario usuario) {
         return usuarioService.guardar(usuario);
     }
 
