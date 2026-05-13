@@ -3,6 +3,7 @@ package com.duoc.ms_reportes.service;
 import com.duoc.ms_reportes.client.GeograficoClient;
 import com.duoc.ms_reportes.client.NotificacionClient;
 import com.duoc.ms_reportes.dto.NotificacionDTO;
+import com.duoc.ms_reportes.dto.ReporteDTO;
 import com.duoc.ms_reportes.dto.UbicacionDTO;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.repository.ReporteRepository;
@@ -27,39 +28,47 @@ public class ReporteService {
         this.notificacionClient = notificacionClient;
     }
 
-    public Reporte crearReporteProcesado(Reporte datosEntrada) {
+    // AHORA RECIBE EL DTO
+    public Reporte crearReporteProcesado(ReporteDTO datosEntrada) {
+
+        // 1. Mapeamos los datos del DTO a la Entidad
         Reporte nuevoReporte = new Reporte();
         nuevoReporte.setLatitud(datosEntrada.getLatitud());
         nuevoReporte.setLongitud(datosEntrada.getLongitud());
         nuevoReporte.setDescripcion(datosEntrada.getDescripcion());
         nuevoReporte.setUrlMedia(datosEntrada.getUrlMedia());
-        nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
-        nuevoReporte.setEstado("NUEVO"); // Nos aseguramos que nazca como NUEVO
+        nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
 
-        if ("OFICIAL".equalsIgnoreCase(datosEntrada.getTipoUsuario())) {
-            nuevoReporte.setPrioridad("ALTA");
-        } else {
-            nuevoReporte.setPrioridad("MEDIA");
-        }
+        // Valores por defecto
+        nuevoReporte.setEstado("NUEVO");
+        nuevoReporte.setPrioridad("ALTA"); // Puedes ajustarlo según la lógica de tu app
 
-        // 1. Guardamos el reporte en la BD
+        // 2. Guardamos en Base de Datos
         Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
 
-        // 2. Enviamos los datos validados a ms-geografico de forma directa
-        UbicacionDTO ubicacion = new UbicacionDTO(
-                reporteGuardado.getId(),
-                reporteGuardado.getLatitud(),
-                reporteGuardado.getLongitud()
-        );
-        geograficoClient.guardarUbicacion(ubicacion);
+        // 3. Enviamos las coordenadas a ms-geografico de forma asíncrona o síncrona
+        try {
+            UbicacionDTO ubicacion = new UbicacionDTO(
+                    reporteGuardado.getId(),
+                    reporteGuardado.getLatitud(),
+                    reporteGuardado.getLongitud()
+            );
+            geograficoClient.guardarUbicacion(ubicacion);
+        } catch (Exception e) {
+            System.err.println("Atención: ms-geografico no está disponible en este momento.");
+        }
 
-        // 3. Enviamos los datos validados a ms-notificaciones de forma directa
-        NotificacionDTO alerta = new NotificacionDTO(
-                "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
-                "BRIGADAS_ZONA_SUR"
-        );
-        notificacionClient.enviarAlerta(alerta);
+        // 4. Enviamos los datos validados a ms-notificaciones de forma directa
+        try {
+            NotificacionDTO alerta = new NotificacionDTO(
+                    "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
+                    "BRIGADAS_ZONA_SUR"
+            );
+            notificacionClient.enviarAlerta(alerta);
+        } catch (Exception e) {
+            System.err.println("Atención: ms-notificaciones no está disponible en este momento.");
+        }
 
         return reporteGuardado;
     }
@@ -82,6 +91,6 @@ public class ReporteService {
 
     public Reporte obtenerPorId(Long id) {
         return reporteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
 }

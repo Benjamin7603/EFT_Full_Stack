@@ -5,17 +5,36 @@ spring:
   application:
     name: ms-bff
 
+# URLs de los microservicios — usadas por los Feign Clients
+# Dentro de Docker usan el nombre del contenedor, fuera usan localhost
+MS_GEOGRAFICO_URL: http://ms-geografico:8083
+MS_REPORTES_URL: http://ms-reportes:8081
+MS_USUARIOS_URL: http://ms-usuarios:8082
+MS_NOTIFICACIONES_URL: http://ms-notificaciones:8084
+
+# Feign: timeout generoso para evitar errores en cadena
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+
+jwt:
+  secret: ${JWT_SECRET:geofire-super-secret-key-2024-incendios-eft}
 
 management:
   endpoints:
     web:
       exposure:
         include: health
-
   endpoint:
     health:
       show-details: always

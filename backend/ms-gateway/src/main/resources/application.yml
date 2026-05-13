@@ -15,25 +15,36 @@ spring:
               - GET
               - POST
               - PUT
+              - PATCH
               - DELETE
               - OPTIONS
             allowedHeaders: "*"
+            exposedHeaders: "*"
       discovery:
         locator:
           enabled: true
       routes:
+        # ✅ NUEVO: Ruta de autenticación (login) — pública
+        - id: ms-auth-route
+          uri: lb://MS-USUARIOS
+          predicates:
+            - Path=/api/auth/**
+
         - id: ms-usuarios-route
           uri: lb://MS-USUARIOS
           predicates:
             - Path=/api/usuarios/**
+
         - id: ms-reportes-route
           uri: lb://MS-REPORTES
           predicates:
             - Path=/api/reportes/**
+
         - id: ms-geografico-route
           uri: lb://MS-GEOGRAFICO
           predicates:
             - Path=/api/geografico/**
+
         - id: ms-notificaciones-route
           uri: lb://MS-NOTIFICACIONES
           predicates:
@@ -54,3 +65,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+# ✅ NUEVO: misma clave que ms-usuarios (debe ser idéntica)
+jwt:
+  secret: ${JWT_SECRET:geofire-super-secret-key-2024-incendios-eft}
