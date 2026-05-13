@@ -1,21 +1,21 @@
+// src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logoImg from '../assets/logo.png';
-import './Dashboard.css'; // Importamos la magia visual
+import ReporteModal from '../components/ReporteModal';
+import './Dashboard.css';
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const [userName, setUserName] = useState("Usuario");
-    const [userInitial, setUserInitial] = useState("U");
-
-    // Estado para guardar los reportes que vengan de Java
+    const [userName, setUserName] = useState('Usuario');
+    const [userInitial, setUserInitial] = useState('U');
     const [reportes, setReportes] = useState([]);
+    const [mostrarModal, setMostrarModal] = useState(false);
 
     useEffect(() => {
-        // 1. Obtener nombre del usuario simulado
-        const storedNombre = localStorage.getItem('userNombre');
         const storedUsername = localStorage.getItem('userUsername');
+        const storedNombre   = localStorage.getItem('userNombre');
 
         if (storedUsername) {
             setUserName(storedUsername);
@@ -25,18 +25,21 @@ export default function Dashboard() {
             setUserInitial(storedNombre.charAt(0).toUpperCase());
         }
 
-        // 2. CONEXIÓN REAL AL BACKEND: Buscar reportes
         fetchReportes();
     }, []);
 
     const fetchReportes = async () => {
         try {
-            // Llama a tu microservicio pasando por el Gateway
             const response = await axios.get('http://localhost:8000/api/reportes');
             setReportes(response.data);
         } catch (error) {
-            console.error("Error cargando reportes. Asegúrate de que el Gateway y ms-reportes estén encendidos.", error);
+            console.error('Error cargando reportes. ¿Está el Gateway corriendo?', error);
         }
+    };
+
+    // Callback que llama el modal cuando el POST fue exitoso
+    const handleReporteCreado = () => {
+        fetchReportes(); // refresca la tabla automáticamente
     };
 
     const handleLogout = () => {
@@ -45,9 +48,22 @@ export default function Dashboard() {
         navigate('/');
     };
 
+    // Contadores derivados de los datos reales
+    const reportesActivos  = reportes.filter(r => r.estado === 'NUEVO' || r.estado === 'EN_PROGRESO').length;
+    const reportesResueltos = reportes.filter(r => r.estado === 'RESUELTO').length;
+
     return (
         <div className="dashboard-container">
-            {/* Barra de Navegación */}
+
+            {/* Modal — se renderiza encima de todo cuando mostrarModal es true */}
+            {mostrarModal && (
+                <ReporteModal
+                    onClose={() => setMostrarModal(false)}
+                    onReporteCreado={handleReporteCreado}
+                />
+            )}
+
+            {/* Navbar */}
             <nav className="dash-navbar">
                 <div className="nav-brand">
                     <img src={logoImg} alt="Logo" />
@@ -59,7 +75,6 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            {/* Contenido Principal */}
             <main className="dash-content">
 
                 {/* Banner de Bienvenida */}
@@ -71,28 +86,28 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Estadísticas (Grid 4 columnas) */}
+                {/* Estadísticas — ahora con datos reales */}
                 <div className="stats-grid">
                     <div className="glass-card stat-item">
                         <div className="stat-header">
                             <span className="stat-icon">🔥</span>
-                            <span>Alertas Activas Hoy</span>
+                            <span>Total Reportes</span>
                         </div>
                         <h3 className="stat-value">{reportes.length}</h3>
                     </div>
                     <div className="glass-card stat-item">
                         <div className="stat-header">
-                            <span className="stat-icon">📝</span>
-                            <span>Tus Reportes</span>
+                            <span className="stat-icon">⚡</span>
+                            <span>Activos / En Progreso</span>
                         </div>
-                        <h3 className="stat-value">0</h3>
+                        <h3 className="stat-value">{reportesActivos}</h3>
                     </div>
                     <div className="glass-card stat-item">
                         <div className="stat-header">
-                            <span className="stat-icon">🛡️</span>
-                            <span>Personal Operativo</span>
+                            <span className="stat-icon">✅</span>
+                            <span>Resueltos</span>
                         </div>
-                        <h3 className="stat-value">0</h3>
+                        <h3 className="stat-value">{reportesResueltos}</h3>
                     </div>
                     <div className="glass-card stat-item">
                         <div className="stat-header">
@@ -103,36 +118,40 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Sección Media (Acciones y Mapa) */}
+                {/* Sección Media */}
                 <div className="middle-grid">
 
                     {/* Acciones Rápidas */}
                     <div className="glass-card actions-card">
                         <h3>Acciones Rápidas</h3>
-                        <button className="btn-action btn-primary">
+                        {/* Al hacer click abre el modal */}
+                        <button
+                            className="btn-action btn-primary"
+                            onClick={() => setMostrarModal(true)}
+                        >
                             🚨 Reportar Incendio
                         </button>
                         <button className="btn-action btn-secondary">
                             🔔 Ver Notificaciones
                         </button>
-                        <hr style={{width: '100%', border: 'none', borderTop: '1px solid #eee', margin: '15px 0'}} />
-                        <div style={{display: 'flex', gap: '10px', color: '#666', fontSize: '0.9rem'}}>
-                            <span style={{cursor:'pointer'}}>⚙️ Configuración</span>
-                            <span style={{cursor:'pointer'}}>❓ Ayuda</span>
+                        <hr style={{ width: '100%', border: 'none', borderTop: '1px solid #eee', margin: '15px 0' }} />
+                        <div style={{ display: 'flex', gap: '10px', color: '#666', fontSize: '0.9rem' }}>
+                            <span style={{ cursor: 'pointer' }}>⚙️ Configuración</span>
+                            <span style={{ cursor: 'pointer' }}>❓ Ayuda</span>
                         </div>
                     </div>
 
-                    {/* Mapa Simulado */}
+                    {/* Mapa simulado */}
                     <div className="glass-card map-card">
                         <div className="map-badge">📍 Mapa de Alertas Activas</div>
-                        <p style={{fontStyle: 'italic', color: '#666', fontSize: '1.2rem'}}>
+                        <p style={{ fontStyle: 'italic', color: '#666', fontSize: '1.2rem' }}>
                             [ El mapa interactivo de Google se cargará aquí ]
                         </p>
                     </div>
 
                 </div>
 
-                {/* Tabla de Reportes Real */}
+                {/* Tabla de Reportes */}
                 <div className="glass-card table-card">
                     <div className="table-header">
                         <h2>Últimos Reportes Recibidos</h2>
@@ -141,21 +160,27 @@ export default function Dashboard() {
 
                     {reportes.length === 0 ? (
                         <div className="empty-state">
-                            <h3>No hay reportes en la base de datos en este momento.</h3>
-                            <p>Cuando crees un reporte en la aplicación, aparecerá mágicamente aquí.</p>
-                            <button className="btn-action btn-secondary" style={{marginTop: '15px', padding: '10px 20px'}}>
-                                Crear mi primer reporte
+                            <h3>No hay reportes aún.</h3>
+                            <p>Cuando crees un reporte aparecerá aquí automáticamente.</p>
+                            <button
+                                className="btn-action btn-secondary"
+                                style={{ marginTop: '15px', padding: '10px 20px' }}
+                                onClick={() => setMostrarModal(true)}
+                            >
+                                🚨 Crear mi primer reporte
                             </button>
                         </div>
                     ) : (
-                        <div style={{overflowX: 'auto'}}>
+                        <div style={{ overflowX: 'auto' }}>
                             <table className="reports-table">
                                 <thead>
                                 <tr>
-                                    <th>ID Alerta</th>
+                                    <th>ID</th>
                                     <th>Fecha</th>
                                     <th>Ubicación (Lat, Lng)</th>
                                     <th>Descripción</th>
+                                    <th>Tipo</th>
+                                    <th>Prioridad</th>
                                     <th>Estado</th>
                                 </tr>
                                 </thead>
@@ -163,11 +188,20 @@ export default function Dashboard() {
                                 {reportes.map((rep) => (
                                     <tr key={rep.id}>
                                         <td>#{rep.id}</td>
-                                        <td>{new Date(rep.fechaReporte).toLocaleString()}</td>
+                                        <td>{new Date(rep.fechaReporte).toLocaleString('es-CL')}</td>
                                         <td>{rep.latitud}, {rep.longitud}</td>
                                         <td>{rep.descripcion}</td>
+                                        <td>{rep.tipoUsuario}</td>
                                         <td>
-                                                <span className={`badge-riesgo ${rep.estado.toLowerCase()}`}>
+                                                <span className={`badge-riesgo ${rep.prioridad === 'ALTA' ? 'proceso' : 'nuevo'}`}>
+                                                    {rep.prioridad}
+                                                </span>
+                                        </td>
+                                        <td>
+                                                <span className={`badge-riesgo ${
+                                                    rep.estado === 'NUEVO'       ? 'nuevo'   :
+                                                        rep.estado === 'EN_PROGRESO' ? 'proceso' : 'resuelto'
+                                                }`}>
                                                     {rep.estado}
                                                 </span>
                                         </td>
