@@ -1,0 +1,296 @@
+/* src/pages/Dashboard.css */
+.dashboard-container {
+    min-height: 100vh;
+    background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, #f0f2f5 0%, #e0e2e5 100%);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #333;
+}
+
+/* Navbar */
+.dash-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-brand img {
+    height: 40px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.nav-brand h2 {
+    color: #FF7043;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.avatar {
+    background: #FF7043;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(255, 112, 67, 0.3);
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: #FF7043;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 112, 67, 0.1);
+    transform: scale(1.05);
+}
+
+/* Main Layout */
+.dash-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Glass Cards Genéricas */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Banner Bienvenida */
+.welcome-banner {
+    background: linear-gradient(135deg, #FF7043 30%, #FFAB40 90%);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    border: none;
+}
+
+.welcome-banner .avatar-large {
+    background: rgba(255,255,255,0.2);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    border: 3px solid rgba(255,255,255,0.5);
+}
+
+.welcome-text h1 { margin: 0 0 10px 0; font-weight: 900; }
+.welcome-text p { margin: 0; opacity: 0.9; font-size: 1.1rem; }
+
+/* Grid de Estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.stat-icon {
+    background: rgba(255, 112, 67, 0.15);
+    color: #FF7043;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 0;
+    text-align: right;
+    color: #333;
+}
+
+/* Contenedor Medio (Botones + Mapa) */
+.middle-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 25px;
+}
+
+@media (max-width: 900px) {
+    .middle-grid { grid-template-columns: 1fr; }
+}
+
+/* Acciones Rápidas */
+.actions-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.actions-card h3 { margin-top: 0; }
+
+.btn-action {
+    padding: 15px;
+    border-radius: 50px;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #FF7043 30%, #FFAB40 90%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 112, 67, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 112, 67, 0.4);
+    background: linear-gradient(45deg, #F4511E 30%, #FF9100 90%);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid #FF7043;
+    color: #FF7043;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 112, 67, 0.05);
+    transform: translateY(-3px);
+}
+
+/* Mapa Simulado */
+.map-card {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url("https://www.transparenttextures.com/patterns/cubes.png") #e0e2e5;
+}
+
+.map-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    color: #FF7043;
+}
+
+/* Tabla */
+.table-card { padding: 30px; }
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reports-table th, .reports-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.reports-table th {
+    color: #666;
+    font-weight: bold;
+}
+
+.reports-table tr:hover {
+    background: rgba(0,0,0,0.02);
+}
+
+.badge-riesgo {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-riesgo.nuevo { background: #E3F2FD; color: #1565C0; }
+.badge-riesgo.proceso { background: #FFF9C4; color: #FBC02D; }
+.badge-riesgo.resuelto { background: #C8E6C9; color: #2E7D32; }
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 16px;
+    color: #666;
+}
