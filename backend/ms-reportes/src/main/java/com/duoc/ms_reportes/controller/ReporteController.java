@@ -1,5 +1,6 @@
 package com.duoc.ms_reportes.controller;
 
+import com.duoc.ms_reportes.dto.ReporteDTO;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.service.ReporteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,8 +23,8 @@ public class ReporteController {
 
     @Operation(summary = "Enviar un nuevo reporte")
     @PostMapping
-    public Reporte crear(@Valid @RequestBody Reporte reporte) {
-        return reporteService.crearReporteProcesado(reporte);
+    public Reporte crear(@Valid @RequestBody ReporteDTO reporteDTO) { // AHORA RECIBE EL DTO
+        return reporteService.crearReporteProcesado(reporteDTO);
     }
 
     @Operation(summary = "Listar reportes históricos")
@@ -44,10 +45,5 @@ public class ReporteController {
             @PathVariable("id") Long id,
             @RequestParam("nuevoEstado") String nuevoEstado) {
         return reporteService.actualizarEstado(id, nuevoEstado);
-    }
-
-    @GetMapping("/{id}")
-    public Reporte obtenerPorId(@PathVariable Long id) {
-        return reporteService.obtenerPorId(id);
     }
 }

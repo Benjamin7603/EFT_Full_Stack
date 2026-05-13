@@ -1,9 +1,6 @@
 package com.duoc.ms_usuarios.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,13 +11,14 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Entity
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // <-- ¡ESTA ES LA MAGIA PARA POSTGRES!
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio.")
@@ -31,12 +29,16 @@ public class Usuario {
 
     @Email(message = "El correo no tiene un formato valido")
     @NotBlank(message = "El correo es un campo obligatorio")
+    @Column(unique = true, nullable = false) // <-- EVITA CORREOS REPETIDOS
     private String email;
 
     private String telefono;
     private Date fechaNacimiento;
-    private String rol;
+    private String rol = "USER";
+
+    @Column(unique = true, nullable = false) // <-- EVITA USERNAMES REPETIDOS
     private String username;
+
     private String password;
     private Boolean activo = true;
 }

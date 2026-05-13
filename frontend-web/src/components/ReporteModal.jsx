@@ -1,6 +1,6 @@
 // src/components/ReporteModal.jsx
 import { useState, useRef } from 'react';
-import axios from 'axios';
+import api from '../api/api'; // ← instancia con JWT automático
 import './ReporteModal.css';
 
 export default function ReporteModal({ onClose, onReporteCreado }) {
@@ -78,19 +78,17 @@ export default function ReporteModal({ onClose, onReporteCreado }) {
         setShowError(false);
 
         try {
-            // Por ahora enviamos JSON con urlMedia null (o el nombre del archivo como referencia).
-            // Cuando el backend tenga un endpoint de subida de archivos (S3, Cloudinary, etc.),
-            // aquí se subirá primero el archivo y se obtendrá la URL real.
+            // usuarioId viene del token guardado en localStorage tras el login
             const payload = {
                 latitud: lat,
                 longitud: lng,
                 descripcion: formData.descripcion.trim(),
                 tipoUsuario: formData.tipoUsuario,
-                urlMedia: archivo ? archivo.name : null, // TODO: reemplazar por URL real tras subida
-                usuarioId: formData.usuarioId,
+                urlMedia: archivo ? archivo.name : null,
+                usuarioId: Number(localStorage.getItem('usuarioId')) || 1,
             };
 
-            await axios.post('http://localhost:8000/api/reportes', payload);
+            await api.post('/api/reportes', payload);
 
             setExito(true);
 

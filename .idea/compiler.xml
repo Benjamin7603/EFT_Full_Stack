@@ -12,7 +12,7 @@
         <module name="ms-notificaciones" />
         <module name="ms-gateway" />
       </profile>
-      <profile name="Annotation profile for ms-usuarios" enabled="true">
+      <profile name="Annotation profile for ms-bff" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "ms-reportes", url = "${MS_REPORTES_URL}")
+@FeignClient(name = "ms-reportes", url = "${MS_REPORTES_URL:http://ms-reportes:8081}")
 public interface ReportesClient {
 
     @GetMapping("/api/reportes")
