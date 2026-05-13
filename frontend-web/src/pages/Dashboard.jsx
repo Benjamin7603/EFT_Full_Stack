@@ -29,12 +29,16 @@ export default function Dashboard() {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [nuevoReporte, setNuevoReporte] = useState({
         descripcion: "",
-        latitud: -41.4693,
+        latitud: -41.4693, // Puerto Montt por defecto
         longitud: -72.9424,
         prioridad: "MEDIA",
         tipoUsuario: "CIUDADANO",
         usuarioId: 1
     });
+
+    // --- NUEVOS ESTADOS PARA LA BÚSQUEDA ---
+    const [busqueda, setBusqueda] = useState("");
+    const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
 
     useEffect(() => {
         const storedNombre = localStorage.getItem('userNombre');
@@ -51,7 +55,6 @@ export default function Dashboard() {
         fetchReportes();
     }, []);
 
-    // 1. FUNCIÓN CLAVE: Adjunta el Token de seguridad a las peticiones de Axios
     const tokenConfig = () => {
         const token = localStorage.getItem('token');
         return {
@@ -61,7 +64,6 @@ export default function Dashboard() {
         };
     };
 
-    // 2. FETCH SEGURO: Pide los reportes enviando el Token a Java
     const fetchReportes = async () => {
         try {
             const response = await axios.get('http://localhost:8000/api/reportes', tokenConfig());
@@ -76,15 +78,31 @@ export default function Dashboard() {
         navigate('/login');
     };
 
-    // 3. ENVÍO SEGURO Y VALIDADO DEL DTO
+    // --- MAGIA DEL BUSCADOR: Consulta a OpenStreetMap ---
+    const buscarDireccion = async () => {
+        if (!busqueda) return;
+        try {
+            const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${busqueda}&addressdetails=1&limit=5`);
+            setResultadosBusqueda(response.data);
+        } catch (error) {
+            console.error("Error buscando la dirección:", error);
+        }
+    };
+
+    // --- GUARDA LAS COORDENADAS OCULTAS AL ELEGIR UN RESULTADO ---
+    const seleccionarUbicacion = (lat, lon, nombreLugar) => {
+        setNuevoReporte({ ...nuevoReporte, latitud: parseFloat(lat), longitud: parseFloat(lon) });
+        setBusqueda(nombreLugar); // Dejamos el nombre bonito en la barra
+        setResultadosBusqueda([]); // Cerramos la lista
+    };
+
     const handleEnviarReporte = async (e) => {
         e.preventDefault();
         try {
-            // Preparamos los datos tal y como los pide el DTO en Java
             const payload = {
                 ...nuevoReporte,
-                urlMedia: "", // Para que el backend no rechace el DTO
-                usuarioId: parseInt(localStorage.getItem('userId')) || 1 // Idealmente amarrado al login
+                urlMedia: "",
+                usuarioId: parseInt(localStorage.getItem('userId')) || 1
             };
 
             await axios.post('http://localhost:8000/api/reportes', payload, tokenConfig());
@@ -92,16 +110,15 @@ export default function Dashboard() {
             alert("✅ ¡Reporte enviado correctamente!");
             setMostrarModal(false);
 
-            // Limpia descripción y prioridad, mantiene latitud y longitud
+            // Limpia el formulario
             setNuevoReporte({ ...nuevoReporte, descripcion: "", prioridad: "MEDIA" });
+            setBusqueda("");
 
             fetchReportes();
         } catch (error) {
             console.error("Error al enviar reporte:", error.response || error);
 
-            // Manejador Inteligente de Errores:
             if (error.response?.status === 400 && error.response?.data) {
-                // Lee el JSON de errores del GlobalExceptionHandler y lo muestra bonito
                 const mensajes = Object.values(error.response.data).join('\n');
                 alert("⚠️ Error en el formulario:\n" + mensajes);
             }
@@ -259,7 +276,7 @@ export default function Dashboard() {
                 </div>
             </main>
 
-            {/* MODAL */}
+            {/* MODAL CON NUEVA BÚSQUEDA */}
             {mostrarModal && (
                 <div className="modal-overlay">
                     <div className="modal-card">
@@ -279,28 +296,50 @@ export default function Dashboard() {
                                     required
                                 />
                             </div>
-                            <div className="location-inputs">
-                                <div className="input-group">
-                                    <label>Latitud</label>
+
+                            {/* --- AQUÍ ESTÁ EL NUEVO BUSCADOR --- */}
+                            <div className="input-group">
+                                <label>Buscar Ubicación</label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
                                     <input
-                                        type="number" step="any"
+                                        type="text"
                                         className="input-field"
-                                        value={nuevoReporte.latitud}
-                                        onChange={(e) => setNuevoReporte({...nuevoReporte, latitud: parseFloat(e.target.value)})}
-                                        required
+                                        placeholder="Ej: Mall Paseo Costanera, Puerto Montt"
+                                        value={busqueda}
+                                        onChange={(e) => setBusqueda(e.target.value)}
+                                        style={{ flex: 1 }}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={buscarDireccion}
+                                        className="btn-guardar"
+                                        style={{ width: 'auto', padding: '10px 20px', display: 'flex', alignItems: 'center' }}
+                                    >
+                                        🔍 Buscar
+                                    </button>
                                 </div>
-                                <div className="input-group">
-                                    <label>Longitud</label>
-                                    <input
-                                        type="number" step="any"
-                                        className="input-field"
-                                        value={nuevoReporte.longitud}
-                                        onChange={(e) => setNuevoReporte({...nuevoReporte, longitud: parseFloat(e.target.value)})}
-                                        required
-                                    />
-                                </div>
+
+                                {/* Resultados desplegables */}
+                                {resultadosBusqueda.length > 0 && (
+                                    <ul style={{
+                                        background: 'white', border: '1px solid #ccc',
+                                        borderRadius: '8px', listStyle: 'none',
+                                        padding: '0', marginTop: '5px', maxHeight: '150px',
+                                        overflowY: 'auto'
+                                    }}>
+                                        {resultadosBusqueda.map((lugar) => (
+                                            <li
+                                                key={lugar.place_id}
+                                                style={{ padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer', fontSize: '0.9rem' }}
+                                                onClick={() => seleccionarUbicacion(lugar.lat, lugar.lon, lugar.display_name)}
+                                            >
+                                                {lugar.display_name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
+
                             <div className="input-group">
                                 <label>Prioridad</label>
                                 <select
