@@ -1,6 +1,23 @@
+version: '3.8'
+
 services:
+  postgres-db:
+    image: postgres:15
+    container_name: eft-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: eft_incendios
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - incendios-network
+    restart: always
+
   eureka-server:
-    build: ./ms-eureka-server
+    build: ./backend/ms-eureka-server
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -8,74 +25,84 @@ services:
       - incendios-network
 
   ms-gateway:
-    build: ./ms-gateway
+    build: ./backend/ms-gateway
     container_name: ms-gateway
     ports:
       - "8000:8000"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_URL=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
     networks:
       - incendios-network
 
   ms-usuarios:
-    build: ./ms-usuarios
+    build: ./backend/ms-usuarios
     container_name: ms-usuarios
     ports:
       - "8082:8082"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_URL=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
+      - postgres-db
     networks:
       - incendios-network
 
   ms-reportes:
-    build: ./ms-reportes
+    build: ./backend/ms-reportes
     container_name: ms-reportes
     ports:
       - "8081:8081"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - MS_GEOGRAFICO_URL=http://ms-geografico:8083
+      - MS_NOTIFICACIONES_URL=http://ms-notificaciones:8084
     depends_on:
       - eureka-server
+      - postgres-db
       - ms-geografico
       - ms-notificaciones
     networks:
       - incendios-network
 
   ms-geografico:
-    build: ./ms-geografico
+    build: ./backend/ms-geografico
     container_name: ms-geografico
     ports:
       - "8083:8083"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_URL=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
+      - postgres-db
     networks:
       - incendios-network
 
   ms-notificaciones:
-    build: ./ms-notificaciones
+    build: ./backend/ms-notificaciones
     container_name: ms-notificaciones
     ports:
       - "8084:8084"
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_URL=http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
+      - postgres-db
     networks:
       - incendios-network
 
   ms-bff:
-    build: ./ms-bff
+    build: ./backend/ms-bff
     container_name: ms-bff
     ports:
       - "8085:8085"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - MS_GEOGRAFICO_URL=http://ms-geografico:8083
+      - MS_REPORTES_URL=http://ms-reportes:8081
+      - MS_USUARIOS_URL=http://ms-usuarios:8082
+      - MS_NOTIFICACIONES_URL=http://ms-notificaciones:8084
     depends_on:
       - eureka-server
       - ms-gateway

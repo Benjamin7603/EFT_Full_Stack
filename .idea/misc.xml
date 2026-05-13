@@ -11,6 +11,13 @@
         <option value="$PROJECT_DIR$/ms-geografico/pom.xml" />
         <option value="$PROJECT_DIR$/ms-eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/ms-notificaciones/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-usuarios/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-reportes/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-notificaciones/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-geografico/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-bff/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/ms-eureka-server/pom.xml" />
       </list>
     </option>
   </component>
