@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d6215223-b9c7-4c2d-af26-beaef12b8c8a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend-web/.dockerignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend-web/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ms-gateway/src/main/java/com/duoc/ms_gateway/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/ms-gateway/src/main/java/com/duoc/ms_gateway/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/loose-envify" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/loose-envify.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.bin/loose-envify.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.dev.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.dev.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.umd.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/dist/index.umd.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/src/index.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/js-api-loader/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/core.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/core.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/grid.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/grid.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/noop.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/supercluster.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/supercluster.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/superviewport.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/superviewport.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/utils.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/algorithms/utils.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/cluster.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/cluster.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.dev.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.esm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.esm.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.umd.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/index.umd.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/marker-utils.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/marker-utils.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/markerclusterer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/markerclusterer.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/overlay-view-safe.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/dist/renderer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@googlemaps/markerclusterer/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/GoogleMap.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/LoadScript.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/LoadScriptNext.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/__tests__/components/circle.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/cjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/cjs.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/cjs.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/cjs.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/addons/GoogleMarkerClusterer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/addons/InfoBox.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/addons/MarkerClusterer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/directions/DirectionsRenderer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/directions/DirectionsService.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/distance-matrix/DistanceMatrixService.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/dom/Overlay.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/dom/OverlayView.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/dom/dom-helper.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Circle.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Data.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/DrawingManager.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/InfoWindow.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Marker.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Polygon.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Polyline.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/drawing/Rectangle.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/heatmap/HeatmapLayer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/kml/KmlLayer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/maps/BicyclingLayer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/maps/TrafficLayer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/maps/TransitLayer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/overlays/GroundOverlay.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/places/Autocomplete.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/places/StandaloneSearchBox.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/streetview/StreetViewPanorama.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/components/streetview/StreetViewService.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/docs/DocsApiKeyInput.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/docs/ScriptLoaded.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/docs/docs-api-key.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/esm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/esm.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/esm.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/esm.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/map-context.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/umd.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/umd.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/umd.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/umd.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/useJsApiLoader.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/useLoadScript.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/foreach.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/helper.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/injectscript.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/isbrowser.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/make-load-script-url.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/noop.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/prevent-google-fonts.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/dist/utils/reduce.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/GoogleMap.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/GoogleMap.stories.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/GoogleMap.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/LoadScript.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/LoadScriptNext.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/LoadScriptNext.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/__tests__/components/circle.test.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/__tests__/utils/helper.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/__tests__/utils/injectscript.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/GoogleMarkerClusterer.stories.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/GoogleMarkerClusterer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/InfoBox.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/InfoBox.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/MarkerClusterer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/MarkerClusterer.stories.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/MarkerClusterer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/addons/MarkerClustererF.stories.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/directions/DirectionsRenderer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/directions/DirectionsRenderer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/directions/DirectionsService.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/distance-matrix/DistanceMatrixService.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/dom/Overlay.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/dom/OverlayView.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/dom/OverlayView.stories.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/dom/OverlayView.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/dom/dom-helper.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Circle.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Circle.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Data.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Data.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/DrawingManager.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/DrawingManager.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/InfoWindow.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/InfoWindow.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Marker.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Marker.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Polygon.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Polygon.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Polyline.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Polyline.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Rectangle.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/drawing/Rectangle.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/heatmap/HeatmapLayer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/heatmap/HeatmapLayer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/kml/KmlLayer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/kml/KmlLayer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/BicyclingLayer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/BicyclingLayer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/TrafficLayer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/TrafficLayer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/TransitLayer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/maps/TransitLayer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/overlays/GroundOverlay.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/overlays/GroundOverlay.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/places/Autocomplete.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/places/Autocomplete.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/places/StandaloneSearchBox.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/places/StandaloneSearchBox.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/streetview/StreetViewPanorama.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/streetview/StreetViewPanorama.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/streetview/StreetViewService.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/components/streetview/StreetViewService.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/DocsApiKeyInput.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/ScriptLoaded.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/docs-api-key.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/getting-started.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/docs/introduction.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/map-context.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/setup-tests.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/types.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/useGoogleMap.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/useJsApiLoader.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/useJsApiLoader.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/useLoadScript.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/useLoadScript.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/foreach.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/helper.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/injectscript.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/isbrowser.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/make-load-script-url.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/noop.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/prevent-google-fonts.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/api/src/utils/reduce.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/InfoBox.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/cjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/cjs.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/cjs.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/cjs.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/esm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/esm.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/esm.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/esm.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/umd.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/umd.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/umd.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/dist/umd.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/src/InfoBox.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/infobox/src/types.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/Cluster.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/ClusterIcon.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/Clusterer.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/__tests__/clusterer.test.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/cjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/cjs.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/cjs.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/cjs.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/esm.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/esm.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/esm.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/esm.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/types.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/umd.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/umd.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/umd.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/dist/umd.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/Cluster.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/ClusterIcon.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/Clusterer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/__tests__/clusterer.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@react-google-maps/marker-clusterer/src/types.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@types/google.maps/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@types/google.maps/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@types/google.maps/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/@types/google.maps/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/es6/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/es6/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/es6/react.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/es6/react.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/react.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/fast-deep-equal/react.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/browser.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/invariant.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/invariant.js.flow" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/invariant/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/js-tokens/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/js-tokens/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/js-tokens/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/js-tokens/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/js-tokens/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/index.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/kdbush.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/kdbush.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/kdbush/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/cli.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/custom.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/loose-envify.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/loose-envify/replace.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-client.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-client.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-profiling.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-profiling.profiling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server-legacy.browser.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server-legacy.node.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.browser.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.browser.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.bun.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.bun.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.edge.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.edge.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.node.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-server.node.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-test-utils.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom-test-utils.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom.react-server.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/cjs/react-dom.react-server.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/client.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/client.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/profiling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/profiling.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/react-dom.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.browser.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.bun.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.edge.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.node.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/server.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/static.browser.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/static.edge.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/static.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/static.node.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/static.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react-dom/test-utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-compiler-runtime.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-compiler-runtime.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-compiler-runtime.profiling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-dev-runtime.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-dev-runtime.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-dev-runtime.profiling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-dev-runtime.react-server.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-dev-runtime.react-server.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-runtime.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-runtime.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-runtime.profiling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-runtime.react-server.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react-jsx-runtime.react-server.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react.react-server.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/cjs/react.react-server.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/compiler-runtime.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/jsx-dev-runtime.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/jsx-dev-runtime.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/jsx-runtime.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/jsx-runtime.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/react/react.react-server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler-unstable_mock.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler-unstable_mock.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler-unstable_post_task.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler-unstable_post_task.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler.native.development.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler.native.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/cjs/scheduler.production.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/index.native.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/unstable_mock.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/scheduler/unstable_post_task.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/dist/supercluster.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/dist/supercluster.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/supercluster/package.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;carlitroxxx&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Benjamin7603/EFT_Full_Stack.git&quot;,
+    &quot;accountId&quot;: &quot;9974ac3b-d532-4999-85b3-f45d7eec579b&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3DrWbH6urxD9PSdLjv5p4GyRReC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "despliegue",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.configurations.included.in.services": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.MsNotificacionesApplication">
+    <configuration name="MsBffApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="ms-bff" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_bff.MsBffApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsEurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-eureka-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_eureka_server.MsEurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_gateway.MsGatewayApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsGeograficoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-geografico" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_geografico.MsGeograficoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsNotificacionesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-notificaciones" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_notificaciones.MsNotificacionesApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsReportesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-reportes" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_reportes.MsReportesApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MsUsuariosApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ms-usuarios" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.duoc.ms_usuarios.MsUsuariosApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.33" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d6215223-b9c7-4c2d-af26-beaef12b8c8a" name="Changes" comment="" />
+      <created>1779040740499</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779040740499</updated>
+      <workItem from="1779040742637" duration="2409000" />
+      <workItem from="1779043967997" duration="4210000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
