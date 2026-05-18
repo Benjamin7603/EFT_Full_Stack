@@ -41,3 +41,71 @@ El backend está orquestado mediante los siguientes componentes principales:
 ## 👨‍💻 Equipo de Desarrollo
 * **Benjamin García (Fullstack Developer):** Responsable del diseño e implementación de la arquitectura de microservicios, configuración de base de datos en la nube (Supabase) y redacción de la documentación técnica y arquitectónica.
 * **Carlos Moil (Backend & Software Architect):** Encargado de la creación de la interfaz de usuario móvil mediante Kotlin y Jetpack Compose, integración de APIs (Retrofit), validaciones de seguridad de datos y creación de pruebas unitarias.
+
+---
+
+## Flujo de trabajo GitFlow
+Para este proyecto se utiliza una metodología llamada GitFlow, para organizar el desarrollo del proyecto y mantener estabilidad en la rama principal.
+### 1. Actualizar la rama principal
+Antes de empezar a desarrollar el proyecto.
+```bash
+git checkout main
+git pull origin main
+```
+### 2. Crear nueva rama feature
+Ya desarrollado el proyecto crear la rama feature/cambio.
+```bash
+git checkout -b feature/nombre-feature
+```
+Ejemplo:
+
+```bash
+git checkout -b feature/cors-fix
+```
+### 3. Guardar cambios
+   Agregar cambios:
+
+```bash
+git add .
+```
+
+Crear commit:
+
+```bash
+git commit -m "fix: configuración CORS para frontend dockerizado"
+```
+### 4. Subir rama al repositorio remoto
+```bash
+git push -u origin feature/nombre-feature
+```
+Ejemplo:
+
+```bash
+git push -u origin feature/cors-fix
+```
+### 5. Realizar Merge hacia main
+Ir al repositorio en github y presionar "Compare & pull request"
+1. Crear Pull Request desde `feature/nombre-feature` hacia `main`
+2. Revisar cambios
+3. Realizar merge
+### 6. Eliminar rama feature
+Eliminar rama local:
+
+```bash
+git branch -d feature/nombre-feature
+```
+
+Eliminar rama remota:
+
+```bash
+git push origin --delete feature/nombre-feature
+```
+## Estructura de ramas utilizada
+
+| Tipo de rama | Propósito |
+|---|---|
+| `main` | Rama principal estable |
+| `feature/*` | Nuevas funcionalidades o mejoras |
+| `fix/*` | Corrección de errores |
+| `hotfix/*` | Correcciones urgentes en producción |
+---
