@@ -23,6 +23,7 @@ services:
       - "8761:8761"
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-gateway:
     build: ./backend/ms-gateway
@@ -35,6 +36,7 @@ services:
       - eureka-server
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-usuarios:
     build: ./backend/ms-usuarios
@@ -48,6 +50,7 @@ services:
       - postgres-db
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-reportes:
     build: ./backend/ms-reportes
@@ -65,6 +68,7 @@ services:
       - ms-notificaciones
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-geografico:
     build: ./backend/ms-geografico
@@ -78,6 +82,7 @@ services:
       - postgres-db
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-notificaciones:
     build: ./backend/ms-notificaciones
@@ -91,6 +96,7 @@ services:
       - postgres-db
     networks:
       - incendios-network
+    restart: unless-stopped
 
   ms-bff:
     build: ./backend/ms-bff
@@ -110,6 +116,20 @@ services:
       - ms-geografico
     networks:
       - incendios-network
+    restart: unless-stopped
+
+  frontend-web:
+    build:
+      context: ./frontend-web
+    container_name: frontend-web
+    ports:
+      - "80:80"
+    depends_on:
+      - ms-bff
+      - ms-gateway
+    networks:
+      - incendios-network
+    restart: unless-stopped
 
 networks:
   incendios-network:
