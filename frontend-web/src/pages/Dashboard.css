@@ -437,6 +437,120 @@
 
 .btn-cancelar:hover { background: #f8f9fa; }
 
+.weather-banner {
+    margin-top: 28px;
+
+    background: linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8fafc 100%
+    );
+
+    border-radius: 22px;
+
+    padding: 24px 30px;
+
+    border-left: 6px solid #ff6b35;
+
+    box-shadow:
+            0 10px 30px rgba(15, 23, 42, 0.05);
+
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.weather-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #102a43;
+}
+
+/* GRID */
+
+.weather-content {
+    display: grid;
+
+    grid-template-columns:
+            repeat(7, 1fr);
+
+    gap: 18px;
+}
+
+/* ITEMS */
+
+.weather-item {
+    background: #f8fafc;
+    border-radius: 18px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: 0.2s ease;
+    min-height: 82px;
+    box-shadow: inset 0 0 0 1px rgba(226,232,240,0.7);
+    flex-direction: column;
+}
+
+.weather-item:hover {
+    transform: translateY(-2px);
+}
+
+/* TEMPERATURA */
+
+.weather-temp {
+    background: #fff4ef;
+}
+
+.weather-temp strong {
+
+    font-size: 2.2rem;
+    font-weight: 800;
+
+    color: #ff6b35;
+}
+
+/* ICONOS */
+
+.weather-icon {
+    font-size: 1.3rem;
+}
+
+/* TEXTOS */
+
+.weather-item span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334e68;
+}
+
+/* RIESGO */
+
+.weather-risk {
+
+    font-weight: 700;
+    border: none;
+}
+
+.risk-bajo {
+    background: rgba(72, 187, 120, 0.12);
+    color: #2f855a;
+}
+
+.risk-moderado {
+    background: rgba(237, 137, 54, 0.14);
+    color: #dd6b20;
+}
+
+.risk-alto {
+    background: rgba(245, 101, 101, 0.14);
+    color: #e53e3e;
+}
 .btn-guardar {
     background: #FF7043;
     border: none;
@@ -461,8 +575,43 @@
 }
 
 /* Responsividad básica */
+@media (max-width: 1200px) {
+    .weather-hide-mobile {
+        display: none;
+    }
+    .weather-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 992px) {
     .map-section {
+        grid-template-columns: 1fr;
+    }
+
+}
+@media (max-width: 768px) {
+    .weather-hide-mobile {
+        display: none;
+    }
+
+    .weather-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .weather-title {
+        font-size: 1.1rem;
+    }
+
+    .weather-temp strong {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 500px) {
+
+    .weather-content {
         grid-template-columns: 1fr;
     }
 }
