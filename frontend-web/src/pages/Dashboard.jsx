@@ -671,6 +671,91 @@ export default function Dashboard() {
                 </div>
 
             </main>
+            {/* MODAL CON NUEVA BÚSQUEDA */}
+            {mostrarModal && (
+                <div className="modal-overlay">
+                    <div className="modal-card">
+                        <div className="modal-header">
+                            <h2>Crear Alerta Geográfica</h2>
+                            <button className="close-btn" onClick={() => setMostrarModal(false)}>&times;</button>
+                        </div>
+                        <form className="modal-form" onSubmit={handleEnviarReporte}>
+                            <div className="input-group">
+                                <label>Descripción de la emergencia</label>
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    placeholder="Ej: Incendio forestal cerca de la ruta 5"
+                                    value={nuevoReporte.descripcion}
+                                    onChange={(e) => setNuevoReporte({...nuevoReporte, descripcion: e.target.value})}
+                                    required
+                                />
+                            </div>
+
+                            {/* --- AQUÍ ESTÁ EL NUEVO BUSCADOR --- */}
+                            <div className="input-group">
+                                <label>Buscar Ubicación</label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Ej: Mall Paseo Costanera, Puerto Montt"
+                                        value={busqueda}
+                                        onChange={(e) => setBusqueda(e.target.value)}
+                                        style={{ flex: 1 }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={buscarDireccion}
+                                        className="btn-guardar"
+                                        style={{ width: 'auto', padding: '10px 20px', display: 'flex', alignItems: 'center' }}
+                                    >
+                                        🔍 Buscar
+                                    </button>
+                                </div>
+
+                                {/* Resultados desplegables */}
+                                {resultadosBusqueda.length > 0 && (
+                                    <ul style={{
+                                        background: 'white', border: '1px solid #ccc',
+                                        borderRadius: '8px', listStyle: 'none',
+                                        padding: '0', marginTop: '5px', maxHeight: '150px',
+                                        overflowY: 'auto'
+                                    }}>
+                                        {resultadosBusqueda.map((lugar) => (
+                                            <li
+                                                key={lugar.place_id}
+                                                style={{ padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer', fontSize: '0.9rem' }}
+                                                onClick={() => seleccionarUbicacion(lugar.lat, lugar.lon, lugar.display_name)}
+                                            >
+                                                {lugar.display_name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
+                            <div className="input-group">
+                                <label>Prioridad</label>
+                                <select
+                                    className="input-field"
+                                    value={nuevoReporte.prioridad}
+                                    onChange={(e) => setNuevoReporte({...nuevoReporte, prioridad: e.target.value})}
+                                >
+                                    <option value="ALTA">Alta</option>
+                                    <option value="MEDIA">Media</option>
+                                    <option value="BAJA">Baja</option>
+                                </select>
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="button" className="btn-cancelar" onClick={() => setMostrarModal(false)}>Cancelar</button>
+                                <button type="submit" className="btn-guardar">Enviar Reporte</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
