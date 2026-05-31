@@ -11,7 +11,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+/**
+ * Servicio encargado de la gestión y procesamiento de reportes de incendios.
+ * Coordina la persistencia de incidentes y la comunicación inter-servicio con los
+ * microservicios geográfico y de notificaciones.
+ */
 @Service
 public class ReporteService {
 
@@ -19,7 +23,12 @@ public class ReporteService {
     private final GeograficoClient geograficoClient;
     private final NotificacionClient notificacionClient;
 
-    // Inyección de dependencias por constructor
+    /**
+     * Constructor para la inyección de dependencias requeridas por el servicio de reportes.
+     * @param reporteRepository Repositorio para el acceso a datos y persistencia de reportes.
+     * @param geograficoClient Cliente de comunicación para el microservicio geográfico.
+     * @param notificacionClient Cliente de comunicación para el microservicio de notificaciones.
+     */
     public ReporteService(ReporteRepository reporteRepository,
                           GeograficoClient geograficoClient,
                           NotificacionClient notificacionClient) {
@@ -28,10 +37,16 @@ public class ReporteService {
         this.notificacionClient = notificacionClient;
     }
 
-    // AHORA RECIBE EL DTO
+    /**
+     * Procesa y crea un nuevo reporte de incendio en el sistema.
+     * Realiza el mapeo de los datos de entrada a la entidad
+     * correspondiente, inicializa propiedades por defecto, persiste
+     * el registro y notifica a los microservicios externos pertinentes.
+     * @param datosEntrada Objeto {@link ReporteDTO} con la información del incidente enviado por el usuario.
+     * @return Entidad {@link Reporte} guardada en la base de datos con su ID asignado.
+     */
     public Reporte crearReporteProcesado(ReporteDTO datosEntrada) {
 
-        // 1. Mapeamos los datos del DTO a la Entidad
         Reporte nuevoReporte = new Reporte();
         nuevoReporte.setLatitud(datosEntrada.getLatitud());
         nuevoReporte.setLongitud(datosEntrada.getLongitud());
@@ -40,14 +55,11 @@ public class ReporteService {
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
         nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
 
-        // Valores por defecto
         nuevoReporte.setEstado("NUEVO");
-        nuevoReporte.setPrioridad("ALTA"); // Puedes ajustarlo según la lógica de tu app
+        nuevoReporte.setPrioridad("ALTA");
 
-        // 2. Guardamos en Base de Datos
         Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
 
-        // 3. Enviamos las coordenadas a ms-geografico de forma asíncrona o síncrona
         try {
             UbicacionDTO ubicacion = new UbicacionDTO(
                     reporteGuardado.getId(),
@@ -59,7 +71,6 @@ public class ReporteService {
             System.err.println("Atención: ms-geografico no está disponible en este momento.");
         }
 
-        // 4. Enviamos los datos validados a ms-notificaciones de forma directa
         try {
             NotificacionDTO alerta = new NotificacionDTO(
                     "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
@@ -72,23 +83,40 @@ public class ReporteService {
 
         return reporteGuardado;
     }
-
+    /**
+     * Obtiene el listado de todos los reportes registrados en el sistema.
+     * @return Una {@link List} que contiene todos los objetos de {@link Reporte}.
+     */
     public List<Reporte> listarTodos() {
         return reporteRepository.findAll();
     }
-
+    /**
+     * Obtiene los reportes que se encuentran actualmente activos.
+     * Filtra los registros que posean un estado igual a "NUEVO" o "EN_PROGRESO".
+     * @return Una {@link List} con los objetos {@link Reporte}.
+     */
     public List<Reporte> listarActivos() {
-        // Filtramos para mostrar en el mapa SOLO los que están ocurriendo ahora
         return reporteRepository.findByEstadoIn(List.of("NUEVO", "EN_PROGRESO"));
     }
-
+    /**
+     * Actualiza el estado de un reporte específico.
+     * @param id Identificador único del reporte a modificar.
+     * @param nuevoEstado Nueva etiqueta de estado a asignar (ej: EN_PROGRESO, FINALIZADO).
+     * @return Objeto {@link Reporte} modificado con su nuevo estado.
+     * @throws EntityNotFoundException Si no se encuentra un reporte asociado al identificador provisto.
+     */
     public Reporte actualizarEstado(Long id, String nuevoEstado) {
         return reporteRepository.findById(id).map(reporte -> {
             reporte.setEstado(nuevoEstado);
             return reporteRepository.save(reporte);
         }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
-
+    /**
+     * Obtiene un reporte en base a su identificador único de registro.
+     * @param id Identificador único del reporte a consultar.
+     * @return Objeto {@link Reporte} correspondiente al ID suministrado.
+     * @throws EntityNotFoundException Si el reporte buscado no existe en los registros.
+     */
     public Reporte obtenerPorId(Long id) {
         return reporteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
