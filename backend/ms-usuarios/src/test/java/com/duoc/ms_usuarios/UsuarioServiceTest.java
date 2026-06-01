@@ -25,16 +25,9 @@ class UsuarioServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 1. Instanciamos el repositorio (usamos Mockito solo para simular la BD, como pide el estándar)
         usuarioRepository = mock(UsuarioRepository.class);
-
-        // 2. Instanciamos el encriptador REAL de Spring Security (BCrypt) para medir cobertura real
         passwordEncoder = new BCryptPasswordEncoder();
-
-        // 3. Inyectamos los componentes reales al servicio
         usuarioService = new UsuarioService(usuarioRepository, passwordEncoder);
-
-        // Usuario base para las pruebas
         usuarioBase = new Usuario();
         usuarioBase.setId(1L);
         usuarioBase.setNombre("Juan");
@@ -123,7 +116,6 @@ class UsuarioServiceTest {
         Usuario guardado = usuarioService.guardar(usuarioBase);
 
         assertNotNull(guardado);
-        // Verificamos que la password ya no es texto plano (BCrypt empieza con $2a$ o $2b$)
         assertTrue(guardado.getPassword().startsWith("$2a$") || guardado.getPassword().startsWith("$2b$"));
         assertTrue(passwordEncoder.matches("miPasswordSegura125", guardado.getPassword()));
     }
@@ -131,12 +123,12 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("Guardar usuario con password vacía o nula no debe encriptar")
     void testGuardar_passwordVacia_noEncripta() {
-        usuarioBase.setPassword("   "); // Espacios en blanco (.isBlank())
+        usuarioBase.setPassword("   ");
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Usuario guardado = usuarioService.guardar(usuarioBase);
 
-        assertEquals("   ", guardado.getPassword()); // Se mantiene tal cual
+        assertEquals("   ", guardado.getPassword());
     }
 
     // =========================================================
@@ -169,7 +161,7 @@ class UsuarioServiceTest {
     void testActualizar_usuarioExiste_sinPassword() {
         Usuario datosNuevos = new Usuario();
         datosNuevos.setNombre("Carlos");
-        datosNuevos.setPassword(""); // Vacía
+        datosNuevos.setPassword("");
 
         String passwordOriginal = usuarioBase.getPassword();
 
@@ -178,7 +170,7 @@ class UsuarioServiceTest {
 
         Usuario modificado = usuarioService.actualizar(1L, datosNuevos);
 
-        assertEquals(passwordOriginal, modificado.getPassword()); // No cambió
+        assertEquals(passwordOriginal, modificado.getPassword());
     }
 
     @Test

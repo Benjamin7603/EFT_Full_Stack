@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@DisplayName("Pruebas Unitarias - UsuarioController (Corregido)")
+@DisplayName("Pruebas Unitarias - UsuarioController")
 class UsuarioControllerTest {
 
     private UsuarioService usuarioService;
@@ -34,13 +34,11 @@ class UsuarioControllerTest {
         usuarioService = mock(UsuarioService.class);
         usuarioController = new UsuarioController();
 
-        // Inyectamos el mock en el campo privado @Autowired del controlador
         ReflectionTestUtils.setField(usuarioController, "usuarioService", usuarioService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(usuarioController).build();
         objectMapper = new ObjectMapper();
 
-        // Creamos un usuario completamente lleno para evitar el error 400 de validación (@Valid)
         usuarioBase = new Usuario();
         usuarioBase.setId(1L);
         usuarioBase.setNombre("Juan");
@@ -86,7 +84,6 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("DELETE /api/usuarios/{id} elimina un usuario")
     void testEliminar() throws Exception {
-        // CORRECCIÓN: Como eliminar() retorna boolean en tu Service, usamos 'when' en lugar de 'doNothing'
         when(usuarioService.eliminar(1L)).thenReturn(true);
 
         mockMvc.perform(delete("/api/usuarios/1"))
