@@ -68,7 +68,7 @@ class AuthControllerTest {
     @DisplayName("Login con rol nulo asigna por defecto el rol USER")
     void testLogin_rolNulo_asignaDefault() throws Exception {
         LoginRequest request = new LoginRequest("juan123", "123456");
-        usuarioValido.setRol(null); // Gatilla la rama 'usuario.getRol() != null' como falsa
+        usuarioValido.setRol(null);
 
         when(usuarioService.buscarPorUsername("juan123")).thenReturn(usuarioValido);
         when(passwordEncoder.matches("123456", "passwordEncriptado")).thenReturn(true);

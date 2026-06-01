@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Pruebas Unitarias - GlobalExceptionHandler (Solución Completa)")
+@DisplayName("Pruebas Unitarias - GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
@@ -51,7 +51,7 @@ class GlobalExceptionHandlerTest {
     }
 
     // =========================================================
-    // 1. TEST PARA: MethodArgumentNotValidException (Llamada Directa para evadir restricción de Mockito)
+    // 1. TEST PARA: MethodArgumentNotValidException
     // =========================================================
     @Test
     @DisplayName("Debe procesar MethodArgumentNotValidException retornando un mapa de errores de validación")
@@ -124,7 +124,7 @@ class GlobalExceptionHandlerTest {
     }
 
     // =========================================================
-    // 4. TEST PARA: Exception (Errores Generales)
+    // 4. TEST PARA: Exception
     // =========================================================
     @Test
     @DisplayName("Debe capturar cualquier otra excepción genérica y responder 500 Internal Server Error")
@@ -135,5 +135,17 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.mensaje").value("Error inesperado en el servidor"))
                 .andExpect(jsonPath("$.detalle").value("Fallo crítico de hardware"));
+    }
+
+    @Test
+    @DisplayName("Debe capturar DataIntegrityViolationException con mensaje NULL y responder 409 Genérico")
+    void testManejarRestriccionUnica_mensajeNull() throws Exception {
+        DataIntegrityViolationException excepcionSinMensaje = new DataIntegrityViolationException(null);
+
+        when(usuarioService.listar()).thenThrow(excepcionSinMensaje);
+
+        mockMvc.perform(get("/api/usuarios"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("Error: Un dato único ya existe en el sistema."));
     }
 }
