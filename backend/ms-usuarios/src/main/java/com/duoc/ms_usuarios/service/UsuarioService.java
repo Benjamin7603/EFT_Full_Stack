@@ -2,6 +2,7 @@ package com.duoc.ms_usuarios.service;
 
 import com.duoc.ms_usuarios.model.Usuario;
 import com.duoc.ms_usuarios.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class UsuarioService {
      * @return Objeto {@link Usuario} encontrado, o {@code null} si no existe.
      */
     public Usuario buscarPorId(Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+        return usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
     }
 
     /**
@@ -49,7 +50,7 @@ public class UsuarioService {
      * @return Objeto {@link Usuario} encontrado, o {@code null} si no se encuentra.
      */
     public Usuario buscarPorUsername(String username) {
-        return usuarioRepository.findByUsername(username).orElse(null);
+        return usuarioRepository.findByUsername(username).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Usuario no encontrado con username: " + username));
     }
 
     /**
@@ -82,7 +83,7 @@ public class UsuarioService {
                 user.setPassword(passwordEncoder.encode(usuario.getPassword()));
             }
             return usuarioRepository.save(user);
-        }).orElse(null);
+        }).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
     }
     /**
      * Elimina un usuario buscado con su ID, validando su existencia.
