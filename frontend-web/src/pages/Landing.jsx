@@ -1,8 +1,20 @@
 import { Link } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
+import Swal from 'sweetalert2';
 import './Landing.css';
-
+import '../App.css';
 export default function Landing() {
+    const handleDescargaAndroid = () => {
+        Swal.fire({
+            title: '¡Descarga Iniciada!',
+            text: 'Se está preparando el archivo APK de GeoFire para tu dispositivo Android.',
+            icon: 'success',
+            confirmButtonColor: '#FF7043',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdrop: `rgba(255, 112, 67, 0.15) blur(4px)`
+        });
+    };
+
     return (
         <div className="landing-container">
             <header className="landing-header">
@@ -20,7 +32,7 @@ export default function Landing() {
                     <h2>Protege tu entorno en <span>Tiempo Real</span>.</h2>
                     <p>GeoFire es la red comunitaria y profesional líder para el reporte, monitoreo y gestión de emergencias geográficas e incendios.</p>
                     <div className="hero-btns">
-                        <button className="btn-landing btn-android" onClick={() => alert("Descargando APK...")}>
+                        <button className="btn-landing btn-android" onClick={handleDescargaAndroid}>
                             🤖 Descargar Android
                         </button>
                         <Link to="/registro" className="btn-landing btn-web">

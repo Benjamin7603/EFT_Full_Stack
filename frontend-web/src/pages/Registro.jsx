@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logoImg from '../assets/logo.png';
+import Swal from 'sweetalert2';
 import './Registro.css';
+import '../App.css';
 
 export default function Registro() {
     const navigate = useNavigate();
@@ -46,15 +48,55 @@ export default function Registro() {
         }
 
         try {
-            // Llamada real al backend a través del Gateway
             await axios.post('http://localhost:8000/api/usuarios', formData);
 
-            // Guardamos en localStorage para que el Dashboard lo lea
             localStorage.setItem('userNombre', formData.nombre);
             localStorage.setItem('userUsername', formData.username);
 
-            alert('¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...');
-            navigate('/login');
+            try {
+                const loginResponse = await axios.post('http://localhost:8000/api/auth/login', {
+                    username: formData.username,
+                    password: formData.password
+                });
+
+                if (loginResponse.data.token) {
+                    localStorage.setItem('token', loginResponse.data.token);
+
+                    Swal.fire({
+                        title: '¡Registro Exitoso!',
+                        text: 'Tu cuenta ha sido creada e iniciamos sesión automáticamente por ti. ¡Bienvenido a GeoFire!',
+                        icon: 'success',
+                        confirmButtonColor: '#FF7043',
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdrop: `rgba(255, 112, 67, 0.2) blur(5px)`
+                    }).then(() => {
+                        navigate('/dashboard');
+                    });
+                    return;
+                }
+            } catch (loginError) {
+                console.error('Error en login automático post-registro:', loginError);
+
+                Swal.fire({
+                    title: 'Usuario Creado',
+                    text: 'Tu cuenta fue registrada con éxito, pero necesitaremos que inicies sesión manualmente.',
+                    icon: 'info',
+                    confirmButtonColor: '#FFAB40'
+                }).then(() => {
+                    navigate('/login');
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Cuenta Creada',
+                text: 'Redirigiendo al inicio de sesión...',
+                icon: 'success',
+                confirmButtonColor: '#FF7043'
+            }).then(() => {
+                navigate('/login');
+            });
+
         } catch (error) {
             console.error('Error al registrar:', error);
             const msg = error.response?.data?.mensaje
@@ -72,7 +114,6 @@ export default function Registro() {
                 <h1 className="registro-title">Crear cuenta en GeoFire</h1>
                 <p className="registro-subtitle">Únete a nuestra red de reportes geográficos</p>
 
-                {/* Alerta de error */}
                 {showAlert && (
                     <div className="registro-alert">
                         <span>⚠️ {alertMessage}</span>
@@ -81,33 +122,19 @@ export default function Registro() {
                 )}
 
                 <form className="registro-form" onSubmit={handleSubmit}>
-
-                    {/* Nombre y Apellido en una fila */}
                     <div className="form-row">
                         <div className="input-group">
                             <label htmlFor="nombre">Nombre</label>
                             <input
-                                type="text"
-                                id="nombre"
-                                name="nombre"
-                                className="input-field"
-                                placeholder="Ej: Juan"
-                                value={formData.nombre}
-                                onChange={handleChange}
-                                required
+                                type="text" id="nombre" name="nombre" className="input-field"
+                                placeholder="Ej: Juan" value={formData.nombre} onChange={handleChange} required
                             />
                         </div>
                         <div className="input-group">
                             <label htmlFor="apellido">Apellido</label>
                             <input
-                                type="text"
-                                id="apellido"
-                                name="apellido"
-                                className="input-field"
-                                placeholder="Ej: García"
-                                value={formData.apellido}
-                                onChange={handleChange}
-                                required
+                                type="text" id="apellido" name="apellido" className="input-field"
+                                placeholder="Ej: García" value={formData.apellido} onChange={handleChange} required
                             />
                         </div>
                     </div>
@@ -115,56 +142,34 @@ export default function Registro() {
                     <div className="input-group">
                         <label htmlFor="username">Nombre de Usuario</label>
                         <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            className="input-field"
-                            placeholder="Ej: juangarcia"
-                            value={formData.username}
-                            onChange={handleChange}
-                            required
+                            type="text" id="username" name="username" className="input-field"
+                            placeholder="Ej: juangarcia" value={formData.username} onChange={handleChange} required
                         />
                     </div>
 
                     <div className="input-group">
                         <label htmlFor="email">Correo Electrónico</label>
                         <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            className="input-field"
-                            placeholder="Ej: juan@gmail.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
+                            type="email" id="email" name="email" className="input-field"
+                            placeholder="Ej: juan@gmail.com" value={formData.email} onChange={handleChange} required
                         />
                     </div>
 
                     <div className="input-group">
                         <label htmlFor="password">Contraseña</label>
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="input-field"
-                            placeholder="Mínimo 6 caracteres"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
+                            type="password" id="password" name="password" className="input-field"
+                            placeholder="Mínimo 6 caracteres" value={formData.password} onChange={handleChange} required
                         />
                     </div>
 
-                    <button type="submit" className="registro-btn">
-                        🚀 Registrarse
-                    </button>
-
+                    <button type="submit" className="registro-btn">🚀 Registrarse</button>
                 </form>
 
                 <div className="registro-footer">
                     ¿Ya tienes una cuenta?{' '}
                     <Link to="/login" className="registro-link">Inicia sesión aquí</Link>
                 </div>
-
             </div>
         </div>
     );
