@@ -21,11 +21,9 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos de Auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
 
-                        // Configuración de Swagger para que no pida Token
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -35,7 +33,8 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().authenticated()
+
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

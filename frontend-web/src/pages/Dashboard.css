@@ -25,7 +25,40 @@
     z-index: 2000;
     box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
+.btn-perfil {
+    background: rgba(255, 112, 67, 0.1);
+    color: #FF7043;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
+.btn-perfil:hover {
+    background: #FF7043;
+    color: white;
+}
+.btn-profile-icon {
+    background: rgba(255, 112, 67, 0.1);
+    padding: 9px 16px;
+    color: #FF7043;
+    border: none;
+    width: 52px;
+    height: 39px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-profile-icon:hover {
+    background: #FF7043;
+    color: white;
+    transform: translateY(-1px);
+}
 .nav-brand {
     display: flex;
     align-items: center;
@@ -51,6 +84,7 @@
 }
 
 .avatar {
+
     width: 42px;
     height: 42px;
     background: linear-gradient(45deg, #FF7043, #FFAB40);
