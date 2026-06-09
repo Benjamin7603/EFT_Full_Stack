@@ -2,35 +2,48 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import logoImg from '../assets/logo.png';
+import Swal from 'sweetalert2';
 import './Login.css';
-
+import '../App.css';
 export default function Login() {
-    const [username, setUsername] = useState(''); // <-- Ahora pedimos Username
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            // Enviamos "username" tal como lo espera tu backend en Java
             const response = await axios.post('http://localhost:8000/api/auth/login', {
                 username: username,
                 password: password
             });
 
             if (response.data.token) {
-                // ¡Éxito! Guardamos el Token en el navegador
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('userUsername', response.data.username || username);
 
-                alert("¡Bienvenido a GeoFire!");
-                navigate('/dashboard');
+                Swal.fire({
+                    title: '¡Bienvenido a GeoFire!',
+                    text: `Has ingresado correctamente como ${username}.`,
+                    icon: 'success',
+                    confirmButtonColor: '#FF7043',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdrop: `rgba(0,0,0,0.4) blur(4px)`
+                }).then(() => {
+                    navigate('/dashboard');
+                });
             }
         } catch (error) {
             console.error("Error en login:", error);
-            // Mostrará el error real (ej: "Contraseña incorrecta")
             const msj = error.response?.data?.error || "Credenciales incorrectas o error de servidor.";
-            alert("Error: " + msj);
+
+            Swal.fire({
+                title: 'Error de Autenticación',
+                text: msj,
+                icon: 'error',
+                confirmButtonColor: '#E53E3E',
+                background: 'rgba(255, 255, 255, 0.95)'
+            });
         }
     };
 
