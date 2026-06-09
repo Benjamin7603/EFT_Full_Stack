@@ -3,7 +3,8 @@ package com.duoc.ms_geografico;
 import com.duoc.ms_geografico.controller.GeograficoController;
 import com.duoc.ms_geografico.exception.GlobalExceptionHandler;
 import com.duoc.ms_geografico.model.Ubicacion;
-import com.duoc.ms_geografico.repository.UbicacionRepository;
+import com.duoc.ms_geografico.service.UbicacionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,84 +30,75 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Pruebas Unitarias - GlobalExceptionHandler (Calibrado 90%-95%)")
+@DisplayName("Pruebas Unitarias - GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
-    private UbicacionRepository ubicacionRepository;
+    private UbicacionService ubicacionService;
     private GlobalExceptionHandler exceptionHandler;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
-        ubicacionRepository = mock(UbicacionRepository.class);
+    void setUp() {
+        ubicacionService = mock(UbicacionService.class);
         exceptionHandler = new GlobalExceptionHandler();
+        objectMapper = new ObjectMapper();
 
-        GeograficoController controllerReal = new GeograficoController();
-        java.lang.reflect.Field field = GeograficoController.class.getDeclaredField("ubicacionRepository");
-        field.setAccessible(true);
-        field.set(controllerReal, ubicacionRepository);
+        GeograficoController controller = new GeograficoController(ubicacionService);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(controllerReal)
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
                 .setControllerAdvice(exceptionHandler)
                 .build();
     }
 
-    // =========================================================
-    // MethodArgumentNotValidException
-    // =========================================================
     @Test
     void testManejarValidaciones_Estructura() throws Exception {
         BindException bindException = new BindException(new Ubicacion(), "ubicacion");
+
         Method metodoReal = GeograficoController.class.getMethod("guardarUbicacion", Ubicacion.class);
         MethodParameter param = MethodParameter.forExecutable(metodoReal, 0);
-        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(param, bindException);
 
-        ResponseEntity<Map<String, String>> respuesta = exceptionHandler.manejarValidaciones(ex);
+        MethodArgumentNotValidException ex =
+                new MethodArgumentNotValidException(param, bindException);
+
+        ResponseEntity<Map<String, String>> respuesta =
+                exceptionHandler.manejarValidaciones(ex);
 
         assertNotNull(respuesta);
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
     }
 
-    // =========================================================
-    // EntityNotFoundException
-    // =========================================================
     @Test
     void testManejarNoEncontrado() throws Exception {
-        Ubicacion validadorDto = new Ubicacion();
-        validadorDto.setIdReporte(10L);
-        validadorDto.setLatitud(-33.456);
-        validadorDto.setLongitud(-70.648);
+        Ubicacion ubicacion = new Ubicacion();
+        ubicacion.setIdReporte(10L);
+        ubicacion.setLatitud(-33.456);
+        ubicacion.setLongitud(-70.648);
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        String jsonValido = mapper.writeValueAsString(validadorDto);
-
-        when(ubicacionRepository.save(any(Ubicacion.class))).thenThrow(new EntityNotFoundException("Coordenada inexistente"));
+        when(ubicacionService.guardarUbicacion(any(Ubicacion.class)))
+                .thenThrow(new EntityNotFoundException("Coordenada inexistente"));
 
         mockMvc.perform(post("/api/geografico/guardar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonValido))
+                        .content(objectMapper.writeValueAsString(ubicacion)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Coordenada inexistente"));
     }
 
-    // =========================================================
-    // Exception Genérica
-    // =========================================================
     @Test
     void testManejarErrorGeneral() throws Exception {
-        Ubicacion validadorDto = new Ubicacion();
-        validadorDto.setIdReporte(10L);
-        validadorDto.setLatitud(-33.456);
-        validadorDto.setLongitud(-70.648);
+        Ubicacion ubicacion = new Ubicacion();
+        ubicacion.setIdReporte(10L);
+        ubicacion.setLatitud(-33.456);
+        ubicacion.setLongitud(-70.648);
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        String jsonValido = mapper.writeValueAsString(validadorDto);
-
-        when(ubicacionRepository.save(any(Ubicacion.class))).thenThrow(new RuntimeException("Fallo de conexion de red"));
+        when(ubicacionService.guardarUbicacion(any(Ubicacion.class)))
+                .thenThrow(new RuntimeException("Fallo de conexion de red"));
 
         mockMvc.perform(post("/api/geografico/guardar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonValido))
+                        .content(objectMapper.writeValueAsString(ubicacion)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.mensaje").value("Error inesperado en ms-geografico"))
                 .andExpect(jsonPath("$.detalle").value("Fallo de conexion de red"));

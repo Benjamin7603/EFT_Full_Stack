@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { LogOut } from "lucide-react";
+import {LogOut, UserRound} from "lucide-react";
 import L from 'leaflet';
 import Swal from 'sweetalert2';
 
@@ -285,11 +285,17 @@ export default function Dashboard() {
                     <img src={logoImg} alt="GeoFire" />
                     <h2>GeoFire</h2>
                 </div>
-
                 <div className="user-profile">
                     <div className="avatar">{userInitial}</div>
                     <span>Hola, {userName}</span>
 
+                    <button
+                        className="btn-profile-icon"
+                        onClick={() => navigate("/perfil")}
+                        title="Mi perfil"
+                    >
+                        <UserRound size={20} strokeWidth={2.5} />
+                    </button>
                     <button
                         onClick={handleLogout}
                         className="btn-logout"
@@ -297,6 +303,7 @@ export default function Dashboard() {
                         <LogOut size={20} />
                     </button>
                 </div>
+
 
             </nav>
 

@@ -3,19 +3,16 @@ package com.duoc.ms_geografico;
 import com.duoc.ms_geografico.controller.GeograficoController;
 import com.duoc.ms_geografico.exception.GlobalExceptionHandler;
 import com.duoc.ms_geografico.model.Ubicacion;
-import com.duoc.ms_geografico.repository.UbicacionRepository;
+import com.duoc.ms_geografico.service.UbicacionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -28,27 +25,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GeograficoControllerTest {
 
     private MockMvc mockMvc;
-
-    @Mock
-    private UbicacionRepository ubicacionRepository;
-
-    @InjectMocks
-    private GeograficoController graficoController;
-
+    private UbicacionService ubicacionService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        ubicacionService = Mockito.mock(UbicacionService.class);
+
+        GeograficoController geograficoController =
+                new GeograficoController(ubicacionService);
+
         objectMapper = new ObjectMapper();
-        mockMvc = MockMvcBuilders.standaloneSetup(graficoController)
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(geograficoController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
-    // =========================================================
-    // POST /api/geografico/guardar
-    // =========================================================
     @Test
     void testGuardarUbicacion_Exitoso() throws Exception {
         Ubicacion ubicacionInput = new Ubicacion();
@@ -62,7 +56,8 @@ class GeograficoControllerTest {
         ubicacionPersistida.setLatitud(-33.456);
         ubicacionPersistida.setLongitud(-70.648);
 
-        when(ubicacionRepository.save(any(Ubicacion.class))).thenReturn(ubicacionPersistida);
+        when(ubicacionService.guardarUbicacion(any(Ubicacion.class)))
+                .thenReturn(ubicacionPersistida);
 
         mockMvc.perform(post("/api/geografico/guardar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,12 +68,10 @@ class GeograficoControllerTest {
                 .andExpect(jsonPath("$.latitud").value(-33.456))
                 .andExpect(jsonPath("$.longitud").value(-70.648));
 
-        verify(ubicacionRepository, times(1)).save(any(Ubicacion.class));
+        verify(ubicacionService, times(1))
+                .guardarUbicacion(any(Ubicacion.class));
     }
 
-    // =========================================================
-    // GET /api/geografico/reporte/{idReporte} - Exitoso
-    // =========================================================
     @Test
     void testObtenerPorReporte_Exitoso() throws Exception {
         Ubicacion ubicacionEncontrada = new Ubicacion();
@@ -87,7 +80,8 @@ class GeograficoControllerTest {
         ubicacionEncontrada.setLatitud(-33.456);
         ubicacionEncontrada.setLongitud(-70.648);
 
-        when(ubicacionRepository.findByIdReporte(10L)).thenReturn(Optional.of(ubicacionEncontrada));
+        when(ubicacionService.obtenerPorReporte(10L))
+                .thenReturn(ubicacionEncontrada);
 
         mockMvc.perform(get("/api/geografico/reporte/10"))
                 .andExpect(status().isOk())
@@ -96,19 +90,37 @@ class GeograficoControllerTest {
                 .andExpect(jsonPath("$.latitud").value(-33.456))
                 .andExpect(jsonPath("$.longitud").value(-70.648));
 
-        verify(ubicacionRepository, times(1)).findByIdReporte(10L);
+        verify(ubicacionService, times(1))
+                .obtenerPorReporte(10L);
     }
 
-    // =========================================================
-    // GET /api/geografico/reporte/{idReporte} - No Encontrado
-    // =========================================================
     @Test
     void testObtenerPorReporte_NoEncontrado() throws Exception {
-        when(ubicacionRepository.findByIdReporte(99L)).thenReturn(Optional.empty());
+        when(ubicacionService.obtenerPorReporte(99L))
+                .thenThrow(new EntityNotFoundException(
+                        "No se encontró ubicación geográfica para el reporte con ID: 99"
+                ));
 
         mockMvc.perform(get("/api/geografico/reporte/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value(
+                        "No se encontró ubicación geográfica para el reporte con ID: 99"
+                ));
 
-        verify(ubicacionRepository, times(1)).findByIdReporte(99L);
+        verify(ubicacionService, times(1))
+                .obtenerPorReporte(99L);
+    }
+
+    @Test
+    void testGuardarUbicacion_DatosInvalidos() throws Exception {
+        Ubicacion ubicacionInvalida = new Ubicacion();
+
+        mockMvc.perform(post("/api/geografico/guardar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ubicacionInvalida)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.idReporte").value("El ID del reporte es obligatorio"))
+                .andExpect(jsonPath("$.latitud").value("La latitud es obligatoria"))
+                .andExpect(jsonPath("$.longitud").value("La longitud es obligatoria"));
     }
 }

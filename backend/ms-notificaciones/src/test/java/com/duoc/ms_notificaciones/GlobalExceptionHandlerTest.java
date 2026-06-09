@@ -3,7 +3,8 @@ package com.duoc.ms_notificaciones;
 import com.duoc.ms_notificaciones.controller.NotificacionController;
 import com.duoc.ms_notificaciones.exception.GlobalExceptionHandler;
 import com.duoc.ms_notificaciones.model.Notificacion;
-import com.duoc.ms_notificaciones.repository.NotificacionRepository;
+import com.duoc.ms_notificaciones.service.NotificacionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,32 +34,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
-    private NotificacionRepository notificacionRepository;
+    private NotificacionService notificacionService;
     private GlobalExceptionHandler exceptionHandler;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
-        notificacionRepository = mock(NotificacionRepository.class);
+    void setUp() {
+        notificacionService = mock(NotificacionService.class);
         exceptionHandler = new GlobalExceptionHandler();
+        objectMapper = new ObjectMapper();
 
-        NotificacionController controllerReal = new NotificacionController();
-        java.lang.reflect.Field field = NotificacionController.class.getDeclaredField("notificacionRepository");
-        field.setAccessible(true);
-        field.set(controllerReal, notificacionRepository);
+        NotificacionController controllerReal =
+                new NotificacionController(notificacionService);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(controllerReal)
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controllerReal)
                 .setControllerAdvice(exceptionHandler)
                 .build();
     }
 
     @Test
     void testManejarValidaciones_Estructura() throws Exception {
-        BindException bindException = new BindException(new Notificacion(), "notificacion");
-        Method metodoReal = NotificacionController.class.getMethod("enviarAlerta", Notificacion.class);
-        MethodParameter param = MethodParameter.forExecutable(metodoReal, 0);
-        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(param, bindException);
+        BindException bindException =
+                new BindException(new Notificacion(), "notificacion");
 
-        ResponseEntity<Map<String, String>> respuesta = exceptionHandler.manejarValidaciones(ex);
+        Method metodoReal =
+                NotificacionController.class.getMethod("enviarAlerta", Notificacion.class);
+
+        MethodParameter param =
+                MethodParameter.forExecutable(metodoReal, 0);
+
+        MethodArgumentNotValidException ex =
+                new MethodArgumentNotValidException(param, bindException);
+
+        ResponseEntity<Map<String, String>> respuesta =
+                exceptionHandler.manejarValidaciones(ex);
 
         assertNotNull(respuesta);
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
@@ -70,14 +80,12 @@ class GlobalExceptionHandlerTest {
         validadorDto.setDestinatario("central@incendios.cl");
         validadorDto.setMensaje("Alerta activa");
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        String jsonValido = mapper.writeValueAsString(validadorDto);
-
-        when(notificacionRepository.save(any(Notificacion.class))).thenThrow(new EntityNotFoundException("Registro ausente"));
+        when(notificacionService.enviarAlerta(any(Notificacion.class)))
+                .thenThrow(new EntityNotFoundException("Registro ausente"));
 
         mockMvc.perform(post("/api/notificaciones/enviar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonValido))
+                        .content(objectMapper.writeValueAsString(validadorDto)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Registro ausente"));
     }
@@ -88,14 +96,12 @@ class GlobalExceptionHandlerTest {
         validadorDto.setDestinatario("central@incendios.cl");
         validadorDto.setMensaje("Alerta activa");
 
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        String jsonValido = mapper.writeValueAsString(validadorDto);
-
-        when(notificacionRepository.save(any(Notificacion.class))).thenThrow(new RuntimeException("Fallo del sistema"));
+        when(notificacionService.enviarAlerta(any(Notificacion.class)))
+                .thenThrow(new RuntimeException("Fallo del sistema"));
 
         mockMvc.perform(post("/api/notificaciones/enviar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonValido))
+                        .content(objectMapper.writeValueAsString(validadorDto)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.mensaje").value("Error inesperado en ms-notificaciones"))
                 .andExpect(jsonPath("$.detalle").value("Fallo del sistema"));
