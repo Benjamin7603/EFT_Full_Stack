@@ -1,0 +1,9 @@
+.nav-brand {
+    cursor: pointer;
+}
+
+.navbar-active {
+    background: #FF7043 !important;
+    color: white !important;
+    box-shadow: 0 6px 16px rgba(255, 112, 67, 0.28);
+}

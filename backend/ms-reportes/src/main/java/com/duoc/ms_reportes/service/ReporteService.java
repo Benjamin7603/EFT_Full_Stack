@@ -55,8 +55,14 @@ public class ReporteService {
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
         nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
 
+        String prioridad = datosEntrada.getPrioridad().toUpperCase();
+
+        if (!prioridad.equals("ALTA") && !prioridad.equals("MEDIA") && !prioridad.equals("BAJA")) {
+            throw new IllegalArgumentException("La prioridad debe ser ALTA, MEDIA o BAJA");
+        }
+
         nuevoReporte.setEstado("NUEVO");
-        nuevoReporte.setPrioridad("ALTA");
+        nuevoReporte.setPrioridad(prioridad);
 
         Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
 

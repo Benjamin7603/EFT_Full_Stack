@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Data
 public class ReporteDTO {
+
     @NotBlank(message = "La descripción es requerida")
     private String descripcion;
 
@@ -18,8 +19,11 @@ public class ReporteDTO {
     private String urlMedia;
 
     @NotBlank(message = "El tipo de usuario es requerido")
-    private String tipoUsuario; // "CIUDADANO" o "OFICIAL"
+    private String tipoUsuario;
 
     @NotNull(message = "El ID de usuario es requerido")
     private Long usuarioId;
+
+    @NotBlank(message = "La prioridad es requerida")
+    private String prioridad;
 }

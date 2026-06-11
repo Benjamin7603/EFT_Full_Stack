@@ -15,10 +15,10 @@ import {
 } from "lucide-react";
 
 import api from "../api/api";
-import logoImg from "../assets/logo.png";
 
 import "./Dashboard.css";
 import "./Perfil.css";
+import Navbar from "../components/Navbar.jsx";
 
 export default function Perfil() {
     const navigate = useNavigate();
@@ -46,12 +46,13 @@ export default function Perfil() {
 
     const tokenData = getTokenData();
 
-    const usuarioId =
+    const usuarioIdSesion =
         localStorage.getItem("usuarioId") ||
         localStorage.getItem("userId") ||
-        tokenData.usuarioId;
+        tokenData.usuarioId ||
+        "";
 
-    const username =
+    const usernameSesion =
         localStorage.getItem("username") ||
         localStorage.getItem("userUsername") ||
         tokenData.username ||
@@ -80,43 +81,95 @@ export default function Perfil() {
         rol: rolSesion,
     };
 
+    const [usuarioActual, setUsuarioActual] = useState(null);
     const [form, setForm] = useState(emptyForm);
     const [initialForm, setInitialForm] = useState(emptyForm);
+
     const [loading, setLoading] = useState(false);
     const [loadingPerfil, setLoadingPerfil] = useState(true);
+    const [loadingReportes, setLoadingReportes] = useState(true);
+
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
+    const [misReportes, setMisReportes] = useState([]);
 
-    const inicial = (form.nombre || username || "U")
+    const usernameVisible =
+        usuarioActual?.username ||
+        usernameSesion ||
+        "usuario";
+
+    const inicial = (form.nombre || usernameVisible || "U")
         .trim()
         .charAt(0)
         .toUpperCase();
 
-    const nombreVisible = form.nombre || username || "Usuario";
+    const nombreVisible = form.nombre || usernameVisible || "Usuario";
+
+    const obtenerClasePrioridad = (prioridad) => {
+        if (prioridad === "ALTA") return "proceso";
+        if (prioridad === "BAJA") return "resuelto";
+        return "nuevo";
+    };
+
+    const obtenerClaseEstado = (estado) => {
+        if (estado === "NUEVO") return "nuevo";
+        if (estado === "EN_PROGRESO") return "proceso";
+        return "resuelto";
+    };
+
+    const formatearCoordenadas = (latitud, longitud) => {
+        if (latitud === null || latitud === undefined || longitud === null || longitud === undefined) {
+            return "Sin ubicación";
+        }
+
+        const lat = Number(latitud);
+        const lon = Number(longitud);
+
+        if (Number.isNaN(lat) || Number.isNaN(lon)) {
+            return "Sin ubicación";
+        }
+
+        return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    };
 
     useEffect(() => {
         const cargarPerfil = async () => {
             setLoadingPerfil(true);
+            setLoadingReportes(true);
             setError("");
+            setMensaje("");
 
-            if (!usuarioId) {
-                setError("No se encontró el ID del usuario en la sesión. Vuelve a iniciar sesión.");
+            if (!usuarioIdSesion && !usernameSesion) {
+                setError("No se encontró información del usuario en la sesión. Vuelve a iniciar sesión.");
                 setLoadingPerfil(false);
+                setLoadingReportes(false);
                 return;
             }
 
             try {
-                const response = await api.get("/api/usuarios");
+                const usuariosResponse = await api.get("/api/usuarios");
+                const usuarios = usuariosResponse.data || [];
 
-                const usuarioEncontrado = response.data.find(
-                    (usuario) => String(usuario.id) === String(usuarioId)
-                );
+                const usuarioEncontrado = usuarios.find((usuario) => {
+                    const coincidePorId =
+                        usuarioIdSesion &&
+                        String(usuario.id) === String(usuarioIdSesion);
+
+                    const coincidePorUsername =
+                        usernameSesion &&
+                        String(usuario.username) === String(usernameSesion);
+
+                    return coincidePorId || coincidePorUsername;
+                });
 
                 if (!usuarioEncontrado) {
                     setError("No se encontró la información del usuario autenticado.");
                     setLoadingPerfil(false);
+                    setLoadingReportes(false);
                     return;
                 }
+
+                setUsuarioActual(usuarioEncontrado);
 
                 const datosPerfil = {
                     nombre: usuarioEncontrado.nombre || "",
@@ -131,10 +184,24 @@ export default function Perfil() {
                 setInitialForm(datosPerfil);
 
                 localStorage.setItem("usuarioId", usuarioEncontrado.id);
-                localStorage.setItem("username", usuarioEncontrado.username || username);
-                localStorage.setItem("userUsername", usuarioEncontrado.username || username);
+                localStorage.setItem("username", usuarioEncontrado.username || usernameSesion);
+                localStorage.setItem("userUsername", usuarioEncontrado.username || usernameSesion);
                 localStorage.setItem("nombre", usuarioEncontrado.nombre || "");
                 localStorage.setItem("rol", usuarioEncontrado.rol || rolSesion);
+
+                try {
+                    const reportesResponse = await api.get("/api/reportes");
+                    const reportes = reportesResponse.data || [];
+
+                    const reportesUsuario = reportes
+                        .filter((reporte) => String(reporte.usuarioId) === String(usuarioEncontrado.id))
+                        .sort((a, b) => new Date(b.fechaReporte) - new Date(a.fechaReporte));
+
+                    setMisReportes(reportesUsuario);
+                } catch (reportesError) {
+                    console.error("Error cargando historial de reportes:", reportesError);
+                    setMisReportes([]);
+                }
             } catch (err) {
                 setError(
                     err.response?.data?.error ||
@@ -143,6 +210,7 @@ export default function Perfil() {
                 );
             } finally {
                 setLoadingPerfil(false);
+                setLoadingReportes(false);
             }
         };
 
@@ -174,7 +242,9 @@ export default function Perfil() {
     const guardarCambios = async (e) => {
         e.preventDefault();
 
-        if (!usuarioId) {
+        const usuarioIdActual = usuarioActual?.id || usuarioIdSesion;
+
+        if (!usuarioIdActual) {
             setError("No se encontró el ID del usuario en la sesión. Vuelve a iniciar sesión.");
             return;
         }
@@ -206,8 +276,10 @@ export default function Perfil() {
                 payload.password = form.password.trim();
             }
 
-            const response = await api.put(`/api/usuarios/${usuarioId}`, payload);
+            const response = await api.put(`/api/usuarios/${usuarioIdActual}`, payload);
             const usuarioActualizado = response.data;
+
+            setUsuarioActual(usuarioActualizado);
 
             const datosActualizados = {
                 nombre: usuarioActualizado.nombre || form.nombre,
@@ -221,6 +293,9 @@ export default function Perfil() {
             setForm(datosActualizados);
             setInitialForm(datosActualizados);
 
+            localStorage.setItem("usuarioId", usuarioActualizado.id || usuarioIdActual);
+            localStorage.setItem("username", usuarioActualizado.username || usernameVisible);
+            localStorage.setItem("userUsername", usuarioActualizado.username || usernameVisible);
             localStorage.setItem("nombre", datosActualizados.nombre);
             localStorage.setItem("rol", datosActualizados.rol);
 
@@ -239,49 +314,22 @@ export default function Perfil() {
 
     return (
         <div className="perfil-container">
-            <nav className="dash-navbar">
-                <div className="nav-brand" onClick={() => navigate("/dashboard")}>
-                    <img src={logoImg} alt="GeoFire" />
-                    <h2>GeoFire</h2>
-                </div>
-
-                <div className="user-profile">
-                    <div className="avatar">{inicial}</div>
-
-                    <span>Hola, {nombreVisible}</span>
-
-                    <button
-                        className="btn-profile-icon perfil-active"
-                        type="button"
-                        title="Mi perfil"
-                    >
-                        <UserRound size={20} strokeWidth={2.5} />
-                    </button>
-
-                    <button
-                        onClick={cerrarSesion}
-                        className="btn-logout"
-                        type="button"
-                        title="Cerrar sesión"
-                    >
-                        <LogOut size={20} />
-                    </button>
-                </div>
-            </nav>
-
+            <Navbar active="perfil" showProfile={false} />
             <main className="perfil-content">
-                <section className="perfil-header-card">
-                    <div className="perfil-avatar">{inicial}</div>
+                <div className="perfil-header-wrapper">
+                    <section className="perfil-header-card">
+                        <div className="perfil-avatar">{inicial}</div>
 
-                    <div className="perfil-header-info">
-                        <span className="perfil-kicker">Centro de cuenta</span>
-                        <h1>Mi cuenta GeoFire</h1>
-                        <p>
-                            Administra tus datos personales, credenciales y preferencias de
-                            acceso dentro de la plataforma.
-                        </p>
-                    </div>
-                </section>
+                        <div className="perfil-header-info">
+                            <span className="perfil-kicker">Centro de cuenta</span>
+                            <h1>Mi cuenta GeoFire</h1>
+                            <p>
+                                Administra tus datos personales, credenciales y preferencias de
+                                acceso dentro de la plataforma.
+                            </p>
+                        </div>
+                    </section>
+                </div>
 
                 <section className="perfil-grid">
                     <aside className="perfil-info-card">
@@ -289,7 +337,7 @@ export default function Perfil() {
                             <div className="perfil-summary-avatar">{inicial}</div>
 
                             <h2>{loadingPerfil ? "Cargando..." : nombreVisible}</h2>
-                            <p>@{username || "usuario"}</p>
+                            <p>@{usernameVisible}</p>
 
                             <span className="perfil-status">
                                 <BadgeCheck size={16} />
@@ -303,7 +351,7 @@ export default function Perfil() {
                                     <UserRound size={16} />
                                     Username
                                 </span>
-                                <strong>{username || "No disponible"}</strong>
+                                <strong>{usernameVisible || "No disponible"}</strong>
                             </div>
 
                             <div className="perfil-info-item">
@@ -488,6 +536,73 @@ export default function Perfil() {
                             </button>
                         </div>
                     </form>
+                </section>
+
+                <section className="table-card">
+                    <div className="table-header">
+                        <h2>Historial de mis reportes</h2>
+                    </div>
+
+                    {loadingReportes ? (
+                        <p>Cargando historial de reportes...</p>
+                    ) : misReportes.length === 0 ? (
+                        <p>Aún no has generado reportes desde esta cuenta.</p>
+                    ) : (
+                        <div className="table-responsive">
+                            <table className="reports-table">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Ubicación</th>
+                                    <th>Descripción</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {misReportes.map((reporte) => (
+                                    <tr key={reporte.id}>
+                                        <td>#{reporte.id}</td>
+
+                                        <td>
+                                            {reporte.fechaReporte
+                                                ? new Date(reporte.fechaReporte).toLocaleString("es-CL")
+                                                : "Sin fecha"}
+                                        </td>
+
+                                        <td>
+                                            {formatearCoordenadas(reporte.latitud, reporte.longitud)}
+                                        </td>
+
+                                        <td>{reporte.descripcion}</td>
+
+                                        <td>
+                                                <span
+                                                    className={`badge-riesgo ${obtenerClasePrioridad(
+                                                        reporte.prioridad
+                                                    )}`}
+                                                >
+                                                    {reporte.prioridad || "SIN PRIORIDAD"}
+                                                </span>
+                                        </td>
+
+                                        <td>
+                                                <span
+                                                    className={`badge-riesgo ${obtenerClaseEstado(
+                                                        reporte.estado
+                                                    )}`}
+                                                >
+                                                    {reporte.estado || "SIN ESTADO"}
+                                                </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </section>
             </main>
         </div>

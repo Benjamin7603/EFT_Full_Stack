@@ -50,7 +50,12 @@ public class GlobalExceptionHandler {
         // Retornamos 409 Conflict y la variable "error" que React espera leer
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
-
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> manejarBadRequest(IllegalArgumentException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
     // 4. Errores generales — solo los de nuestro código
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {
