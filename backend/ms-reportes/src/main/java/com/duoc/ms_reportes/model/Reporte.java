@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reporte {
+public class Reporte implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +32,14 @@ public class Reporte {
     @NotBlank(message = "La descripción no puede estar vacía")
     private String descripcion;
 
-    private String urlMedia; // foto o video en la nube
+    private String urlMedia;
 
     @NotBlank(message = "El tipo de usuario es obligatorio")
-    private String tipoUsuario; // "CIUDADANO" o "OFICIAL"
+    private String tipoUsuario;
 
     private String prioridad;
 
-    private String estado = "NUEVO"; // Estado inicial por defecto
+    private String estado = "NUEVO";
 
     @Column(name = "fecha_reporte")
     private LocalDateTime fechaReporte = LocalDateTime.now();

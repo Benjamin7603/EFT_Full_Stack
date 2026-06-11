@@ -96,14 +96,14 @@ export default function Dashboard() {
     const fetchReportes = async () => {
         try {
             const response = await axios.get(
-                'http://localhost:8000/api/reportes',
+                'http://localhost:8000/api/reportes/activos',
                 tokenConfig()
             );
 
             setReportes(response.data || []);
         }
         catch (error) {
-            console.error("Error cargando reportes:", error);
+            console.error("Error cargando reportes activos:", error);
         }
     };
 

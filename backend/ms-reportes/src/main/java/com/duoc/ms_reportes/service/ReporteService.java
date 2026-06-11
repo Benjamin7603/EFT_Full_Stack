@@ -8,13 +8,16 @@ import com.duoc.ms_reportes.dto.UbicacionDTO;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.repository.ReporteRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 /**
  * Servicio encargado de la gestión y procesamiento de reportes de incendios.
- * Coordina la persistencia de incidentes y la comunicación inter-servicio con los
- * microservicios geográfico y de notificaciones.
+ * Coordina la persistencia de incidentes, el uso de caché Redis y la comunicación
+ * inter-servicio con los microservicios geográfico y de notificaciones.
  */
 @Service
 public class ReporteService {
@@ -25,6 +28,7 @@ public class ReporteService {
 
     /**
      * Constructor para la inyección de dependencias requeridas por el servicio de reportes.
+     *
      * @param reporteRepository Repositorio para el acceso a datos y persistencia de reportes.
      * @param geograficoClient Cliente de comunicación para el microservicio geográfico.
      * @param notificacionClient Cliente de comunicación para el microservicio de notificaciones.
@@ -39,12 +43,13 @@ public class ReporteService {
 
     /**
      * Procesa y crea un nuevo reporte de incendio en el sistema.
-     * Realiza el mapeo de los datos de entrada a la entidad
-     * correspondiente, inicializa propiedades por defecto, persiste
-     * el registro y notifica a los microservicios externos pertinentes.
+     * Al crear un nuevo reporte se limpian los cachés de listados, ya que el dashboard
+     * y el historial deben reflejar el nuevo incidente.
+     *
      * @param datosEntrada Objeto {@link ReporteDTO} con la información del incidente enviado por el usuario.
      * @return Entidad {@link Reporte} guardada en la base de datos con su ID asignado.
      */
+    @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
     public Reporte crearReporteProcesado(ReporteDTO datosEntrada) {
 
         Reporte nuevoReporte = new Reporte();
@@ -89,36 +94,49 @@ public class ReporteService {
 
         return reporteGuardado;
     }
+
     /**
      * Obtiene el listado de todos los reportes registrados en el sistema.
+     * Se cachea en Redis porque es una consulta frecuente desde dashboard, perfil y panel admin.
+     *
      * @return Una {@link List} que contiene todos los objetos de {@link Reporte}.
      */
+    @Cacheable(value = "reportesTodos", key = "'all'")
     public List<Reporte> listarTodos() {
         return reporteRepository.findAll();
     }
+
     /**
      * Obtiene los reportes que se encuentran actualmente activos.
-     * Filtra los registros que posean un estado igual a "NUEVO" o "EN_PROGRESO".
-     * @return Una {@link List} con los objetos {@link Reporte}.
+     * Se cachea en Redis porque alimenta el dashboard principal y el mapa de incidentes.
+     *
+     * @return Una {@link List} con los objetos {@link Reporte} en estado NUEVO o EN_PROGRESO.
      */
+    @Cacheable(value = "reportesActivos", key = "'active'")
     public List<Reporte> listarActivos() {
         return reporteRepository.findByEstadoIn(List.of("NUEVO", "EN_PROGRESO"));
     }
+
     /**
      * Actualiza el estado de un reporte específico.
+     * Al modificar el estado se limpian los cachés para evitar mostrar reportes obsoletos.
+     *
      * @param id Identificador único del reporte a modificar.
-     * @param nuevoEstado Nueva etiqueta de estado a asignar (ej: EN_PROGRESO, FINALIZADO).
+     * @param nuevoEstado Nueva etiqueta de estado a asignar.
      * @return Objeto {@link Reporte} modificado con su nuevo estado.
      * @throws EntityNotFoundException Si no se encuentra un reporte asociado al identificador provisto.
      */
+    @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
     public Reporte actualizarEstado(Long id, String nuevoEstado) {
         return reporteRepository.findById(id).map(reporte -> {
             reporte.setEstado(nuevoEstado);
             return reporteRepository.save(reporte);
         }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
+
     /**
      * Obtiene un reporte en base a su identificador único de registro.
+     *
      * @param id Identificador único del reporte a consultar.
      * @return Objeto {@link Reporte} correspondiente al ID suministrado.
      * @throws EntityNotFoundException Si el reporte buscado no existe en los registros.
@@ -127,4 +145,5 @@ public class ReporteService {
         return reporteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
+
 }

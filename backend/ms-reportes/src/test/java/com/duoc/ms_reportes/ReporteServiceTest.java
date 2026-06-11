@@ -295,4 +295,49 @@ class ReporteServiceTest {
         verify(reporteRepository, never())
                 .save(any(Reporte.class));
     }
+    @Test
+    void testCrearReporteProcesado_PrioridadInvalida() {
+        ReporteDTO dto = crearDtoValido("CRITICA");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                reporteService.crearReporteProcesado(dto)
+        );
+
+        assertEquals("La prioridad debe ser ALTA, MEDIA o BAJA", ex.getMessage());
+
+        verify(reporteRepository, never()).save(any(Reporte.class));
+        verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_PrioridadMinusculaSeNormaliza() {
+        ReporteDTO dto = crearDtoValido("media");
+        Reporte reporteSimulado = crearReporteGuardado(103L, "MEDIA");
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
+
+        Reporte resultado = reporteService.crearReporteProcesado(dto);
+
+        assertNotNull(resultado);
+        assertEquals("MEDIA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_PrioridadConEspaciosLanzaError() {
+        ReporteDTO dto = crearDtoValido(" MEDIA ");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                reporteService.crearReporteProcesado(dto)
+        );
+
+        assertEquals("La prioridad debe ser ALTA, MEDIA o BAJA", ex.getMessage());
+
+        verify(reporteRepository, never()).save(any(Reporte.class));
+    }
 }
