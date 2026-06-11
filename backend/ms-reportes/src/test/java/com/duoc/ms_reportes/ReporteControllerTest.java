@@ -47,6 +47,7 @@ class ReporteControllerTest {
         dto.setUrlMedia("http://media.com/foto.jpg");
         dto.setTipoUsuario("BRIGADISTA");
         dto.setUsuarioId(1L);
+        dto.setPrioridad("MEDIA");
 
         Reporte reporteSimulado = new Reporte();
         reporteSimulado.setId(1L);

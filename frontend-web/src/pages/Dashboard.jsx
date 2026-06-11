@@ -2,18 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import {LogOut, UserRound} from "lucide-react";
 import L from 'leaflet';
 import Swal from 'sweetalert2';
 
-// Importaciones de recursos y estilos locales
-import logoImg from '../assets/logo.png';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 import 'leaflet/dist/leaflet.css';
 import './Dashboard.css';
 import '../App.css';
+import Navbar from "../components/Navbar.jsx";
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -25,11 +23,42 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function Dashboard() {
-
     const navigate = useNavigate();
 
-    const [userName, setUserName] = useState("Usuario");
-    const [userInitial, setUserInitial] = useState("U");
+    const getTokenData = () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                return {};
+            }
+
+            const payload = token.split(".")[1];
+            const decoded = JSON.parse(atob(payload));
+
+            return {
+                usuarioId: decoded.usuarioId,
+                username: decoded.sub,
+                rol: decoded.rol,
+            };
+        } catch {
+            return {};
+        }
+    };
+
+    const tokenData = getTokenData();
+
+    const getUsuarioIdSesion = () => {
+        return (
+            localStorage.getItem("usuarioId") ||
+            localStorage.getItem("userId") ||
+            tokenData.usuarioId ||
+            null
+        );
+    };
+
+    const usuarioIdSesion = getUsuarioIdSesion();
+
 
     const [reportes, setReportes] = useState([]);
 
@@ -40,22 +69,23 @@ export default function Dashboard() {
 
     const [nuevoReporte, setNuevoReporte] = useState({
         descripcion: "",
-        latitud: -41.4693,
-        longitud: -72.9424,
+        latitud: null,
+        longitud: null,
         prioridad: "MEDIA",
         tipoUsuario: "CIUDADANO",
-        usuarioId: 1
+        usuarioId: usuarioIdSesion ? Number(usuarioIdSesion) : null
     });
 
-    // WEATHER
     const [weather, setWeather] = useState(null);
 
-    // BUSCADOR EN TIEMPO REAL
     const [busqueda, setBusqueda] = useState("");
     const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
 
+    const [errorModal, setErrorModal] = useState("");
+
     const tokenConfig = () => {
         const token = localStorage.getItem('token');
+
         return {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -69,14 +99,14 @@ export default function Dashboard() {
                 'http://localhost:8000/api/reportes',
                 tokenConfig()
             );
-            setReportes(response.data);
+
+            setReportes(response.data || []);
         }
         catch (error) {
             console.error("Error cargando reportes:", error);
         }
     };
 
-    // WEATHER API
     const fetchWeather = async () => {
         try {
             const response = await axios.get(
@@ -97,6 +127,7 @@ export default function Dashboard() {
                     }
                 }
             );
+
             setWeather(response.data.current);
         }
         catch (error) {
@@ -104,19 +135,38 @@ export default function Dashboard() {
         }
     };
 
-    // Cargar datos iniciales encapsulados para evitar cascading renders en IntelliJ
+    const resetFormularioReporte = () => {
+        const usuarioIdActual = getUsuarioIdSesion();
+
+        setNuevoReporte({
+            descripcion: "",
+            latitud: null,
+            longitud: null,
+            prioridad: "MEDIA",
+            tipoUsuario: "CIUDADANO",
+            usuarioId: usuarioIdActual ? Number(usuarioIdActual) : null
+        });
+
+        setBusqueda("");
+        setResultadosBusqueda([]);
+        setErrorModal("");
+    };
+
     useEffect(() => {
         const inicializarDashboard = async () => {
-            const storedNombre = localStorage.getItem('userNombre');
-            const storedUsername = localStorage.getItem('userUsername');
 
-            if (storedUsername) {
-                setUserName(storedUsername);
-                setUserInitial(storedUsername.charAt(0).toUpperCase());
+
+            if (tokenData.usuarioId && !localStorage.getItem("usuarioId")) {
+                localStorage.setItem("usuarioId", tokenData.usuarioId);
             }
-            else if (storedNombre) {
-                setUserName(storedNombre);
-                setUserInitial(storedNombre.charAt(0).toUpperCase());
+
+            if (tokenData.username && !localStorage.getItem("username")) {
+                localStorage.setItem("username", tokenData.username);
+                localStorage.setItem("userUsername", tokenData.username);
+            }
+
+            if (tokenData.rol && !localStorage.getItem("rol")) {
+                localStorage.setItem("rol", tokenData.rol);
             }
 
             await fetchReportes();
@@ -127,33 +177,44 @@ export default function Dashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
 
-    // ── NUEVA LÓGICA: Efecto Debounce para buscar mientras el usuario escribe ──
     useEffect(() => {
-        // Si la barra está vacía o tiene menos de 3 caracteres, limpiamos los resultados y no buscamos
         if (!busqueda || busqueda.trim().length < 3) {
             setResultadosBusqueda([]);
             return;
         }
 
-        // Creamos un temporizador que esperará 500ms tras la última pulsación de tecla
         const delayDebounceFn = setTimeout(async () => {
             try {
                 const response = await axios.get(
-                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}&addressdetails=1&limit=5`
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}&addressdetails=1&limit=5&countrycodes=cl`
                 );
-                setResultadosBusqueda(response.data || []);
-            } catch (error) {
+
+                const resultadosChile = response.data || [];
+
+                setResultadosBusqueda(resultadosChile);
+
+                if (resultadosChile.length === 0) {
+                    setErrorModal("No se encontraron ubicaciones dentro de Chile.");
+                }
+            }
+            catch (error) {
                 console.error("Error buscando dirección en tiempo real:", error);
             }
-        }, 500); // 500 milisegundos de espera
+        }, 500);
 
-        // Si el usuario vuelve a presionar una tecla antes de los 500ms, este return destruye el temporizador anterior y crea uno nuevo
         return () => clearTimeout(delayDebounceFn);
     }, [busqueda]);
 
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate('/login');
+
+
+    const abrirModalReporte = () => {
+        resetFormularioReporte();
+        setMostrarModal(true);
+    };
+
+    const cerrarModalReporte = () => {
+        setMostrarModal(false);
+        resetFormularioReporte();
     };
 
     const seleccionarUbicacion = (lat, lon, nombreLugar) => {
@@ -162,18 +223,43 @@ export default function Dashboard() {
             latitud: parseFloat(lat),
             longitud: parseFloat(lon)
         });
-        // Desactivamos temporalmente el trigger del useEffect limpiando o fijando el texto exacto
+
         setBusqueda(nombreLugar);
         setResultadosBusqueda([]);
+        setErrorModal("");
     };
 
     const handleEnviarReporte = async (e) => {
         e.preventDefault();
+
+        const usuarioIdActual = getUsuarioIdSesion();
+
+        if (!usuarioIdActual) {
+            setErrorModal("No se encontró el ID del usuario en la sesión. Vuelve a iniciar sesión.");
+            return;
+        }
+
+        if (!nuevoReporte.descripcion.trim()) {
+            setErrorModal("Debes ingresar una descripción de la emergencia.");
+            return;
+        }
+
+        if (!busqueda.trim()) {
+            setErrorModal("Debes buscar y seleccionar una ubicación antes de enviar el reporte.");
+            return;
+        }
+
+        if (nuevoReporte.latitud === null || nuevoReporte.longitud === null) {
+            setErrorModal("Selecciona una ubicación válida desde la lista de resultados.");
+            return;
+        }
+
         try {
             const payload = {
                 ...nuevoReporte,
+                descripcion: nuevoReporte.descripcion.trim(),
                 urlMedia: "",
-                usuarioId: parseInt(localStorage.getItem('userId')) || 1
+                usuarioId: Number(usuarioIdActual)
             };
 
             await axios.post(
@@ -182,59 +268,42 @@ export default function Dashboard() {
                 tokenConfig()
             );
 
-            Swal.fire({
-                icon: 'success',
-                title: '¡Reporte Enviado!',
-                text: 'La alerta de emergencia ha sido georreferenciada correctamente.',
-                confirmButtonColor: '#3085d6'
-            });
-
             setMostrarModal(false);
+            resetFormularioReporte();
 
-            setNuevoReporte({
-                ...nuevoReporte,
-                descripcion: "",
-                prioridad: "MEDIA"
-            });
-
-            setBusqueda("");
             await fetchReportes();
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Reporte Enviado!',
+                    text: 'La alerta de emergencia ha sido georreferenciada correctamente.',
+                    confirmButtonColor: '#FF7043'
+                });
+            }, 150);
         }
         catch (error) {
             console.error("Error al enviar reporte:", error.response || error);
 
             if (error.response?.status === 400 && error.response?.data) {
                 const mensajes = Object.values(error.response.data).join('\n');
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Formulario Inválido',
-                    text: mensajes,
-                    confirmButtonColor: '#f39c12'
-                });
+                setErrorModal(mensajes);
             }
             else if (
                 error.response?.status === 401 ||
                 error.response?.status === 403
             ) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Sesión Expirada',
-                    text: 'Permiso denegado. Vuelve a iniciar sesión para continuar.',
-                    confirmButtonColor: '#d33'
-                });
+                setErrorModal("Permiso denegado. Vuelve a iniciar sesión para continuar.");
             }
             else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de Red',
-                    text: 'No se logró establecer conexión con el servidor de GeoFire.',
-                    confirmButtonColor: '#d33'
-                });
+                setErrorModal("No se logró establecer conexión con el servidor de GeoFire.");
             }
         }
     };
 
-    const reportesFiltrados = reportes.filter(rep => {
+    const reportesActivos = reportes.filter(rep => rep.estado !== "RESUELTO");
+
+    const reportesFiltrados = reportesActivos.filter(rep => {
         const pasaEstado =
             filtroEstado === "TODOS" ||
             rep.estado === filtroEstado;
@@ -246,7 +315,6 @@ export default function Dashboard() {
         return pasaEstado && pasaPrioridad;
     });
 
-    // RIESGO SIMPLE
     const calcularRiesgo = () => {
         if (!weather) return "Moderado";
 
@@ -276,41 +344,26 @@ export default function Dashboard() {
         return "Bajo";
     };
 
+    const formatearCoordenadas = (latitud, longitud) => {
+        if (latitud === null || latitud === undefined || longitud === null || longitud === undefined) {
+            return "Sin ubicación";
+        }
+
+        const lat = Number(latitud);
+        const lon = Number(longitud);
+
+        if (Number.isNaN(lat) || Number.isNaN(lon)) {
+            return "Sin ubicación";
+        }
+
+        return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    };
+
     return (
         <div className="dashboard-container">
-
-            <nav className="dash-navbar">
-
-                <div className="nav-brand">
-                    <img src={logoImg} alt="GeoFire" />
-                    <h2>GeoFire</h2>
-                </div>
-                <div className="user-profile">
-                    <div className="avatar">{userInitial}</div>
-                    <span>Hola, {userName}</span>
-
-                    <button
-                        className="btn-profile-icon"
-                        onClick={() => navigate("/perfil")}
-                        title="Mi perfil"
-                    >
-                        <UserRound size={20} strokeWidth={2.5} />
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        className="btn-logout"
-                    >
-                        <LogOut size={20} />
-                    </button>
-                </div>
-
-
-            </nav>
-
+            <Navbar active="dashboard" showDashboard={false} />
             <main className="dash-content">
-
                 <div className="dashboard-header">
-
                     <div>
                         <h1>Panel de Control GeoFire</h1>
                         <p>Monitoreo en tiempo real de incendios y emergencias.</p>
@@ -318,22 +371,20 @@ export default function Dashboard() {
 
                     <button
                         className="btn-nuevo-reporte"
-                        onClick={() => setMostrarModal(true)}
+                        onClick={abrirModalReporte}
+                        type="button"
                     >
                         + NUEVO REPORTE
                     </button>
-
                 </div>
 
                 {weather && (
                     <div className="weather-banner">
-
                         <div className="weather-title">
                             ☀️ Condiciones Climáticas Puerto Montt
                         </div>
 
                         <div className="weather-content">
-
                             <div className="weather-item weather-temp">
                                 <div className="weather-main">
                                     <strong>
@@ -394,14 +445,11 @@ export default function Dashboard() {
                                 </div>
                                 <small>NIVEL DE RIESGO</small>
                             </div>
-
                         </div>
-
                     </div>
                 )}
 
                 <div className="filters-container">
-
                     <div className="filter-group">
                         <label>Estado:</label>
                         <select
@@ -429,13 +477,10 @@ export default function Dashboard() {
                             <option value="BAJA">Baja</option>
                         </select>
                     </div>
-
                 </div>
 
                 <section className="map-section">
-
                     <div className="map-card">
-
                         <div className="map-badge">📍 Mapa de Incidentes</div>
 
                         <MapContainer
@@ -467,11 +512,9 @@ export default function Dashboard() {
                                 </Marker>
                             ))}
                         </MapContainer>
-
                     </div>
 
                     <div className="stats-grid">
-
                         <div className="stat-card">
                             <span className="stat-icon">🔥</span>
                             <div className="stat-info">
@@ -495,19 +538,16 @@ export default function Dashboard() {
                                 <p>{reportes.length}</p>
                             </div>
                         </div>
-
                     </div>
-
                 </section>
 
                 <div className="table-card">
-
                     <div className="table-header">
-                        <h2>Historial de Reportes</h2>
+                        <h2>Reportes Activos</h2>
                     </div>
 
                     {reportesFiltrados.length === 0 ? (
-                        <p>No hay reportes que coincidan con los filtros.</p>
+                        <p>No hay reportes activos que coincidan con los filtros.</p>
                     ) : (
                         <table className="reports-table">
                             <thead>
@@ -521,18 +561,26 @@ export default function Dashboard() {
                                 <th>Estado</th>
                             </tr>
                             </thead>
+
                             <tbody>
                             {reportesFiltrados.map((rep) => (
                                 <tr key={rep.id}>
                                     <td>#{rep.id}</td>
+
                                     <td>
-                                        {new Date(rep.fechaReporte).toLocaleString('es-CL')}
+                                        {rep.fechaReporte
+                                            ? new Date(rep.fechaReporte).toLocaleString('es-CL')
+                                            : "Sin fecha"}
                                     </td>
+
                                     <td>
-                                        {rep.latitud}, {rep.longitud}
+                                        {formatearCoordenadas(rep.latitud, rep.longitud)}
                                     </td>
+
                                     <td>{rep.descripcion}</td>
+
                                     <td>{rep.tipoUsuario}</td>
+
                                     <td>
                                             <span
                                                 className={`badge-riesgo ${
@@ -543,9 +591,10 @@ export default function Dashboard() {
                                                             : 'nuevo'
                                                 }`}
                                             >
-                                                {rep.prioridad}
+                                                {rep.prioridad || "MEDIA"}
                                             </span>
                                     </td>
+
                                     <td>
                                             <span
                                                 className={`badge-riesgo ${
@@ -556,7 +605,7 @@ export default function Dashboard() {
                                                             : 'resuelto'
                                                 }`}
                                             >
-                                                {rep.estado}
+                                                {rep.estado || "NUEVO"}
                                             </span>
                                     </td>
                                 </tr>
@@ -564,60 +613,101 @@ export default function Dashboard() {
                             </tbody>
                         </table>
                     )}
-
                 </div>
-
             </main>
 
-            {/* MODAL CON BÚSQUEDA AUTOMÁTICA EN TIEMPO REAL */}
             {mostrarModal && (
                 <div className="modal-overlay">
                     <div className="modal-card">
                         <div className="modal-header">
                             <h2>Crear Alerta Geográfica</h2>
-                            <button className="close-btn" onClick={() => setMostrarModal(false)}>&times;</button>
+
+                            <button
+                                className="close-btn"
+                                onClick={cerrarModalReporte}
+                                type="button"
+                            >
+                                &times;
+                            </button>
                         </div>
+
                         <form className="modal-form" onSubmit={handleEnviarReporte}>
+                            {errorModal && (
+                                <div className="modal-inline-alert">
+                                    ⚠️ {errorModal}
+                                </div>
+                            )}
+
                             <div className="input-group">
                                 <label>Descripción de la emergencia</label>
+
                                 <input
                                     type="text"
                                     className="input-field"
                                     placeholder="Ej: Incendio forestal cerca de la ruta 5"
                                     value={nuevoReporte.descripcion}
-                                    onChange={(e) => setNuevoReporte({...nuevoReporte, descripcion: e.target.value})}
-                                    required
+                                    onChange={(e) => {
+                                        setNuevoReporte({
+                                            ...nuevoReporte,
+                                            descripcion: e.target.value
+                                        });
+
+                                        setErrorModal("");
+                                    }}
                                 />
                             </div>
 
-                            {/* --- BUSCADOR AUTOMÁTICO EN TIEMPO REAL --- */}
                             <div className="input-group">
                                 <label>Buscar Ubicación</label>
+
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     <input
                                         type="text"
                                         className="input-field"
-                                        placeholder="Escribe para buscar... (ej: Costanera, Puerto Montt)"
+                                        placeholder="Escribe para buscar una ubicación en Chile..."
                                         value={busqueda}
-                                        onChange={(e) => setBusqueda(e.target.value)}
+                                        onChange={(e) => {
+                                            setBusqueda(e.target.value);
+                                            setErrorModal("");
+                                            setNuevoReporte({
+                                                ...nuevoReporte,
+                                                latitud: null,
+                                                longitud: null
+                                            });
+                                        }}
                                         style={{ flex: 1 }}
                                     />
                                 </div>
 
-                                {/* Resultados desplegables automáticos */}
                                 {resultadosBusqueda.length > 0 && (
-                                    <ul style={{
-                                        background: 'white', border: '1px solid #ccc',
-                                        borderRadius: '8px', listStyle: 'none',
-                                        padding: '0', marginTop: '5px', maxHeight: '150px',
-                                        overflowY: 'auto'
-                                    }}>
-                                        {/* eslint-disable-next-line no-unused-vars */}
+                                    <ul
+                                        style={{
+                                            background: 'white',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                            listStyle: 'none',
+                                            padding: '0',
+                                            marginTop: '5px',
+                                            maxHeight: '150px',
+                                            overflowY: 'auto'
+                                        }}
+                                    >
                                         {resultadosBusqueda.map((lugar, idx) => (
                                             <li
                                                 key={lugar.place_id || idx}
-                                                style={{ padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer', fontSize: '0.9rem' }}
-                                                onClick={() => seleccionarUbicacion(lugar.lat, lugar.lon, lugar.display_name)}
+                                                style={{
+                                                    padding: '10px',
+                                                    borderBottom: '1px solid #eee',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.9rem'
+                                                }}
+                                                onClick={() =>
+                                                    seleccionarUbicacion(
+                                                        lugar.lat,
+                                                        lugar.lon,
+                                                        lugar.display_name
+                                                    )
+                                                }
                                             >
                                                 {lugar.display_name}
                                             </li>
@@ -628,10 +718,18 @@ export default function Dashboard() {
 
                             <div className="input-group">
                                 <label>Prioridad</label>
+
                                 <select
                                     className="input-field"
                                     value={nuevoReporte.prioridad}
-                                    onChange={(e) => setNuevoReporte({...nuevoReporte, prioridad: e.target.value})}
+                                    onChange={(e) => {
+                                        setNuevoReporte({
+                                            ...nuevoReporte,
+                                            prioridad: e.target.value
+                                        });
+
+                                        setErrorModal("");
+                                    }}
                                 >
                                     <option value="ALTA">Alta</option>
                                     <option value="MEDIA">Media</option>
@@ -640,14 +738,25 @@ export default function Dashboard() {
                             </div>
 
                             <div className="modal-actions">
-                                <button type="button" className="btn-cancelar" onClick={() => setMostrarModal(false)}>Cancelar</button>
-                                <button type="submit" className="btn-guardar">Enviar Reporte</button>
+                                <button
+                                    type="button"
+                                    className="btn-cancelar"
+                                    onClick={cerrarModalReporte}
+                                >
+                                    Cancelar
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="btn-guardar"
+                                >
+                                    Enviar Reporte
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }
