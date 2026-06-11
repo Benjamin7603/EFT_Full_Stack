@@ -53,10 +53,23 @@ class GlobalExceptionHandlerTest {
                 .build();
     }
 
+    private Notificacion crearValida() {
+        Notificacion notificacion = new Notificacion();
+        notificacion.setTitulo("Nuevo reporte");
+        notificacion.setDestinatario("BRIGADAS_ZONA_SUR");
+        notificacion.setMensaje("Alerta activa");
+        notificacion.setTipo("REPORTE");
+        notificacion.setPrioridad("ALTA");
+        notificacion.setLeida(false);
+        return notificacion;
+    }
+
     @Test
     void testManejarValidaciones_Estructura() throws Exception {
         BindException bindException =
                 new BindException(new Notificacion(), "notificacion");
+
+        bindException.rejectValue("mensaje", "NotBlank", "El mensaje no puede estar vacío");
 
         Method metodoReal =
                 NotificacionController.class.getMethod("enviarAlerta", Notificacion.class);
@@ -72,13 +85,12 @@ class GlobalExceptionHandlerTest {
 
         assertNotNull(respuesta);
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("El mensaje no puede estar vacío", respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void testManejarNoEncontrado() throws Exception {
-        Notificacion validadorDto = new Notificacion();
-        validadorDto.setDestinatario("central@incendios.cl");
-        validadorDto.setMensaje("Alerta activa");
+        Notificacion validadorDto = crearValida();
 
         when(notificacionService.enviarAlerta(any(Notificacion.class)))
                 .thenThrow(new EntityNotFoundException("Registro ausente"));
@@ -91,10 +103,22 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void testManejarBadRequest() throws Exception {
+        Notificacion validadorDto = crearValida();
+
+        when(notificacionService.enviarAlerta(any(Notificacion.class)))
+                .thenThrow(new IllegalArgumentException("El destinatario es obligatorio."));
+
+        mockMvc.perform(post("/api/notificaciones/enviar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validadorDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("El destinatario es obligatorio."));
+    }
+
+    @Test
     void testManejarErrorGeneral() throws Exception {
-        Notificacion validadorDto = new Notificacion();
-        validadorDto.setDestinatario("central@incendios.cl");
-        validadorDto.setMensaje("Alerta activa");
+        Notificacion validadorDto = crearValida();
 
         when(notificacionService.enviarAlerta(any(Notificacion.class)))
                 .thenThrow(new RuntimeException("Fallo del sistema"));
