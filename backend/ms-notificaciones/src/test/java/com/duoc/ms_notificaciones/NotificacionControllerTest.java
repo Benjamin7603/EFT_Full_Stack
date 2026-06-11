@@ -17,8 +17,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("Pruebas Unitarias - NotificacionController")
@@ -43,43 +42,74 @@ class NotificacionControllerTest {
                 .build();
     }
 
-    @Test
-    @DisplayName("Debe procesar el envio de alerta exitosamente y retornar HTTP 200")
-    void testEnviarAlerta_Exitoso() throws Exception {
-        Notificacion notificacionInput = new Notificacion();
-        notificacionInput.setDestinatario("brigadista@incendios.cl");
-        notificacionInput.setMensaje("Foco de incendio detectado en sector sur");
+    private Notificacion crearNotificacion() {
+        Notificacion notificacion = new Notificacion();
+        notificacion.setId(1L);
+        notificacion.setTitulo("Nuevo reporte");
+        notificacion.setMensaje("Foco de incendio detectado en sector sur");
+        notificacion.setDestinatario("BRIGADAS_ZONA_SUR");
+        notificacion.setTipo("REPORTE");
+        notificacion.setPrioridad("ALTA");
+        notificacion.setLeida(false);
+        notificacion.setReporteId(25L);
+        return notificacion;
+    }
 
-        Notificacion notificacionPersistida = new Notificacion();
-        notificacionPersistida.setId(1L);
-        notificacionPersistida.setDestinatario("brigadista@incendios.cl");
-        notificacionPersistida.setMensaje("Foco de incendio detectado en sector sur");
+    @Test
+    @DisplayName("POST /api/notificaciones/enviar crea notificación")
+    void testEnviarAlerta_Exitoso() throws Exception {
+        Notificacion input = crearNotificacion();
+        input.setId(null);
+
+        Notificacion persistida = crearNotificacion();
 
         when(notificacionService.enviarAlerta(any(Notificacion.class)))
-                .thenReturn(notificacionPersistida);
+                .thenReturn(persistida);
 
         mockMvc.perform(post("/api/notificaciones/enviar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notificacionInput)))
+                        .content(objectMapper.writeValueAsString(input)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.destinatario").value("brigadista@incendios.cl"))
-                .andExpect(jsonPath("$.mensaje").value("Foco de incendio detectado en sector sur"));
+                .andExpect(jsonPath("$.titulo").value("Nuevo reporte"))
+                .andExpect(jsonPath("$.destinatario").value("BRIGADAS_ZONA_SUR"))
+                .andExpect(jsonPath("$.mensaje").value("Foco de incendio detectado en sector sur"))
+                .andExpect(jsonPath("$.leida").value(false));
 
         verify(notificacionService, times(1))
                 .enviarAlerta(any(Notificacion.class));
     }
 
     @Test
-    @DisplayName("Debe retornar HTTP 400 cuando el mensaje esta vacio")
+    @DisplayName("POST /api/notificaciones crea notificación")
+    void testCrear_Exitoso() throws Exception {
+        Notificacion input = crearNotificacion();
+        input.setId(null);
+
+        Notificacion persistida = crearNotificacion();
+
+        when(notificacionService.enviarAlerta(any(Notificacion.class)))
+                .thenReturn(persistida);
+
+        mockMvc.perform(post("/api/notificaciones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(input)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+
+        verify(notificacionService, times(1))
+                .enviarAlerta(any(Notificacion.class));
+    }
+
+    @Test
+    @DisplayName("POST retorna 400 cuando mensaje está vacío")
     void testEnviarAlerta_MensajeVacio() throws Exception {
-        Notificacion notificacionInvalida = new Notificacion();
-        notificacionInvalida.setDestinatario("brigadista@incendios.cl");
-        notificacionInvalida.setMensaje("");
+        Notificacion invalida = crearNotificacion();
+        invalida.setMensaje("");
 
         mockMvc.perform(post("/api/notificaciones/enviar")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notificacionInvalida)))
+                        .content(objectMapper.writeValueAsString(invalida)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.mensaje").value("El mensaje no puede estar vacío"));
 
@@ -88,12 +118,25 @@ class NotificacionControllerTest {
     }
 
     @Test
-    @DisplayName("Debe listar el historial de notificaciones")
+    @DisplayName("POST retorna 400 cuando destinatario está vacío")
+    void testEnviarAlerta_DestinatarioVacio() throws Exception {
+        Notificacion invalida = crearNotificacion();
+        invalida.setDestinatario("");
+
+        mockMvc.perform(post("/api/notificaciones/enviar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalida)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.destinatario").value("El destinatario no puede estar vacío"));
+
+        verify(notificacionService, never())
+                .enviarAlerta(any(Notificacion.class));
+    }
+
+    @Test
+    @DisplayName("GET /api/notificaciones lista historial")
     void testListarHistorial_Exitoso() throws Exception {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setId(1L);
-        notificacion.setDestinatario("BRIGADAS_ZONA_SUR");
-        notificacion.setMensaje("Alerta activa");
+        Notificacion notificacion = crearNotificacion();
 
         when(notificacionService.listarHistorial())
                 .thenReturn(List.of(notificacion));
@@ -102,19 +145,16 @@ class NotificacionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].destinatario").value("BRIGADAS_ZONA_SUR"))
-                .andExpect(jsonPath("$[0].mensaje").value("Alerta activa"));
+                .andExpect(jsonPath("$[0].mensaje").value("Foco de incendio detectado en sector sur"));
 
         verify(notificacionService, times(1))
                 .listarHistorial();
     }
 
     @Test
-    @DisplayName("Debe obtener una notificacion por ID")
+    @DisplayName("GET /api/notificaciones/{id} obtiene por ID")
     void testObtenerPorId_Exitoso() throws Exception {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setId(1L);
-        notificacion.setDestinatario("BRIGADAS_ZONA_SUR");
-        notificacion.setMensaje("Alerta activa");
+        Notificacion notificacion = crearNotificacion();
 
         when(notificacionService.obtenerPorId(1L))
                 .thenReturn(notificacion);
@@ -122,28 +162,111 @@ class NotificacionControllerTest {
         mockMvc.perform(get("/api/notificaciones/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.destinatario").value("BRIGADAS_ZONA_SUR"))
-                .andExpect(jsonPath("$.mensaje").value("Alerta activa"));
+                .andExpect(jsonPath("$.destinatario").value("BRIGADAS_ZONA_SUR"));
 
         verify(notificacionService, times(1))
                 .obtenerPorId(1L);
     }
 
     @Test
-    @DisplayName("Debe retornar HTTP 404 cuando no existe la notificacion")
+    @DisplayName("GET /api/notificaciones/{id} retorna 404 si no existe")
     void testObtenerPorId_NoEncontrado() throws Exception {
         when(notificacionService.obtenerPorId(99L))
-                .thenThrow(new EntityNotFoundException(
-                        "La notificación con ID 99 no existe."
-                ));
+                .thenThrow(new EntityNotFoundException("La notificación con ID 99 no existe."));
 
         mockMvc.perform(get("/api/notificaciones/99"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(
-                        "La notificación con ID 99 no existe."
-                ));
+                .andExpect(jsonPath("$.error").value("La notificación con ID 99 no existe."));
 
         verify(notificacionService, times(1))
                 .obtenerPorId(99L);
+    }
+
+    @Test
+    @DisplayName("GET /destinatario/{destinatario} lista por destinatario")
+    void testListarPorDestinatario() throws Exception {
+        when(notificacionService.listarPorDestinatario("BRIGADAS_ZONA_SUR"))
+                .thenReturn(List.of(crearNotificacion()));
+
+        mockMvc.perform(get("/api/notificaciones/destinatario/BRIGADAS_ZONA_SUR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].destinatario").value("BRIGADAS_ZONA_SUR"));
+
+        verify(notificacionService, times(1))
+                .listarPorDestinatario("BRIGADAS_ZONA_SUR");
+    }
+
+    @Test
+    @DisplayName("GET /destinatario/{destinatario}/no-leidas lista no leídas")
+    void testListarNoLeidas() throws Exception {
+        when(notificacionService.listarNoLeidas("BRIGADAS_ZONA_SUR"))
+                .thenReturn(List.of(crearNotificacion()));
+
+        mockMvc.perform(get("/api/notificaciones/destinatario/BRIGADAS_ZONA_SUR/no-leidas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].leida").value(false));
+
+        verify(notificacionService, times(1))
+                .listarNoLeidas("BRIGADAS_ZONA_SUR");
+    }
+
+    @Test
+    @DisplayName("GET /destinatario/{destinatario}/contador cuenta no leídas")
+    void testContarNoLeidas() throws Exception {
+        when(notificacionService.contarNoLeidas("BRIGADAS_ZONA_SUR"))
+                .thenReturn(3L);
+
+        mockMvc.perform(get("/api/notificaciones/destinatario/BRIGADAS_ZONA_SUR/contador"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.noLeidas").value(3));
+
+        verify(notificacionService, times(1))
+                .contarNoLeidas("BRIGADAS_ZONA_SUR");
+    }
+
+    @Test
+    @DisplayName("PATCH /{id}/leer marca como leída")
+    void testMarcarComoLeida() throws Exception {
+        Notificacion leida = crearNotificacion();
+        leida.setLeida(true);
+
+        when(notificacionService.marcarComoLeida(1L))
+                .thenReturn(leida);
+
+        mockMvc.perform(patch("/api/notificaciones/1/leer"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leida").value(true));
+
+        verify(notificacionService, times(1))
+                .marcarComoLeida(1L);
+    }
+
+    @Test
+    @DisplayName("PATCH /destinatario/{destinatario}/leer-todas marca todas como leídas")
+    void testMarcarTodasComoLeidas() throws Exception {
+        Notificacion leida = crearNotificacion();
+        leida.setLeida(true);
+
+        when(notificacionService.marcarTodasComoLeidas("BRIGADAS_ZONA_SUR"))
+                .thenReturn(List.of(leida));
+
+        mockMvc.perform(patch("/api/notificaciones/destinatario/BRIGADAS_ZONA_SUR/leer-todas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].leida").value(true));
+
+        verify(notificacionService, times(1))
+                .marcarTodasComoLeidas("BRIGADAS_ZONA_SUR");
+    }
+
+    @Test
+    @DisplayName("DELETE /{id} elimina notificación")
+    void testEliminar() throws Exception {
+        doNothing().when(notificacionService).eliminar(1L);
+
+        mockMvc.perform(delete("/api/notificaciones/1"))
+                .andExpect(status().isOk());
+
+        verify(notificacionService, times(1))
+                .eliminar(1L);
     }
 }
