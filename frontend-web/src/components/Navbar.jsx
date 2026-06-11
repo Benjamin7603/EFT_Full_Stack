@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import logoImg from "../assets/logo.png";
+import NotificationBell from "./NotificationBell";
 import "./Navbar.css";
 
 export default function Navbar({
@@ -54,6 +55,9 @@ export default function Navbar({
         "USER"
     ).toUpperCase();
 
+    const rolesConNotificaciones = ["ADMIN", "BOMBERO", "BRIGADISTA"];
+    const mostrarNotificaciones = rolesConNotificaciones.includes(rolSesion);
+
     const inicial = nombreSesion.trim().charAt(0).toUpperCase() || "U";
 
     const cerrarSesion = () => {
@@ -71,6 +75,10 @@ export default function Navbar({
             <div className="user-profile">
                 <div className="avatar">{inicial}</div>
                 <span>Hola, {nombreSesion}</span>
+
+                {mostrarNotificaciones && (
+                    <NotificationBell destinatario={rolSesion} />
+                )}
 
                 {showAdmin && rolSesion === "ADMIN" && (
                     <button

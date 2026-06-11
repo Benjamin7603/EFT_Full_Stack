@@ -85,7 +85,7 @@ public class ReporteService {
         try {
             NotificacionDTO alerta = new NotificacionDTO(
                     "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
-                    "BRIGADAS_ZONA_SUR"
+                    "ADMIN"
             );
             notificacionClient.enviarAlerta(alerta);
         } catch (Exception e) {
