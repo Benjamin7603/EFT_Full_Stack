@@ -1,6 +1,3 @@
-// src/api/api.js
-// Instancia de axios compartida para toda la app.
-// Agrega automáticamente el token JWT en cada request.
 
 import axios from 'axios';
 

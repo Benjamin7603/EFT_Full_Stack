@@ -201,6 +201,27 @@
     background: #FF7043;
     color: white;
 }
+.notification-view-all {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    background: #fff7f3;
+    color: #ff7043;
+    padding: 13px 16px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.notification-view-all:hover {
+    background: #ff7043;
+    color: white;
+}
 
 @keyframes notificationFadeIn {
     from {

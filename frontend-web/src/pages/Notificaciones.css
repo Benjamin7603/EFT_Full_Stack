@@ -1,0 +1,475 @@
+.notificaciones-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f3f6f9 0%, #eef2f6 100%);
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.notificaciones-container {
+    width: min(1320px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 34px 0 70px;
+}
+
+/* HERO estilo Perfil/Admin */
+.notificaciones-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 26px;
+    padding: 38px 42px;
+    border-radius: 26px;
+    background: white;
+    color: #243447;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    border-left: 6px solid #ff7043;
+}
+
+.notificaciones-kicker {
+    display: inline-block;
+    color: #ff7043;
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+}
+
+.notificaciones-hero h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 2.1rem;
+    font-weight: 900;
+}
+
+.notificaciones-hero p {
+    max-width: 780px;
+    margin: 12px 0 0;
+    color: #5d6d7e;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.notificaciones-hero p strong {
+    color: #ff7043;
+}
+
+/* Botones */
+.noti-refresh-btn,
+.noti-mark-all-btn {
+    border: none;
+    border-radius: 14px;
+    padding: 13px 18px;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.noti-refresh-btn {
+    background: #fff0ea;
+    color: #ff7043;
+}
+
+.noti-refresh-btn:hover {
+    background: #ff7043;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(255, 112, 67, 0.22);
+}
+
+.noti-refresh-btn:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Stats estilo tarjetas Admin */
+.notificaciones-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.noti-stat-card {
+    background: white;
+    border-radius: 22px;
+    padding: 24px 26px;
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.07);
+}
+
+.noti-stat-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+    display: grid;
+    place-items: center;
+}
+
+.noti-stat-icon.total {
+    color: #ff7043;
+    background: #fff0ea;
+}
+
+.noti-stat-icon.unread {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.noti-stat-icon.read {
+    color: #16a34a;
+    background: #dcfce7;
+}
+
+.noti-stat-card span {
+    color: #a5afbd;
+    font-weight: 900;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+}
+
+.noti-stat-card strong {
+    display: block;
+    color: #243447;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-top: 4px;
+}
+
+/* Toolbar */
+.notificaciones-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.noti-search {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.noti-search svg {
+    color: #94a3b8;
+}
+
+.noti-search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 15px 0;
+    font-size: 0.95rem;
+    color: #243447;
+    background: transparent;
+}
+
+.noti-filters {
+    display: flex;
+    gap: 8px;
+    background: white;
+    padding: 7px;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.noti-filters button {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    padding: 10px 15px;
+    border-radius: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.noti-filters button.active {
+    background: #ff7043;
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 112, 67, 0.22);
+}
+
+.noti-mark-all-btn {
+    background: #fff0ea;
+    color: #ff7043;
+}
+
+.noti-mark-all-btn:hover {
+    background: #ff7043;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Estados */
+.noti-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    border-radius: 18px;
+    padding: 16px 18px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+/* Lista */
+.notificaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Empty box más parecido al dashboard/admin */
+.noti-empty {
+    background: white;
+    border: 1px dashed #cbd5e1;
+    border-radius: 26px;
+    padding: 72px 24px;
+    text-align: center;
+    color: #64748b;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
+}
+
+.noti-empty svg {
+    color: #ff7043;
+    margin-bottom: 12px;
+}
+
+.noti-empty h3 {
+    margin: 0;
+    color: #243447;
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.noti-empty p {
+    margin: 8px 0 0;
+}
+
+/* Cards de notificación */
+.noti-card {
+    background: white;
+    border: 1px solid #edf0f4;
+    border-radius: 22px;
+    padding: 24px 26px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.07);
+    position: relative;
+    overflow: hidden;
+}
+
+.noti-card.unread {
+    border-left: 5px solid #ff7043;
+}
+
+.noti-card.read {
+    opacity: 0.82;
+}
+
+.noti-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.noti-card h3 {
+    margin: 0;
+    color: #243447;
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.noti-date {
+    display: block;
+    margin-top: 6px;
+    color: #94a3b8;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.noti-message {
+    margin: 16px 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.noti-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.noti-prioridad,
+.noti-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.noti-prioridad.alta {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.noti-prioridad.media {
+    background: #fff0ea;
+    color: #ff7043;
+}
+
+.noti-prioridad.baja {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.noti-status.leida {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.noti-status.pendiente {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.noti-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.noti-meta span {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.noti-card-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.noti-action {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 13px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s ease;
+}
+
+.noti-action.read {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.noti-action.read:hover {
+    background: #16a34a;
+    color: white;
+}
+
+.noti-action.delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.noti-action.delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.spinning {
+    animation: noti-spin 0.9s linear infinite;
+}
+
+@keyframes noti-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .notificaciones-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .notificaciones-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .notificaciones-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .noti-filters {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .noti-card {
+        grid-template-columns: 1fr;
+    }
+
+    .noti-card-top {
+        flex-direction: column;
+    }
+
+    .noti-badges {
+        justify-content: flex-start;
+    }
+
+    .noti-card-actions {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 560px) {
+    .notificaciones-container {
+        width: min(100% - 24px, 1320px);
+        padding-top: 22px;
+    }
+
+    .notificaciones-hero {
+        padding: 26px;
+        border-radius: 22px;
+    }
+
+    .notificaciones-hero h1 {
+        font-size: 2rem;
+    }
+
+    .noti-card {
+        padding: 20px;
+    }
+}
