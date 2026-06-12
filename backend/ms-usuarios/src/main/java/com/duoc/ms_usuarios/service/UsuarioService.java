@@ -30,6 +30,10 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorId(Long id) {
+        return obtenerPorId(id);
+    }
+
+    public Usuario obtenerPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
     }
@@ -44,8 +48,6 @@ public class UsuarioService {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         }
 
-        // 🔥 BLOQUEO DE SEGURIDAD:
-        // Ignoramos lo que envíe el cliente y forzamos a que toda cuenta nueva sea USER.
         usuario.setRol("USER");
 
         if (usuario.getActivo() == null) {
@@ -55,9 +57,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public Usuario actualizar(Long id, Usuario usuario) {
-        return actualizar(id, usuario, null, null);
-    }
 
     public Usuario actualizar(Long id, Usuario usuario, Long usuarioIdSesion, String rolSesion) {
         Usuario usuarioActual = usuarioRepository.findById(id)
@@ -101,9 +100,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuarioActual);
     }
 
-    public boolean eliminar(Long id) {
-        return eliminar(id, null);
-    }
 
     public boolean eliminar(Long id, Long usuarioIdSesion) {
         Usuario usuario = usuarioRepository.findById(id)

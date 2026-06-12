@@ -74,7 +74,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new EntityNotFoundException("Usuario no encontrado en el sistema"));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Usuario no encontrado en el sistema"));
     }
@@ -87,7 +88,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new DataIntegrityViolationException(mensajeBd));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Este correo electrónico ya está registrado en el sistema."));
     }
@@ -100,7 +102,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new DataIntegrityViolationException(mensajeBd));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Este nombre de usuario ya está en uso."));
     }
@@ -113,7 +116,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new DataIntegrityViolationException(mensajeBd));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Error: Un dato único ya existe en el sistema."));
     }
@@ -124,7 +128,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new DataIntegrityViolationException(null));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Error: Un dato único ya existe en el sistema."));
     }
@@ -135,7 +140,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new IllegalArgumentException("No puedes eliminar tu propia cuenta."));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("No puedes eliminar tu propia cuenta."));
     }
@@ -146,7 +152,8 @@ class GlobalExceptionHandlerTest {
         when(usuarioService.listar())
                 .thenThrow(new RuntimeException("Fallo crítico de hardware"));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.mensaje").value("Error inesperado en el servidor"))
                 .andExpect(jsonPath("$.detalle").value("Fallo crítico de hardware"));

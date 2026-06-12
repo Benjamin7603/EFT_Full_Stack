@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import api from "../api/api";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import Swal from 'sweetalert2';
@@ -61,6 +62,7 @@ export default function Dashboard() {
 
 
     const [reportes, setReportes] = useState([]);
+    const [reportesEstadisticas, setReportesEstadisticas] = useState([]);
 
     const [filtroEstado, setFiltroEstado] = useState("TODOS");
     const [filtroPrioridad, setFiltroPrioridad] = useState("TODOS");
@@ -83,27 +85,19 @@ export default function Dashboard() {
 
     const [errorModal, setErrorModal] = useState("");
 
-    const tokenConfig = () => {
-        const token = localStorage.getItem('token');
-
-        return {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        };
-    };
 
     const fetchReportes = async () => {
         try {
-            const response = await axios.get(
-                'http://localhost:8000/api/reportes/activos',
-                tokenConfig()
-            );
+            const [activosResponse, todosResponse] = await Promise.all([
+                api.get("/api/reportes/activos"),
+                api.get("/api/reportes")
+            ]);
 
-            setReportes(response.data || []);
+            setReportes(activosResponse.data || []);
+            setReportesEstadisticas(todosResponse.data || []);
         }
         catch (error) {
-            console.error("Error cargando reportes activos:", error);
+            console.error("Error cargando reportes:", error);
         }
     };
 
@@ -262,11 +256,7 @@ export default function Dashboard() {
                 usuarioId: Number(usuarioIdActual)
             };
 
-            await axios.post(
-                'http://localhost:8000/api/reportes',
-                payload,
-                tokenConfig()
-            );
+            await api.post("/api/reportes", payload);
 
             setMostrarModal(false);
             resetFormularioReporte();
@@ -519,7 +509,7 @@ export default function Dashboard() {
                             <span className="stat-icon">🔥</span>
                             <div className="stat-info">
                                 <h3>Alertas Activas</h3>
-                                <p>{reportes.filter(r => r.estado !== 'RESUELTO').length}</p>
+                                <p>{reportesEstadisticas.filter(r => r.estado !== 'RESUELTO').length}</p>
                             </div>
                         </div>
 
@@ -527,7 +517,7 @@ export default function Dashboard() {
                             <span className="stat-icon">✅</span>
                             <div className="stat-info">
                                 <h3>Incidentes Resueltos</h3>
-                                <p>{reportes.filter(r => r.estado === 'RESUELTO').length}</p>
+                                <p>{reportesEstadisticas.filter(r => r.estado === 'RESUELTO').length}</p>
                             </div>
                         </div>
 
@@ -535,7 +525,7 @@ export default function Dashboard() {
                             <span className="stat-icon">👥</span>
                             <div className="stat-info">
                                 <h3>Total Reportes</h3>
-                                <p>{reportes.length}</p>
+                                <p>{reportesEstadisticas.length}</p>
                             </div>
                         </div>
                     </div>

@@ -60,7 +60,20 @@ export default function Registro() {
                 });
 
                 if (loginResponse.data.token) {
-                    localStorage.setItem('token', loginResponse.data.token);
+                    const data = loginResponse.data;
+
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username || formData.username);
+                    localStorage.setItem('userUsername', data.username || formData.username);
+                    localStorage.setItem('rol', data.rol || 'USER');
+                    localStorage.setItem('ultimoAcceso', new Date().toISOString());
+
+                    if (data.usuarioId !== undefined && data.usuarioId !== null) {
+                        localStorage.setItem('usuarioId', String(data.usuarioId));
+                    }
+
+                    localStorage.setItem('nombre', data.nombre || formData.nombre);
+                    localStorage.setItem('userNombre', data.nombre || formData.nombre);
 
                     Swal.fire({
                         title: '¡Registro Exitoso!',
@@ -72,6 +85,7 @@ export default function Registro() {
                     }).then(() => {
                         navigate('/dashboard');
                     });
+
                     return;
                 }
             } catch (loginError) {

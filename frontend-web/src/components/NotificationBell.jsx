@@ -17,10 +17,12 @@ export default function NotificationBell({ destinatario }) {
 
     const cargarContador = async () => {
         try {
-            const response = await api.get(`/api/notificaciones/destinatario/${destino}/contador`);
-            setContador(Number(response.data) || 0);
+            const response = await api.get(`/api/notificaciones/destinatario/${destino}/no-leidas`);
+            const lista = Array.isArray(response.data) ? response.data : [];
+            setContador(lista.length);
         } catch (error) {
             console.error("Error al cargar contador de notificaciones:", error);
+            setContador(0);
         }
     };
 
@@ -28,7 +30,10 @@ export default function NotificationBell({ destinatario }) {
         try {
             setLoading(true);
             const response = await api.get(`/api/notificaciones/destinatario/${destino}/no-leidas`);
-            setNotificaciones(Array.isArray(response.data) ? response.data : []);
+            const lista = Array.isArray(response.data) ? response.data : [];
+
+            setNotificaciones(lista);
+            setContador(lista.length);
         } catch (error) {
             console.error("Error al cargar notificaciones:", error);
         } finally {
