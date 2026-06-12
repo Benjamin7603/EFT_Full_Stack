@@ -44,9 +44,9 @@ public class UsuarioService {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         }
 
-        if (usuario.getRol() == null || usuario.getRol().isBlank()) {
-            usuario.setRol("USER");
-        }
+        // 🔥 BLOQUEO DE SEGURIDAD:
+        // Ignoramos lo que envíe el cliente y forzamos a que toda cuenta nueva sea USER.
+        usuario.setRol("USER");
 
         if (usuario.getActivo() == null) {
             usuario.setActivo(true);
