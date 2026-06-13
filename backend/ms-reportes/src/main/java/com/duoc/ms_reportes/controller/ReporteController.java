@@ -9,10 +9,12 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 /**
  * Controlador REST encargado de exponer las operaciones de gestión de reportes de incidentes.
  * Permite la recepción, consulta histórica, filtrado en tiempo real de focos activos
  * y la actualización de los estados operativos de cada reporte.
+ *
  * @author Carlos Moil
  * @version 1.0
  */
@@ -22,63 +24,82 @@ import java.util.List;
 public class ReporteController {
 
     private final ReporteService reporteService;
+
     /**
      * Constructor para la inyección del servicio requerido por el controlador.
+     *
      * @param reporteService Servicio de lógica de negocio que orquesta el procesamiento de reportes.
      */
     public ReporteController(ReporteService reporteService) {
         this.reporteService = reporteService;
     }
+
     /**
      * Endpoint para el ingreso y procesamiento de un nuevo reporte de incidente.
-     * Recibe los datos validados del usuario y delega la lógica de creación e integración.
-     * @param reporteDTO Objeto {@link ReporteDTO} con los datos de entrada del aviso (coordenadas, descripción).
-     * Es validado formalmente mediante la anotación {@link Valid}.
-     * @return El objeto {@link Reporte} ya persistido en el sistema con sus propiedades asignadas.
+     *
+     * @param reporteDTO Objeto con los datos de entrada del reporte.
+     * @return Reporte persistido.
      */
     @Operation(summary = "Enviar un nuevo reporte")
     @PostMapping
-    public Reporte crear(@Valid @RequestBody ReporteDTO reporteDTO) { // AHORA RECIBE EL DTO
+    public Reporte crear(@Valid @RequestBody ReporteDTO reporteDTO) {
         return reporteService.crearReporteProcesado(reporteDTO);
     }
+
     /**
-     * Endpoint para recuperar el historial completo de reportes registrados en la base de datos.
-     * @return Una {@link List} que contiene todas las entidades {@link Reporte} almacenadas.
+     * Endpoint para recuperar el historial completo de reportes registrados.
+     *
+     * @return Lista de reportes.
      */
     @Operation(summary = "Listar reportes históricos")
     @GetMapping
     public List<Reporte> listar() {
         return reporteService.listarTodos();
     }
-    /**
-     * Endpoint para obtener de forma exclusiva los reportes de incidentes que se encuentran activos.
-     * Utilizado comúnmente para la representación gráfica o mapeo de emergencias en curso.
-     * @return Una {@link List} con los objetos {@link Reporte} en estado NUEVO o EN_PROGRESO.
-     */
 
+    /**
+     * Endpoint para obtener reportes activos.
+     *
+     * @return Lista de reportes en estado NUEVO o EN_PROGRESO.
+     */
+    @Operation(summary = "Obtener reportes activos")
+    @GetMapping("/activos")
+    public List<Reporte> obtenerActivos() {
+        return reporteService.listarActivos();
+    }
+
+    /**
+     * Endpoint para obtener un reporte por ID.
+     *
+     * @param id Identificador del reporte.
+     * @return Reporte encontrado.
+     */
     @Operation(summary = "Obtener reporte por ID")
     @GetMapping("/{id}")
     public Reporte obtenerPorId(@PathVariable Long id) {
         return reporteService.obtenerPorId(id);
     }
 
-    @Operation(summary = "Obtener reportes activos")
-    @GetMapping("/activos")
-    public List<Reporte> obtenerActivos() {
-        return reporteService.listarActivos();
-    }
     /**
-     * Endpoint para modificar parcialmente el estado operativo de un reporte específico.
-     * Utiliza el mapeo por parche (Patch) para actualizar únicamente el atributo requerido.
-     * @param id Identificador único del reporte que se desea actualizar, extraído de la URL.
-     * @param nuevoEstado Cadena de texto enviada por parámetro que define la nueva situación del incidente.
-     * @return La entidad {@link Reporte} modificada con el nuevo estado almacenado en la base de datos.
+     * Endpoint para modificar el estado operativo de un reporte.
+     * Solo ADMIN puede cambiar estados.
+     *
+     * @param id Identificador del reporte.
+     * @param nuevoEstado Nuevo estado del reporte.
+     * @param rolSesion Rol recibido desde el Gateway.
+     * @return Reporte actualizado.
      */
     @Operation(summary = "Actualizar estado del reporte")
     @PatchMapping("/{id}/estado")
     public Reporte actualizarEstado(
             @PathVariable("id") Long id,
-            @RequestParam("nuevoEstado") String nuevoEstado) {
+            @RequestParam("nuevoEstado") String nuevoEstado,
+            @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
+    ) {
+        if (rolSesion == null || !"ADMIN".equalsIgnoreCase(rolSesion)) {
+            throw new IllegalArgumentException("Solo un administrador puede cambiar el estado de un reporte.");
+        }
+
         return reporteService.actualizarEstado(id, nuevoEstado);
     }
 }

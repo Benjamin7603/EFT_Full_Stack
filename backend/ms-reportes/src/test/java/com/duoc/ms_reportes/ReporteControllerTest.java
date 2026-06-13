@@ -2,6 +2,7 @@ package com.duoc.ms_reportes;
 
 import com.duoc.ms_reportes.controller.ReporteController;
 import com.duoc.ms_reportes.dto.ReporteDTO;
+import com.duoc.ms_reportes.exception.GlobalExceptionHandler;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.service.ReporteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,11 @@ class ReporteControllerTest {
         reporteService = mock(ReporteService.class);
         ReporteController reporteController = new ReporteController(reporteService);
         objectMapper = new ObjectMapper();
-        mockMvc = MockMvcBuilders.standaloneSetup(reporteController).build();
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(reporteController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     // =========================================================
@@ -107,8 +112,18 @@ class ReporteControllerTest {
         when(reporteService.actualizarEstado(eq(1L), eq("EN_PROGRESO"))).thenReturn(reporteActualizado);
 
         mockMvc.perform(patch("/api/reportes/1/estado")
+                        .header("X-Usuario-Rol", "ADMIN")
                         .param("nuevoEstado", "EN_PROGRESO"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("EN_PROGRESO"));
+    }
+    @Test
+    void testActualizarEstado_SinRolAdmin_RetornaBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/reportes/1/estado")
+                        .header("X-Usuario-Rol", "USER")
+                        .param("nuevoEstado", "EN_PROGRESO"))
+                .andExpect(status().isBadRequest());
+
+        verify(reporteService, never()).actualizarEstado(anyLong(), anyString());
     }
 }
