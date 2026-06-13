@@ -54,7 +54,7 @@ class GlobalExceptionHandlerTest {
         BindException bindException = new BindException(new Usuario(), "usuario");
         bindException.rejectValue("email", "NotBlank", "El email es obligatorio");
 
-        Method metodoReal = UsuarioController.class.getMethod("agregar", Usuario.class);
+        Method metodoReal = UsuarioController.class.getMethod("agregar", Usuario.class, String.class);
         MethodParameter parametroMetodo = new MethodParameter(metodoReal, 0);
 
         MethodArgumentNotValidException excepcionValidacion =

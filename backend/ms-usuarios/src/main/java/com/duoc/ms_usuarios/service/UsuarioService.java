@@ -44,11 +44,25 @@ public class UsuarioService {
     }
 
     public Usuario guardar(Usuario usuario) {
+        return guardar(usuario, null);
+    }
+
+    public Usuario guardar(Usuario usuario, String rolSesion) {
         if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         }
 
-        usuario.setRol("USER");
+        if (esAdmin(rolSesion)) {
+            String rolSolicitado = normalizarRol(usuario.getRol());
+
+            if (rolSolicitado == null || rolSolicitado.isBlank()) {
+                usuario.setRol("USER");
+            } else {
+                usuario.setRol(rolSolicitado);
+            }
+        } else {
+            usuario.setRol("USER");
+        }
 
         if (usuario.getActivo() == null) {
             usuario.setActivo(true);
@@ -57,6 +71,9 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    public Usuario actualizar(Long id, Usuario usuario) {
+        return actualizar(id, usuario, null, null);
+    }
 
     public Usuario actualizar(Long id, Usuario usuario, Long usuarioIdSesion, String rolSesion) {
         Usuario usuarioActual = usuarioRepository.findById(id)
@@ -100,6 +117,9 @@ public class UsuarioService {
         return usuarioRepository.save(usuarioActual);
     }
 
+    public boolean eliminar(Long id) {
+        return eliminar(id, null);
+    }
 
     public boolean eliminar(Long id, Long usuarioIdSesion) {
         Usuario usuario = usuarioRepository.findById(id)

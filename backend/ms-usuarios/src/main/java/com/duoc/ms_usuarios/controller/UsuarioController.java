@@ -54,8 +54,11 @@ public class UsuarioController {
 
     @Operation(summary = "Agregar un nuevo usuario")
     @PostMapping
-    public Usuario agregar(@Valid @RequestBody Usuario usuario) {
-        Usuario usuarioGuardado = usuarioService.guardar(usuario);
+    public Usuario agregar(
+            @Valid @RequestBody Usuario usuario,
+            @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
+    ) {
+        Usuario usuarioGuardado = usuarioService.guardar(usuario, rolSesion);
         usuarioGuardado.setPassword(null);
         return usuarioGuardado;
     }
@@ -80,5 +83,20 @@ public class UsuarioController {
             @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioIdSesion
     ) {
         usuarioService.eliminar(id, usuarioIdSesion);
+    }
+
+    @Operation(summary = "Agregar un nuevo usuario desde panel administrador")
+    @PostMapping("/admin")
+    public Usuario agregarDesdeAdmin(
+            @Valid @RequestBody Usuario usuario,
+            @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
+    ) {
+        if (rolSesion == null || !"ADMIN".equalsIgnoreCase(rolSesion)) {
+            throw new IllegalArgumentException("Solo un administrador puede crear usuarios con rol personalizado.");
+        }
+
+        Usuario usuarioGuardado = usuarioService.guardar(usuario, rolSesion);
+        usuarioGuardado.setPassword(null);
+        return usuarioGuardado;
     }
 }

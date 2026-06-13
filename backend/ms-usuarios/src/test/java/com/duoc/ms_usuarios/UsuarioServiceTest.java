@@ -81,6 +81,34 @@ class UsuarioServiceTest {
     }
 
     @Test
+    @DisplayName("obtenerPorId() con ID existente debe retornar usuario")
+    void testObtenerPorId_encontrado() {
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        Usuario resultado = usuarioService.obtenerPorId(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        assertEquals("juan123", resultado.getUsername());
+
+        verify(usuarioRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("obtenerPorId() con ID inexistente debe lanzar EntityNotFoundException")
+    void testObtenerPorId_noEncontrado() {
+        when(usuarioRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () ->
+                usuarioService.obtenerPorId(99L)
+        );
+
+        verify(usuarioRepository, times(1)).findById(99L);
+    }
+
+    @Test
     @DisplayName("buscarPorUsername() existente debe retornar usuario")
     void testBuscarPorUsername_encontrado() {
         when(usuarioRepository.findByUsername("juan123"))
@@ -132,6 +160,7 @@ class UsuarioServiceTest {
         Usuario guardado = usuarioService.guardar(usuarioBase);
 
         assertEquals("   ", guardado.getPassword());
+        assertEquals("USER", guardado.getRol());
     }
 
     @Test
@@ -147,6 +176,63 @@ class UsuarioServiceTest {
 
         assertEquals("USER", guardado.getRol());
         assertTrue(guardado.getActivo());
+    }
+
+    @Test
+    @DisplayName("guardar() como ADMIN debe respetar el rol solicitado")
+    void testGuardar_comoAdmin_respetaRolSolicitado() {
+        usuarioBase.setRol("BOMBERO");
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, "ADMIN");
+
+        assertNotNull(guardado);
+        assertEquals("BOMBERO", guardado.getRol());
+        assertTrue(passwordEncoder.matches("miPasswordSegura125", guardado.getPassword()));
+    }
+
+    @Test
+    @DisplayName("guardar() como ADMIN normaliza el rol solicitado")
+    void testGuardar_comoAdmin_normalizaRolSolicitado() {
+        usuarioBase.setRol(" brigadista ");
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, "ADMIN");
+
+        assertNotNull(guardado);
+        assertEquals("BRIGADISTA", guardado.getRol());
+    }
+
+    @Test
+    @DisplayName("guardar() como ADMIN asigna USER si rol solicitado viene vacío")
+    void testGuardar_comoAdmin_rolVacio_asignaUser() {
+        usuarioBase.setRol("   ");
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, "ADMIN");
+
+        assertNotNull(guardado);
+        assertEquals("USER", guardado.getRol());
+    }
+
+    @Test
+    @DisplayName("guardar() sin ADMIN debe forzar rol USER aunque solicite otro rol")
+    void testGuardar_sinAdmin_fuerzaRolUser() {
+        usuarioBase.setRol("ADMIN");
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, null);
+
+        assertNotNull(guardado);
+        assertEquals("USER", guardado.getRol());
     }
 
     @Test
@@ -176,33 +262,7 @@ class UsuarioServiceTest {
         assertEquals("ADMIN", modificado.getRol());
         assertTrue(passwordEncoder.matches("nuevaClave", modificado.getPassword()));
     }
-    @Test
-    @DisplayName("obtenerPorId() con ID existente debe retornar usuario")
-    void testObtenerPorId_encontrado() {
-        when(usuarioRepository.findById(1L))
-                .thenReturn(Optional.of(usuarioBase));
 
-        Usuario resultado = usuarioService.obtenerPorId(1L);
-
-        assertNotNull(resultado);
-        assertEquals(1L, resultado.getId());
-        assertEquals("juan123", resultado.getUsername());
-
-        verify(usuarioRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    @DisplayName("obtenerPorId() con ID inexistente debe lanzar EntityNotFoundException")
-    void testObtenerPorId_noEncontrado() {
-        when(usuarioRepository.findById(99L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () ->
-                usuarioService.obtenerPorId(99L)
-        );
-
-        verify(usuarioRepository, times(1)).findById(99L);
-    }
     @Test
     @DisplayName("actualizar() sin password mantiene la password original")
     void testActualizar_sinPassword_mantieneOriginal() {
