@@ -38,13 +38,37 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
             );
         }
     };
+    const obtenerTipoUsuario = () => {
+        let rol = localStorage.getItem("rol");
 
+        if (!rol) {
+            try {
+                const token = localStorage.getItem("token");
+
+                if (token) {
+                    const payload = token.split(".")[1];
+                    const decoded = JSON.parse(atob(payload));
+                    rol = decoded.rol;
+                }
+            } catch {
+                rol = null;
+            }
+        }
+
+        const rolNormalizado = rol ? rol.trim().toUpperCase() : "USER";
+
+        if (rolNormalizado === "USER") {
+            return "CIUDADANO";
+        }
+
+        return rolNormalizado;
+    };
     const [nuevoReporte, setNuevoReporte] = useState({
         descripcion: "",
         latitud: null,
         longitud: null,
         prioridad: "MEDIA",
-        tipoUsuario: "CIUDADANO",
+        tipoUsuario: obtenerTipoUsuario(),
         usuarioId: obtenerUsuarioId() ? Number(obtenerUsuarioId()) : null
     });
 
@@ -185,6 +209,7 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
             const payload = {
                 ...nuevoReporte,
                 descripcion: nuevoReporte.descripcion.trim(),
+                tipoUsuario: obtenerTipoUsuario(),
                 urlMedia: "",
                 usuarioId: Number(usuarioIdActual)
             };
