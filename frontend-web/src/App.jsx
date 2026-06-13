@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import Admin from "./pages/Admin";
 import Notificaciones from "./pages/Notificaciones";
-
+import RutasProtegidas from "./components/RutasProtegidas";
 function App() {
     return (
         <Router>
@@ -15,10 +15,10 @@ function App() {
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/notificaciones" element={<Notificaciones />} />
+                <Route path="/dashboard" element={<RutasProtegidas><Dashboard /></RutasProtegidas>}/>
+                <Route path="/perfil" element={<RutasProtegidas><Perfil /></RutasProtegidas>}/>
+                <Route path="/notificaciones" element={<RutasProtegidas><Notificaciones /></RutasProtegidas>}/>
+                <Route path="/admin" element={<RutasProtegidas rolesPermitidos={["ADMIN"]}><Admin /></RutasProtegidas>}/>
             </Routes>
         </Router>
     );
