@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useEffect } from "react";
 import axios from 'axios';
 import logoImg from '../assets/logo.png';
 import Swal from 'sweetalert2';
@@ -12,6 +13,14 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            navigate("/dashboard", { replace: true });
+        }
+    }, [navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
