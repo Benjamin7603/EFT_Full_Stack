@@ -17,8 +17,8 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    // Token válido por 8 horas
-    private static final long EXPIRATION_MS = 8 * 60 * 60 * 1000L;
+    // Token válido por 2 horas
+    private static final long EXPIRATION_MS = 2 * 60 * 60 * 1000L;
 
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

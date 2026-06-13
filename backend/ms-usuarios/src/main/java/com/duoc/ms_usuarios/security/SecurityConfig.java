@@ -9,10 +9,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    // Inyectamos el filtro que acabamos de crear
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -21,9 +29,9 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints PÚBLICOS (Cualquiera puede entrar)
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -31,11 +39,13 @@ public class SecurityConfig {
                                 "/api/usuarios/v3/api-docs/**",
                                 "/api/usuarios/swagger-ui/**"
                         ).permitAll()
-
                         .requestMatchers("/actuator/**").permitAll()
 
-                        .anyRequest().permitAll()
-                );
+                        // Endpoints PRIVADOS (Exigen Token JWT Válido y No Expirado)
+                        .anyRequest().authenticated()
+                )
+                // Agregamos nuestro filtro ANTES del filtro tradicional de Spring Security
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
