@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -120,9 +121,9 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios guarda un nuevo usuario sin exponer password")
-    void testAgregar() throws Exception {
-        when(usuarioService.guardar(any(Usuario.class)))
+    @DisplayName("POST /api/usuarios guarda un nuevo usuario público sin exponer password")
+    void testAgregar_publico() throws Exception {
+        when(usuarioService.guardar(any(Usuario.class), isNull()))
                 .thenReturn(usuarioBase);
 
         mockMvc.perform(post("/api/usuarios")
@@ -132,7 +133,36 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.username").value("juan123"))
                 .andExpect(jsonPath("$.password").doesNotExist());
 
-        verify(usuarioService, times(1)).guardar(any(Usuario.class));
+        verify(usuarioService, times(1)).guardar(any(Usuario.class), isNull());
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios como ADMIN guarda usuario respetando header de rol")
+    void testAgregar_comoAdmin() throws Exception {
+        Usuario bombero = new Usuario();
+        bombero.setId(2L);
+        bombero.setNombre("Pedro");
+        bombero.setApellido("Bombero");
+        bombero.setEmail("pedro@mail.com");
+        bombero.setTelefono("+56 9 9999 9999");
+        bombero.setUsername("pedro123");
+        bombero.setPassword("ClaveSegura123");
+        bombero.setRol("BOMBERO");
+        bombero.setActivo(true);
+
+        when(usuarioService.guardar(any(Usuario.class), eq("ADMIN")))
+                .thenReturn(bombero);
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bombero)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("pedro123"))
+                .andExpect(jsonPath("$.rol").value("BOMBERO"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+
+        verify(usuarioService, times(1)).guardar(any(Usuario.class), eq("ADMIN"));
     }
 
     @Test

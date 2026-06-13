@@ -55,6 +55,13 @@ public class ReporteController {
      * Utilizado comúnmente para la representación gráfica o mapeo de emergencias en curso.
      * @return Una {@link List} con los objetos {@link Reporte} en estado NUEVO o EN_PROGRESO.
      */
+
+    @Operation(summary = "Obtener reporte por ID")
+    @GetMapping("/{id}")
+    public Reporte obtenerPorId(@PathVariable Long id) {
+        return reporteService.obtenerPorId(id);
+    }
+
     @Operation(summary = "Obtener reportes activos")
     @GetMapping("/activos")
     public List<Reporte> obtenerActivos() {

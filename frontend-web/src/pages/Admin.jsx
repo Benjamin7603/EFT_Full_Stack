@@ -245,7 +245,7 @@ export default function Admin() {
             }
 
             if (modoModal === "crear") {
-                await api.post("/api/usuarios", payload);
+                await api.post("/api/usuarios/admin", payload);
                 setMensaje("Usuario creado correctamente.");
             } else {
                 await api.put(`/api/usuarios/${usuarioEditando.id}`, payload);
