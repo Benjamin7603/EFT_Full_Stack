@@ -1,8 +1,8 @@
-// src/components/ReporteModal.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import api from "../api/api";
+import "./ReporteModal.css";
 
 export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSesion }) {
     const obtenerUsuarioId = () => {
@@ -302,33 +302,16 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
                         </div>
 
                         {buscandoUbicacion && (
-                            <small style={{ color: "#6c757d", fontWeight: 600 }}>
+                            <small className="reporte-search-loading">
                                 Buscando ubicaciones...
                             </small>
                         )}
 
                         {resultadosBusqueda.length > 0 && (
-                            <ul
-                                style={{
-                                    background: "white",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "8px",
-                                    listStyle: "none",
-                                    padding: "0",
-                                    marginTop: "5px",
-                                    maxHeight: "150px",
-                                    overflowY: "auto"
-                                }}
-                            >
+                            <ul className="reporte-resultados-lista">
                                 {resultadosBusqueda.map((lugar, idx) => (
                                     <li
                                         key={lugar.id || idx}
-                                        style={{
-                                            padding: "10px",
-                                            borderBottom: "1px solid #eee",
-                                            cursor: "pointer",
-                                            fontSize: "0.9rem"
-                                        }}
                                         onClick={() =>
                                             seleccionarUbicacion(
                                                 lugar.lat,
