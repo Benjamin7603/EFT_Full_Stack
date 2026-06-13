@@ -5,6 +5,7 @@ import com.duoc.ms_usuarios.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,16 +26,38 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    @Operation(summary = "Obtener usuario actual")
+    @GetMapping("/me")
+    public Usuario obtenerPerfilActual(
+            @RequestHeader("X-Usuario-Id") Long usuarioId
+    ) {
+        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
+        usuario.setPassword(null);
+        return usuario;
+    }
+
     @Operation(summary = "Obtener listado de usuarios")
     @GetMapping
-    public List<Usuario> listar() {
-        return usuarioService.listar();
+    public ResponseEntity<List<Usuario>> listar(
+            @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
+    ) {
+        if (rolSesion == null || !"ADMIN".equalsIgnoreCase(rolSesion)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        List<Usuario> usuarios = usuarioService.listar();
+
+        usuarios.forEach(usuario -> usuario.setPassword(null));
+
+        return ResponseEntity.ok(usuarios);
     }
 
     @Operation(summary = "Agregar un nuevo usuario")
     @PostMapping
     public Usuario agregar(@Valid @RequestBody Usuario usuario) {
-        return usuarioService.guardar(usuario);
+        Usuario usuarioGuardado = usuarioService.guardar(usuario);
+        usuarioGuardado.setPassword(null);
+        return usuarioGuardado;
     }
 
     @Operation(summary = "Actualizar un usuario existente")
@@ -45,7 +68,9 @@ public class UsuarioController {
             @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioIdSesion,
             @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
     ) {
-        return usuarioService.actualizar(id, usuario, usuarioIdSesion, rolSesion);
+        Usuario usuarioActualizado = usuarioService.actualizar(id, usuario, usuarioIdSesion, rolSesion);
+        usuarioActualizado.setPassword(null);
+        return usuarioActualizado;
     }
 
     @Operation(summary = "Eliminar un usuario por ID")

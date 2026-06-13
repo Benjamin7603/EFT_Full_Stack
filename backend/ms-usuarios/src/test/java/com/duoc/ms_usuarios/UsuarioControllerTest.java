@@ -54,21 +54,73 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/usuarios lista todos los usuarios")
-    void testListar() throws Exception {
+    @DisplayName("GET /api/usuarios/me retorna el usuario actual sin password")
+    void testObtenerPerfilActual() throws Exception {
+        when(usuarioService.obtenerPorId(1L))
+                .thenReturn(usuarioBase);
+
+        mockMvc.perform(get("/api/usuarios/me")
+                        .header("X-Usuario-Id", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("juan123"))
+                .andExpect(jsonPath("$.email").value("juan@mail.com"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+
+        verify(usuarioService, times(1)).obtenerPorId(1L);
+    }
+
+    @Test
+    @DisplayName("GET /api/usuarios/me retorna 404 si usuario no existe")
+    void testObtenerPerfilActual_noEncontrado() throws Exception {
+        when(usuarioService.obtenerPorId(99L))
+                .thenThrow(new EntityNotFoundException("Usuario no encontrado con ID: 99"));
+
+        mockMvc.perform(get("/api/usuarios/me")
+                        .header("X-Usuario-Id", "99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Usuario no encontrado con ID: 99"));
+
+        verify(usuarioService, times(1)).obtenerPorId(99L);
+    }
+
+    @Test
+    @DisplayName("GET /api/usuarios lista todos los usuarios si rol es ADMIN")
+    void testListar_admin() throws Exception {
         when(usuarioService.listar())
                 .thenReturn(List.of(usuarioBase));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value("juan123"))
-                .andExpect(jsonPath("$[0].email").value("juan@mail.com"));
+                .andExpect(jsonPath("$[0].email").value("juan@mail.com"))
+                .andExpect(jsonPath("$[0].password").doesNotExist());
 
         verify(usuarioService, times(1)).listar();
     }
 
     @Test
-    @DisplayName("POST /api/usuarios guarda un nuevo usuario")
+    @DisplayName("GET /api/usuarios retorna 403 si no es ADMIN")
+    void testListar_noAdmin_retorna403() throws Exception {
+        mockMvc.perform(get("/api/usuarios")
+                        .header("X-Usuario-Rol", "USER"))
+                .andExpect(status().isForbidden());
+
+        verify(usuarioService, never()).listar();
+    }
+
+    @Test
+    @DisplayName("GET /api/usuarios retorna 403 si no viene header de rol")
+    void testListar_sinRol_retorna403() throws Exception {
+        mockMvc.perform(get("/api/usuarios"))
+                .andExpect(status().isForbidden());
+
+        verify(usuarioService, never()).listar();
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios guarda un nuevo usuario sin exponer password")
     void testAgregar() throws Exception {
         when(usuarioService.guardar(any(Usuario.class)))
                 .thenReturn(usuarioBase);
@@ -77,13 +129,14 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(usuarioBase)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("juan123"));
+                .andExpect(jsonPath("$.username").value("juan123"))
+                .andExpect(jsonPath("$.password").doesNotExist());
 
         verify(usuarioService, times(1)).guardar(any(Usuario.class));
     }
 
     @Test
-    @DisplayName("PUT /api/usuarios/{id} actualiza un usuario usando headers del gateway")
+    @DisplayName("PUT /api/usuarios/{id} actualiza un usuario usando headers del gateway sin exponer password")
     void testActualizar() throws Exception {
         when(usuarioService.actualizar(
                 eq(1L),
@@ -98,7 +151,8 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(usuarioBase)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("juan123"));
+                .andExpect(jsonPath("$.username").value("juan123"))
+                .andExpect(jsonPath("$.password").doesNotExist());
 
         verify(usuarioService, times(1))
                 .actualizar(eq(1L), any(Usuario.class), eq(1L), eq("ADMIN"));

@@ -147,22 +147,10 @@ export default function Perfil() {
             }
 
             try {
-                const usuariosResponse = await api.get("/api/usuarios");
-                const usuarios = usuariosResponse.data || [];
+                const usuarioResponse = await api.get("/api/usuarios/me");
+                const usuarioEncontrado = usuarioResponse.data;
 
-                const usuarioEncontrado = usuarios.find((usuario) => {
-                    const coincidePorId =
-                        usuarioIdSesion &&
-                        String(usuario.id) === String(usuarioIdSesion);
-
-                    const coincidePorUsername =
-                        usernameSesion &&
-                        String(usuario.username) === String(usernameSesion);
-
-                    return coincidePorId || coincidePorUsername;
-                });
-
-                if (!usuarioEncontrado) {
+                if (!usuarioEncontrado || !usuarioEncontrado.id) {
                     setError("No se encontró la información del usuario autenticado.");
                     setLoadingPerfil(false);
                     setLoadingReportes(false);
@@ -183,11 +171,12 @@ export default function Perfil() {
                 setForm(datosPerfil);
                 setInitialForm(datosPerfil);
 
-                localStorage.setItem("usuarioId", usuarioEncontrado.id);
-                localStorage.setItem("username", usuarioEncontrado.username || usernameSesion);
-                localStorage.setItem("userUsername", usuarioEncontrado.username || usernameSesion);
+                localStorage.setItem("usuarioId", String(usuarioEncontrado.id));
+                localStorage.setItem("username", usuarioEncontrado.username || usernameSesion || "");
+                localStorage.setItem("userUsername", usuarioEncontrado.username || usernameSesion || "");
                 localStorage.setItem("nombre", usuarioEncontrado.nombre || "");
-                localStorage.setItem("rol", usuarioEncontrado.rol || rolSesion);
+                localStorage.setItem("userNombre", usuarioEncontrado.nombre || "");
+                localStorage.setItem("rol", usuarioEncontrado.rol || rolSesion || "USER");
 
                 try {
                     const reportesResponse = await api.get("/api/reportes");

@@ -222,6 +222,30 @@
     background: #ff7043;
     color: white;
 }
+.notification-mark-all {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 12px;
+    background: #fff0ea;
+    color: #ff7043;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.notification-mark-all:hover {
+    background: #ff7043;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(255, 112, 67, 0.25);
+}
+
+.notification-mark-all:active {
+    transform: translateY(0);
+}
 
 @keyframes notificationFadeIn {
     from {
