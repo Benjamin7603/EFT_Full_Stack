@@ -1,284 +1,390 @@
 // src/components/ReporteModal.jsx
-import { useState, useRef } from 'react';
-import api from '../api/api'; // ← instancia con JWT automático
-import './ReporteModal.css';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
+import api from "../api/api";
 
-export default function ReporteModal({ onClose, onReporteCreado }) {
-    const [enviando, setEnviando] = useState(false);
-    const [exito, setExito] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
-    const [showError, setShowError] = useState(false);
-
-    // Estado del archivo adjunto
-    const [archivo, setArchivo] = useState(null);       // File object
-    const [preview, setPreview] = useState(null);       // URL local para mostrar imagen
-    const [esVideo, setEsVideo] = useState(false);
-    const fileInputRef = useRef(null);
-
-    const [formData, setFormData] = useState({
-        latitud: '',
-        longitud: '',
-        descripcion: '',
-        tipoUsuario: 'CIUDADANO',
-        usuarioId: 1, // TODO: reemplazar con el ID real del usuario autenticado (viene del JWT)
-    });
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleArchivoChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Validar tamaño máximo 20MB
-        if (file.size > 20 * 1024 * 1024) {
-            mostrarError('El archivo no puede superar los 20MB.');
-            return;
+export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSesion }) {
+    const obtenerUsuarioId = () => {
+        if (typeof getUsuarioIdSesion === "function") {
+            return getUsuarioIdSesion();
         }
-
-        setArchivo(file);
-        setEsVideo(file.type.startsWith('video/'));
-        setPreview(URL.createObjectURL(file));
-    };
-
-    const eliminarArchivo = () => {
-        setArchivo(null);
-        setPreview(null);
-        setEsVideo(false);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    const mostrarError = (msg) => {
-        setErrorMsg(msg);
-        setShowError(true);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Validaciones frontend
-        const lat = parseFloat(formData.latitud);
-        const lng = parseFloat(formData.longitud);
-
-        if (isNaN(lat) || lat < -90 || lat > 90) {
-            mostrarError('La latitud debe ser un número entre -90 y 90.');
-            return;
-        }
-        if (isNaN(lng) || lng < -180 || lng > 180) {
-            mostrarError('La longitud debe ser un número entre -180 y 180.');
-            return;
-        }
-        if (formData.descripcion.trim().length < 5) {
-            mostrarError('La descripción debe tener al menos 5 caracteres.');
-            return;
-        }
-
-        setEnviando(true);
-        setShowError(false);
 
         try {
-            // usuarioId viene del token guardado en localStorage tras el login
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                return (
+                    localStorage.getItem("usuarioId") ||
+                    localStorage.getItem("userId") ||
+                    null
+                );
+            }
+
+            const payload = token.split(".")[1];
+            const decoded = JSON.parse(atob(payload));
+
+            return (
+                localStorage.getItem("usuarioId") ||
+                localStorage.getItem("userId") ||
+                decoded.usuarioId ||
+                null
+            );
+        } catch {
+            return (
+                localStorage.getItem("usuarioId") ||
+                localStorage.getItem("userId") ||
+                null
+            );
+        }
+    };
+
+    const [nuevoReporte, setNuevoReporte] = useState({
+        descripcion: "",
+        latitud: null,
+        longitud: null,
+        prioridad: "MEDIA",
+        tipoUsuario: "CIUDADANO",
+        usuarioId: obtenerUsuarioId() ? Number(obtenerUsuarioId()) : null
+    });
+
+    const [busqueda, setBusqueda] = useState("");
+    const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
+    const [errorModal, setErrorModal] = useState("");
+    const [enviando, setEnviando] = useState(false);
+    const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
+    const [ubicacionSeleccionada, setUbicacionSeleccionada] = useState(false);
+
+    useEffect(() => {
+        if (ubicacionSeleccionada) {
+            return;
+        }
+
+        const textoBusqueda = busqueda.trim();
+
+        if (textoBusqueda.length < 3) {
+            setResultadosBusqueda([]);
+            return;
+        }
+
+        const delayDebounceFn = setTimeout(async () => {
+            try {
+                setBuscandoUbicacion(true);
+                setErrorModal("");
+
+                const response = await axios.get("https://photon.komoot.io/api/", {
+                    params: {
+                        q: textoBusqueda,
+                        limit: 8
+                    }
+                });
+
+                const features = response.data?.features || [];
+
+                const resultados = features
+                    .map((feature) => {
+                        const propiedades = feature.properties || {};
+                        const coordenadas = feature.geometry?.coordinates || [];
+
+                        const lon = coordenadas[0];
+                        const lat = coordenadas[1];
+
+                        const partesNombre = [
+                            propiedades.name,
+                            propiedades.street,
+                            propiedades.city,
+                            propiedades.county,
+                            propiedades.state,
+                            propiedades.country
+                        ].filter(Boolean);
+
+                        return {
+                            id: `${lat}-${lon}-${propiedades.osm_id || Math.random()}`,
+                            lat,
+                            lon,
+                            display_name: partesNombre.join(", "),
+                            country: propiedades.country,
+                            countrycode: propiedades.countrycode
+                        };
+                    })
+                    .filter((lugar) => {
+                        const esChile =
+                            lugar.countrycode?.toLowerCase() === "cl" ||
+                            lugar.country?.toLowerCase() === "chile";
+
+                        return (
+                            esChile &&
+                            lugar.lat !== undefined &&
+                            lugar.lon !== undefined &&
+                            lugar.display_name
+                        );
+                    })
+                    .slice(0, 5);
+
+                setResultadosBusqueda(resultados);
+
+                if (resultados.length === 0) {
+                    setErrorModal("No se encontraron ubicaciones dentro de Chile.");
+                }
+            }
+            catch (error) {
+                console.error("Error buscando dirección en tiempo real:", error);
+                setResultadosBusqueda([]);
+                setErrorModal("No se pudo buscar la ubicación. Intenta nuevamente.");
+            }
+            finally {
+                setBuscandoUbicacion(false);
+            }
+        }, 800);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [busqueda, ubicacionSeleccionada]);
+
+    const seleccionarUbicacion = (lat, lon, nombreLugar) => {
+        setUbicacionSeleccionada(true);
+
+        setNuevoReporte((prev) => ({
+            ...prev,
+            latitud: parseFloat(lat),
+            longitud: parseFloat(lon)
+        }));
+
+        setBusqueda(nombreLugar);
+        setResultadosBusqueda([]);
+        setErrorModal("");
+    };
+
+    const handleEnviarReporte = async (e) => {
+        e.preventDefault();
+
+        const usuarioIdActual = obtenerUsuarioId();
+
+        if (!usuarioIdActual) {
+            setErrorModal("No se encontró el ID del usuario en la sesión. Vuelve a iniciar sesión.");
+            return;
+        }
+
+        if (!nuevoReporte.descripcion.trim()) {
+            setErrorModal("Debes ingresar una descripción de la emergencia.");
+            return;
+        }
+
+        if (!busqueda.trim()) {
+            setErrorModal("Debes buscar y seleccionar una ubicación antes de enviar el reporte.");
+            return;
+        }
+
+        if (nuevoReporte.latitud === null || nuevoReporte.longitud === null) {
+            setErrorModal("Selecciona una ubicación válida desde la lista de resultados.");
+            return;
+        }
+
+        try {
+            setEnviando(true);
+
             const payload = {
-                latitud: lat,
-                longitud: lng,
-                descripcion: formData.descripcion.trim(),
-                tipoUsuario: formData.tipoUsuario,
-                urlMedia: archivo ? archivo.name : null,
-                usuarioId: Number(localStorage.getItem('usuarioId')) || 1,
+                ...nuevoReporte,
+                descripcion: nuevoReporte.descripcion.trim(),
+                urlMedia: "",
+                usuarioId: Number(usuarioIdActual)
             };
 
-            await api.post('/api/reportes', payload);
+            await api.post("/api/reportes", payload);
 
-            setExito(true);
-
-            // Avisamos al Dashboard para que refresque la tabla automáticamente
-            setTimeout(() => {
-                onReporteCreado();
-                onClose();
-            }, 2000);
-
-        } catch (error) {
-            console.error('Error al enviar reporte:', error);
-
-            // Manejo de errores del GlobalExceptionHandler de Spring
-            const data = error.response?.data;
-            if (data && typeof data === 'object') {
-                const mensajes = Object.values(data).join(' | ');
-                mostrarError(mensajes);
-            } else {
-                mostrarError('Error al conectar con el servidor. ¿Está corriendo el Gateway?');
+            if (onReporteCreado) {
+                await onReporteCreado();
             }
-        } finally {
+
+            onClose();
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: "success",
+                    title: "¡Reporte Enviado!",
+                    text: "La alerta de emergencia ha sido georreferenciada correctamente.",
+                    confirmButtonColor: "#FF7043"
+                });
+            }, 150);
+        }
+        catch (error) {
+            console.error("Error al enviar reporte:", error.response || error);
+
+            if (error.response?.status === 400 && error.response?.data) {
+                const mensajes = Object.values(error.response.data).join("\n");
+                setErrorModal(mensajes);
+            }
+            else if (
+                error.response?.status === 401 ||
+                error.response?.status === 403
+            ) {
+                setErrorModal("Permiso denegado. Vuelve a iniciar sesión para continuar.");
+            }
+            else {
+                setErrorModal("No se logró establecer conexión con el servidor de GeoFire.");
+            }
+        }
+        finally {
             setEnviando(false);
         }
     };
 
-    // Cerrar al hacer click fuera del modal
-    const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
+    const cerrarModal = () => {
+        if (!enviando) {
+            onClose();
+        }
     };
 
     return (
-        <div className="modal-overlay" onClick={handleOverlayClick}>
+        <div className="modal-overlay">
             <div className="modal-card">
-
-                {/* Header */}
                 <div className="modal-header">
-                    <div className="modal-header-text">
-                        <h2>🚨 Nuevo Reporte</h2>
-                        <p>Ingresa los datos del incendio detectado</p>
-                    </div>
-                    <button className="modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
+                    <h2>Crear Alerta Geográfica</h2>
+
+                    <button
+                        className="close-btn"
+                        onClick={cerrarModal}
+                        type="button"
+                        disabled={enviando}
+                    >
+                        &times;
+                    </button>
                 </div>
 
-                {/* Estado de éxito */}
-                {exito ? (
-                    <div className="modal-success">
-                        <span className="success-icon">✅</span>
-                        <h3>¡Reporte enviado!</h3>
-                        <p>El equipo de emergencias ha sido notificado. Actualizando dashboard...</p>
-                    </div>
-                ) : (
-                    <form className="modal-form" onSubmit={handleSubmit}>
+                <form className="modal-form" onSubmit={handleEnviarReporte}>
+                    {errorModal && (
+                        <div className="modal-inline-alert">
+                            ⚠️ {errorModal}
+                        </div>
+                    )}
 
-                        {/* Error */}
-                        {showError && (
-                            <div className="modal-alert">
-                                <span>⚠️ {errorMsg}</span>
-                                <button type="button" className="alert-close" onClick={() => setShowError(false)}>✕</button>
-                            </div>
+                    <div className="input-group">
+                        <label>Descripción de la emergencia</label>
+
+                        <input
+                            type="text"
+                            className="input-field"
+                            placeholder="Ej: Incendio forestal cerca de la ruta 5"
+                            value={nuevoReporte.descripcion}
+                            disabled={enviando}
+                            onChange={(e) => {
+                                setNuevoReporte((prev) => ({
+                                    ...prev,
+                                    descripcion: e.target.value
+                                }));
+
+                                setErrorModal("");
+                            }}
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>Buscar Ubicación</label>
+
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="Escribe para buscar una ubicación en Chile..."
+                                value={busqueda}
+                                disabled={enviando}
+                                onChange={(e) => {
+                                    setUbicacionSeleccionada(false);
+                                    setBusqueda(e.target.value);
+                                    setErrorModal("");
+                                    setNuevoReporte((prev) => ({
+                                        ...prev,
+                                        latitud: null,
+                                        longitud: null
+                                    }));
+                                }}
+                                style={{ flex: 1 }}
+                            />
+                        </div>
+
+                        {buscandoUbicacion && (
+                            <small style={{ color: "#6c757d", fontWeight: 600 }}>
+                                Buscando ubicaciones...
+                            </small>
                         )}
 
-                        {/* Coordenadas */}
-                        <div className="modal-row">
-                            <div className="input-group">
-                                <label htmlFor="latitud">Latitud</label>
-                                <input
-                                    type="number"
-                                    id="latitud"
-                                    name="latitud"
-                                    className="input-field"
-                                    placeholder="-33.4569"
-                                    step="any"
-                                    value={formData.latitud}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label htmlFor="longitud">Longitud</label>
-                                <input
-                                    type="number"
-                                    id="longitud"
-                                    name="longitud"
-                                    className="input-field"
-                                    placeholder="-70.6483"
-                                    step="any"
-                                    value={formData.longitud}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Descripción */}
-                        <div className="input-group">
-                            <label htmlFor="descripcion">Descripción del Incidente</label>
-                            <textarea
-                                id="descripcion"
-                                name="descripcion"
-                                className="input-field"
-                                placeholder="Ej: Incendio forestal en sector norponiente, llamas visibles a 500m..."
-                                value={formData.descripcion}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        {/* Tipo de usuario */}
-                        <div className="input-group">
-                            <label htmlFor="tipoUsuario">Tipo de Reporte</label>
-                            <select
-                                id="tipoUsuario"
-                                name="tipoUsuario"
-                                className="input-field"
-                                value={formData.tipoUsuario}
-                                onChange={handleChange}
+                        {resultadosBusqueda.length > 0 && (
+                            <ul
+                                style={{
+                                    background: "white",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "8px",
+                                    listStyle: "none",
+                                    padding: "0",
+                                    marginTop: "5px",
+                                    maxHeight: "150px",
+                                    overflowY: "auto"
+                                }}
                             >
-                                <option value="CIUDADANO">👤 Ciudadano</option>
-                                <option value="OFICIAL">🛡️ Oficial (Prioridad ALTA)</option>
-                            </select>
-                        </div>
+                                {resultadosBusqueda.map((lugar, idx) => (
+                                    <li
+                                        key={lugar.id || idx}
+                                        style={{
+                                            padding: "10px",
+                                            borderBottom: "1px solid #eee",
+                                            cursor: "pointer",
+                                            fontSize: "0.9rem"
+                                        }}
+                                        onClick={() =>
+                                            seleccionarUbicacion(
+                                                lugar.lat,
+                                                lugar.lon,
+                                                lugar.display_name
+                                            )
+                                        }
+                                    >
+                                        {lugar.display_name}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
 
-                        {/* Adjuntar foto o video */}
-                        <div className="input-group">
-                            <label>Foto / Video del Incidente (opcional)</label>
+                    <div className="input-group">
+                        <label>Prioridad</label>
 
-                            {/* Zona de drop / click */}
-                            {!archivo ? (
-                                <div
-                                    className="file-dropzone"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={(e) => {
-                                        e.preventDefault();
-                                        const file = e.dataTransfer.files[0];
-                                        if (file) handleArchivoChange({ target: { files: [file] } });
-                                    }}
-                                >
-                                    <span className="file-dropzone-icon">📎</span>
-                                    <span className="file-dropzone-text">
-                                        Arrastra un archivo aquí o <strong>haz click para seleccionar</strong>
-                                    </span>
-                                    <span className="file-dropzone-hint">Imágenes o videos · Máx. 20MB</span>
-                                </div>
-                            ) : (
-                                <div className="file-preview">
-                                    {esVideo ? (
-                                        <video src={preview} className="file-preview-media" controls />
-                                    ) : (
-                                        <img src={preview} alt="Vista previa" className="file-preview-media" />
-                                    )}
-                                    <div className="file-preview-info">
-                                        <span className="file-preview-name">📄 {archivo.name}</span>
-                                        <span className="file-preview-size">
-                                            {(archivo.size / 1024 / 1024).toFixed(2)} MB
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className="file-preview-remove"
-                                            onClick={eliminarArchivo}
-                                        >
-                                            ✕ Quitar
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                        <select
+                            className="input-field"
+                            value={nuevoReporte.prioridad}
+                            disabled={enviando}
+                            onChange={(e) => {
+                                setNuevoReporte((prev) => ({
+                                    ...prev,
+                                    prioridad: e.target.value
+                                }));
 
-                            {/* Input oculto */}
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*,video/*"
-                                capture="environment"
-                                style={{ display: 'none' }}
-                                onChange={handleArchivoChange}
-                            />
-                        </div>
+                                setErrorModal("");
+                            }}
+                        >
+                            <option value="ALTA">Alta</option>
+                            <option value="MEDIA">Media</option>
+                            <option value="BAJA">Baja</option>
+                        </select>
+                    </div>
 
-                        {/* Botones */}
-                        <div className="modal-footer">
-                            <button type="button" className="btn-cancel" onClick={onClose}>
-                                Cancelar
-                            </button>
-                            <button type="submit" className="btn-submit" disabled={enviando}>
-                                {enviando ? '⏳ Enviando...' : '🔥 Enviar Reporte'}
-                            </button>
-                        </div>
+                    <div className="modal-actions">
+                        <button
+                            type="button"
+                            className="btn-cancelar"
+                            onClick={cerrarModal}
+                            disabled={enviando}
+                        >
+                            Cancelar
+                        </button>
 
-                    </form>
-                )}
+                        <button
+                            type="submit"
+                            className="btn-guardar"
+                            disabled={enviando}
+                        >
+                            {enviando ? "Enviando..." : "Enviar Reporte"}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
