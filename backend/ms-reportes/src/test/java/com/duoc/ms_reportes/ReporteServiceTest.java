@@ -286,7 +286,7 @@ class ReporteServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () ->
-                reporteService.actualizarEstado(1L, "FINALIZADO")
+                reporteService.actualizarEstado(1L, "RESUELTO")
         );
 
         verify(reporteRepository, times(1))
@@ -294,6 +294,17 @@ class ReporteServiceTest {
 
         verify(reporteRepository, never())
                 .save(any(Reporte.class));
+    }
+    @Test
+    void testActualizarEstado_EstadoInvalido() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                reporteService.actualizarEstado(1L, "FINALIZADO")
+        );
+
+        assertEquals("El estado debe ser NUEVO, EN_PROGRESO o RESUELTO.", ex.getMessage());
+
+        verify(reporteRepository, never()).findById(anyLong());
+        verify(reporteRepository, never()).save(any(Reporte.class));
     }
     @Test
     void testCrearReporteProcesado_PrioridadInvalida() {
@@ -329,15 +340,20 @@ class ReporteServiceTest {
     }
 
     @Test
-    void testCrearReporteProcesado_PrioridadConEspaciosLanzaError() {
+    void testCrearReporteProcesado_PrioridadConEspaciosSeNormaliza() {
         ReporteDTO dto = crearDtoValido(" MEDIA ");
+        Reporte reporteSimulado = crearReporteGuardado(104L, "MEDIA");
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                reporteService.crearReporteProcesado(dto)
-        );
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
 
-        assertEquals("La prioridad debe ser ALTA, MEDIA o BAJA", ex.getMessage());
+        Reporte resultado = reporteService.crearReporteProcesado(dto);
 
-        verify(reporteRepository, never()).save(any(Reporte.class));
+        assertNotNull(resultado);
+        assertEquals("MEDIA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 }

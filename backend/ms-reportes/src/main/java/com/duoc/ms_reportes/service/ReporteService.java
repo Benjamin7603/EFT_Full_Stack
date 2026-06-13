@@ -60,7 +60,9 @@ public class ReporteService {
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
         nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
 
-        String prioridad = datosEntrada.getPrioridad().toUpperCase();
+        String prioridad = datosEntrada.getPrioridad() == null
+                ? ""
+                : datosEntrada.getPrioridad().trim().toUpperCase();
 
         if (!prioridad.equals("ALTA") && !prioridad.equals("MEDIA") && !prioridad.equals("BAJA")) {
             throw new IllegalArgumentException("La prioridad debe ser ALTA, MEDIA o BAJA");
@@ -128,8 +130,22 @@ public class ReporteService {
      */
     @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
     public Reporte actualizarEstado(Long id, String nuevoEstado) {
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            throw new IllegalArgumentException("El estado del reporte es obligatorio.");
+        }
+
+        String estadoNormalizado = nuevoEstado.trim().toUpperCase();
+
+        if (
+                !estadoNormalizado.equals("NUEVO") &&
+                        !estadoNormalizado.equals("EN_PROGRESO") &&
+                        !estadoNormalizado.equals("RESUELTO")
+        ) {
+            throw new IllegalArgumentException("El estado debe ser NUEVO, EN_PROGRESO o RESUELTO.");
+        }
+
         return reporteRepository.findById(id).map(reporte -> {
-            reporte.setEstado(nuevoEstado);
+            reporte.setEstado(estadoNormalizado);
             return reporteRepository.save(reporte);
         }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
     }
