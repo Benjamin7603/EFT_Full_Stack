@@ -85,9 +85,9 @@ export default function Navbar({
                     <NotificationBell destinatario={rolSesion} />
                 )}
 
-                {showAdmin && rolSesion === "ADMIN" && (
+                {showAdmin && rolSesion === "ADMIN" && active !== "admin" && (
                     <button
-                        className={`btn-profile-icon ${active === "admin" ? "navbar-active" : ""}`}
+                        className="btn-profile-icon"
                         onClick={() => navigate("/admin")}
                         title="Panel administrador"
                         type="button"
@@ -96,9 +96,9 @@ export default function Navbar({
                     </button>
                 )}
 
-                {showReportes && mostrarReportes && (
+                {showReportes && mostrarReportes && active !== "reportes" && (
                     <button
-                        className={`btn-profile-icon ${active === "reportes" ? "navbar-active" : ""}`}
+                        className="btn-profile-icon"
                         onClick={() => navigate("/reportes")}
                         title="Gestión de reportes"
                         type="button"
@@ -107,9 +107,9 @@ export default function Navbar({
                     </button>
                 )}
 
-                {showDashboard && (
+                {showDashboard && active !== "dashboard" && (
                     <button
-                        className={`btn-profile-icon ${active === "dashboard" ? "navbar-active" : ""}`}
+                        className="btn-profile-icon"
                         onClick={() => navigate("/dashboard")}
                         title="Dashboard"
                         type="button"
@@ -118,9 +118,9 @@ export default function Navbar({
                     </button>
                 )}
 
-                {showProfile && (
+                {showProfile && active !== "perfil" && (
                     <button
-                        className={`btn-profile-icon ${active === "perfil" ? "navbar-active" : ""}`}
+                        className="btn-profile-icon"
                         onClick={() => navigate("/perfil")}
                         title="Mi perfil"
                         type="button"

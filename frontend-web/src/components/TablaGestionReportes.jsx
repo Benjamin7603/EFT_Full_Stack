@@ -295,7 +295,9 @@ export default function TablaGestionReportes({
 
                                 <td>
                                     {reporte.fechaReporte
-                                        ? new Date(reporte.fechaReporte).toLocaleString("es-CL")
+                                        ? new Date(`${reporte.fechaReporte}Z`).toLocaleString("es-CL", {
+                                            timeZone: "America/Santiago",
+                                        })
                                         : "Sin fecha"}
                                 </td>
 
