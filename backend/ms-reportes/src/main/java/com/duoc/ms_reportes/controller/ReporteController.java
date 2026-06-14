@@ -9,7 +9,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -71,6 +76,26 @@ public class ReporteController {
         validarRolOperativo(rolSesion);
         return reporteService.actualizarPrioridad(id, nuevaPrioridad);
     }
+    @Operation(summary = "Descargar auditoría de reportes en Excel")
+    @GetMapping("/auditoria/excel")
+    public ResponseEntity<ByteArrayResource> descargarAuditoriaExcel(
+            @RequestHeader(value = "X-Usuario-Rol", required = false) String rolSesion
+    ) {
+        validarRolAuditoria(rolSesion);
+
+        byte[] archivoExcel = reporteService.generarExcelAuditoriaReportes();
+
+        String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String nombreArchivo = "auditoria_reportes_geofire_" + fecha + ".xlsx";
+
+        ByteArrayResource resource = new ByteArrayResource(archivoExcel);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nombreArchivo)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentLength(archivoExcel.length)
+                .body(resource);
+    }
 
     private void validarRolOperativo(String rolSesion) {
         if (!esRolOperativo(rolSesion)) {
@@ -79,6 +104,25 @@ public class ReporteController {
                     "No tienes permisos para gestionar reportes."
             );
         }
+    }
+    private void validarRolAuditoria(String rolSesion) {
+        if (!esRolAuditoria(rolSesion)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permisos para descargar auditoría de reportes."
+            );
+        }
+    }
+
+    private boolean esRolAuditoria(String rol) {
+        if (rol == null || rol.isBlank()) {
+            return false;
+        }
+
+        String rolNormalizado = rol.trim().toUpperCase();
+
+        return rolNormalizado.equals("ADMIN")
+                || rolNormalizado.equals("FUNCIONARIO");
     }
 
     private boolean esRolOperativo(String rol) {

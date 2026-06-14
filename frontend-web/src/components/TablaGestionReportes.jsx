@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, RefreshCcw } from "lucide-react";
+import { BarChart3, Download, RefreshCcw } from "lucide-react";
 import Swal from "sweetalert2";
 import api from "../api/api";
 import "./TablaGestionReportes.css";
@@ -15,6 +15,7 @@ export default function TablaGestionReportes({
                                                  loadingExterno = false,
                                                  onActualizarExterno = null,
                                                  mostrarBotonActualizar = true,
+                                                 mostrarBotonExcel = true,
                                              }) {
     const usaDatosExternos = Array.isArray(reportesExternos);
 
@@ -152,6 +153,80 @@ export default function TablaGestionReportes({
         if (prioridad === "BAJA") return "resuelto";
         return "nuevo";
     };
+    const obtenerRolSesion = () => {
+        let rol = localStorage.getItem("rol");
+
+        if (!rol) {
+            try {
+                const token = localStorage.getItem("token");
+
+                if (token) {
+                    const payload = token.split(".")[1];
+                    const decoded = JSON.parse(atob(payload));
+                    rol = decoded.rol;
+                }
+            } catch {
+                rol = null;
+            }
+        }
+
+        return rol ? rol.trim().toUpperCase() : "USER";
+    };
+
+    const puedeDescargarAuditoria = () => {
+        return ["ADMIN", "FUNCIONARIO"].includes(obtenerRolSesion());
+    };
+
+    const descargarAuditoriaExcel = async () => {
+        try {
+            const response = await api.get("/api/reportes/auditoria/excel", {
+                responseType: "blob",
+            });
+
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+
+            const contentDisposition = response.headers["content-disposition"];
+            let nombreArchivo = "auditoria_reportes_geofire.xlsx";
+
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="?([^"]+)"?/);
+                if (match?.[1]) {
+                    nombreArchivo = match[1];
+                }
+            }
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.setAttribute("download", nombreArchivo);
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            Swal.fire({
+                icon: "success",
+                title: "Excel descargado",
+                text: "La auditoría de reportes fue descargada correctamente.",
+                confirmButtonColor: "#FF7043",
+            });
+        } catch (error) {
+            console.error("Error descargando auditoría:", error);
+
+            Swal.fire({
+                icon: "error",
+                title: "No se pudo descargar",
+                text:
+                    error.response?.data?.error ||
+                    "No tienes permisos o no se pudo generar el archivo Excel.",
+                confirmButtonColor: "#dc3545",
+            });
+        }
+    };
 
     return (
         <section className="admin-card tabla-reportes-card">
@@ -178,6 +253,16 @@ export default function TablaGestionReportes({
                         >
                             <RefreshCcw size={17} />
                             {loading ? "Actualizando..." : "Actualizar"}
+                        </button>
+                    )}
+                    {mostrarBotonExcel && puedeDescargarAuditoria() && (
+                        <button
+                            className="btn-admin-primary tabla-reportes-export-btn"
+                            type="button"
+                            onClick={descargarAuditoriaExcel}
+                        >
+                            <Download size={17} />
+                            Descargar Excel
                         </button>
                     )}
                 </div>
