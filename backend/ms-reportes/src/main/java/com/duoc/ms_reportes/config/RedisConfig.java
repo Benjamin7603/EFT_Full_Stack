@@ -11,18 +11,31 @@ import java.time.Duration;
 
 /**
  * Configuración centralizada de Redis Cache para el microservicio de reportes.
- * Define un TTL de 10 minutos para evitar datos obsoletos en consultas frecuentes
- * del dashboard y del historial de reportes.
+ *
+ * Cachés utilizados por el servicio:
+ * - reportesTodos: almacena el listado histórico completo de reportes.
+ * - reportesActivos: almacena reportes en estado NUEVO y EN_PROGRESO.
+ *
+ * TTL definido:
+ * - reportesTodos: 10 minutos.
+ * - reportesActivos: 10 minutos.
+ *
+ * La caché se invalida mediante @CacheEvict cuando se crea un reporte
+ * o cuando se modifica su estado/prioridad, evitando datos obsoletos.
  */
 @Configuration
 public class RedisConfig {
 
     /**
      * Configura el gestor de caché usando Redis como proveedor.
-     * El TTL definido es de 10 minutos para todos los cachés del microservicio.
+     *
+     * Se aplica un TTL global de 10 minutos para todos los cachés
+     * registrados en ms-reportes:
+     * - reportesTodos
+     * - reportesActivos
      *
      * @param redisConnectionFactory fábrica de conexión administrada por Spring Data Redis.
-     * @return CacheManager configurado con TTL global.
+     * @return CacheManager configurado con Redis y TTL global.
      */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
