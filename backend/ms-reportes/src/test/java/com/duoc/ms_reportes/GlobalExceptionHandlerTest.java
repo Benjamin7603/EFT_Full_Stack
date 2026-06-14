@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -70,7 +71,8 @@ class GlobalExceptionHandlerTest {
     // =========================================================
     @Test
     void testManejarNoEncontrado() throws Exception {
-        when(reporteService.listarTodos()).thenThrow(new EntityNotFoundException("El reporte no existe."));
+        when(reporteService.listarTodos())
+                .thenThrow(new EntityNotFoundException("El reporte no existe."));
 
         mockMvc.perform(get("/api/reportes"))
                 .andExpect(status().isNotFound())
@@ -78,11 +80,43 @@ class GlobalExceptionHandlerTest {
     }
 
     // =========================================================
+    // IllegalArgumentException
+    // =========================================================
+    @Test
+    void testManejarBadRequest() {
+        ResponseEntity<Map<String, String>> respuesta =
+                exceptionHandler.manejarBadRequest(new IllegalArgumentException("Solicitud inválida"));
+
+        assertNotNull(respuesta);
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("Solicitud inválida", respuesta.getBody().get("error"));
+    }
+
+    // =========================================================
+    // ResponseStatusException
+    // =========================================================
+    @Test
+    void testManejarResponseStatusException() {
+        ResponseStatusException ex = new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "No tienes permisos para gestionar reportes."
+        );
+
+        ResponseEntity<Map<String, String>> respuesta =
+                exceptionHandler.manejarResponseStatus(ex);
+
+        assertNotNull(respuesta);
+        assertEquals(HttpStatus.FORBIDDEN, respuesta.getStatusCode());
+        assertEquals("No tienes permisos para gestionar reportes.", respuesta.getBody().get("error"));
+    }
+
+    // =========================================================
     // Exception Genérica
     // =========================================================
     @Test
     void testManejarErrorGeneral() throws Exception {
-        when(reporteService.listarTodos()).thenThrow(new RuntimeException("Fallo en base de datos"));
+        when(reporteService.listarTodos())
+                .thenThrow(new RuntimeException("Fallo en base de datos"));
 
         mockMvc.perform(get("/api/reportes"))
                 .andExpect(status().isInternalServerError())

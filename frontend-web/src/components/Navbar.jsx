@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import {
+    ClipboardList,
     LayoutDashboard,
     LogOut,
     ShieldCheck,
@@ -15,6 +16,7 @@ export default function Navbar({
                                    showAdmin = true,
                                    showDashboard = true,
                                    showProfile = true,
+                                   showReportes = true,
                                }) {
     const navigate = useNavigate();
 
@@ -55,7 +57,10 @@ export default function Navbar({
         "USER"
     ).toUpperCase();
 
-    const rolesConNotificaciones = ["ADMIN", "BOMBERO", "BRIGADISTA"];
+    const rolesOperativos = ["ADMIN", "BOMBERO", "BRIGADISTA", "FUNCIONARIO"];
+    const rolesConNotificaciones = ["ADMIN", "BOMBERO", "BRIGADISTA", "FUNCIONARIO"];
+
+    const mostrarReportes = rolesOperativos.includes(rolSesion);
     const mostrarNotificaciones = rolesConNotificaciones.includes(rolSesion);
 
     const inicial = nombreSesion.trim().charAt(0).toUpperCase() || "U";
@@ -88,6 +93,17 @@ export default function Navbar({
                         type="button"
                     >
                         <ShieldCheck size={20} strokeWidth={2.5} />
+                    </button>
+                )}
+
+                {showReportes && mostrarReportes && (
+                    <button
+                        className={`btn-profile-icon ${active === "reportes" ? "navbar-active" : ""}`}
+                        onClick={() => navigate("/reportes")}
+                        title="Gestión de reportes"
+                        type="button"
+                    >
+                        <ClipboardList size={20} strokeWidth={2.5} />
                     </button>
                 )}
 

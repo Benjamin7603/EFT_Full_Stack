@@ -24,6 +24,5 @@ public class ReporteDTO {
     @NotNull(message = "El ID de usuario es requerido")
     private Long usuarioId;
 
-    @NotBlank(message = "La prioridad es requerida")
     private String prioridad;
 }
