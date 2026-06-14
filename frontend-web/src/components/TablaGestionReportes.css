@@ -9,7 +9,15 @@
     gap: 12px;
     flex-wrap: wrap;
 }
+.tabla-reportes-export-btn {
+    white-space: nowrap;
+}
 
+@media (max-width: 800px) {
+    .tabla-reportes-header-actions .tabla-reportes-export-btn {
+        width: 100%;
+    }
+}
 @media (max-width: 800px) {
     .tabla-reportes-header-actions {
         width: 100%;

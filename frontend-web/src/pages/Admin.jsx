@@ -512,6 +512,7 @@ export default function Admin() {
                     loadingExterno={loading}
                     onActualizarExterno={cargarDatos}
                     mostrarBotonActualizar={false}
+                    mostrarBotonExcel={false}
                 />
             </main>
 
