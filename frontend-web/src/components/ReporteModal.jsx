@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react';
 // src/components/ReporteModal.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";

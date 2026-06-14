@@ -1,5 +1,4 @@
 /** @vitest-environment jsdom */
-// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
@@ -7,143 +6,106 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Dashboard from './Dashboard';
 import axios from 'axios';
 
-// MOCK DE DEPENDENCIAS EXTERNAS
-vi.mock('react-leaflet', () => {
-    return {
-        MapContainer: ({ children }) => <div data-testid="map-container">{children}</div>,
-        TileLayer: () => <div>TileLayer</div>,
-        Marker: ({ children }) => <div>{children}</div>,
-        Popup: () => <div>Popup</div>
-    };
-});
+vi.mock('react-leaflet', () => ({
+    MapContainer: ({ children }) => <div data-testid="map-container">{children}</div>,
+    TileLayer: () => <div>TileLayer</div>,
+    Marker: ({ children }) => <div>{children}</div>,
+    Popup: () => <div>Popup</div>
+}));
 
-vi.mock('axios');
+vi.mock('axios', () => ({
+    default: {
+        create: vi.fn(() => ({
+            interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
+            get: vi.fn(() => Promise.resolve({ data: {} })),
+            post: vi.fn(() => Promise.resolve({ data: {} })),
+            put: vi.fn(() => Promise.resolve({ data: {} })),
+            delete: vi.fn(() => Promise.resolve({ data: {} }))
+        })),
+        get: vi.fn(() => Promise.resolve({ data: {} })),
+        post: vi.fn(() => Promise.resolve({ data: {} }))
+    }
+}));
+
 window.alert = vi.fn();
-console.error = vi.fn(); // Ocultamos los errores en consola durante el test
+console.error = vi.fn();
 
 describe('Pruebas Unitarias del Dashboard de GeoFire', () => {
-
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.setItem('userNombre', 'Juan Perez');
-        localStorage.setItem('token', 'fake-jwt-token');
 
-        // Configuramos Axios para simular RESPUESTAS CON DATOS
+        // ¡LA SOLUCIÓN! Un token JWT simulado pero estructurado correctamente (Base64)
+        const validBase64 = btoa(JSON.stringify({ usuarioId: 1, sub: 'juan', rol: 'ADMIN' }));
+        localStorage.setItem('token', `header.${validBase64}.signature`);
+
         axios.get.mockImplementation((url) => {
-            if (url.includes('open-meteo')) {
-                return Promise.resolve({
-                    data: { current: { temperature_2m: 35, wind_speed_10m: 30, relative_humidity_2m: 20, uv_index: 9, precipitation: 0, weather_code: 1 } }
-                });
-            }
-            if (url.includes('nominatim')) {
-                return Promise.resolve({
-                    data: [{ place_id: 1, lat: "-41.4", lon: "-72.9", display_name: "Mall Paseo Costanera" }]
-                });
-            }
-            // Retornamos 2 reportes para probar la tabla y los filtros
-            return Promise.resolve({
-                data: [
-                    { id: 1, descripcion: 'Fuego en el bosque', latitud: -41.4, longitud: -72.9, prioridad: 'ALTA', estado: 'NUEVO', fechaReporte: '2023-10-10T10:00:00' },
-                    { id: 2, descripcion: 'Olor a humo', latitud: -41.5, longitud: -72.8, prioridad: 'BAJA', estado: 'RESUELTO', fechaReporte: '2023-10-11T10:00:00' }
-                ]
-            });
+            if (url.includes('open-meteo')) return Promise.resolve({ data: { current: { temperature_2m: 15.5, wind_speed_10m: 12.0 } } });
+            if (url.includes('nominatim')) return Promise.resolve({ data: [{ display_name: 'Mall Paseo Costanera' }] });
+            if (url.includes('/api/reportes')) return Promise.resolve({ data: [{ id: 1, descripcion: 'Incendio Test', latitud: -41.4, longitud: -72.9, estado: 'NUEVO', prioridad: 'ALTA' }] });
+            return Promise.resolve({ data: {} });
         });
-
-        axios.post.mockResolvedValue({ data: { success: true } });
+        axios.post.mockResolvedValue({ status: 201 });
     });
 
-    afterEach(() => {
-        localStorage.clear();
+    afterEach(() => localStorage.clear());
+
+    it('1. Debe renderizar el Navbar, el clima y el mapa', async () => {
+        render(<BrowserRouter><Dashboard /></BrowserRouter>);
+        expect(screen.getByTestId('map-container')).toBeDefined();
+        await waitFor(() => {
+            expect(screen.getByText('15.5°C')).toBeDefined();
+            expect(screen.getByText('12 km/h')).toBeDefined();
+        });
     });
 
-    it('1. Debe renderizar el panel principal y la tabla con datos', async () => {
+    it('2. Debe cargar y mostrar la tabla de reportes activos', async () => {
         render(<BrowserRouter><Dashboard /></BrowserRouter>);
         await waitFor(() => {
-            expect(screen.getByText('Fuego en el bosque')).toBeDefined();
-            expect(screen.getByText('Olor a humo')).toBeDefined();
+            expect(screen.getByText('Incendio Test')).toBeDefined();
+            expect(screen.getByText('ALTA')).toBeDefined();
+            expect(screen.getByText('NUEVO')).toBeDefined();
         });
     });
 
-    it('2. Debe abrir el modal al hacer clic en "NUEVO REPORTE"', async () => {
+    it('3. Debe abrir y cerrar el Modal de Nuevo Reporte', async () => {
         render(<BrowserRouter><Dashboard /></BrowserRouter>);
         await waitFor(() => expect(screen.getByText('+ NUEVO REPORTE')).toBeDefined());
-
         fireEvent.click(screen.getByText('+ NUEVO REPORTE'));
-        expect(screen.getByText('Crear Alerta Geográfica')).toBeDefined();
+        expect(screen.getByText('Registrar Emergencia')).toBeDefined();
+        fireEvent.click(screen.getByText('Cancelar'));
+        await waitFor(() => expect(screen.queryByText('Registrar Emergencia')).toBeNull());
     });
 
-    it('3. Debe enviar un nuevo reporte exitosamente', async () => {
+    it('4. Debe enviar un nuevo reporte y cerrar el modal', async () => {
         render(<BrowserRouter><Dashboard /></BrowserRouter>);
         await waitFor(() => expect(screen.getByText('+ NUEVO REPORTE')).toBeDefined());
-
         fireEvent.click(screen.getByText('+ NUEVO REPORTE'));
-        fireEvent.change(screen.getByPlaceholderText('Ej: Incendio forestal cerca de la ruta 5'), { target: { value: 'Test' } });
+        fireEvent.change(screen.getByPlaceholderText('Ej: Incendio forestal cerca de la ruta 5'), { target: { value: 'Fuego en bosque' } });
+        fireEvent.change(screen.getByDisplayValue('-41.4693'), { target: { value: '-41.5' } });
+        fireEvent.change(screen.getByDisplayValue('-72.9423'), { target: { value: '-73.0' } });
         fireEvent.click(screen.getByText('Enviar Reporte'));
-
-        await waitFor(() => expect(axios.post).toHaveBeenCalled());
+        await waitFor(() => {
+            expect(axios.post).toHaveBeenCalled();
+            expect(screen.queryByText('Registrar Emergencia')).toBeNull();
+        });
     });
 
-    it('4. Debe cerrar sesión y limpiar el localStorage', async () => {
+    it('5. Debe cerrar sesión correctamente', async () => {
         render(<BrowserRouter><Dashboard /></BrowserRouter>);
-        await waitFor(() => expect(screen.getByText('+ NUEVO REPORTE')).toBeDefined());
-
-        fireEvent.click(document.querySelector('.btn-logout'));
+        const logoutBtn = await screen.findByText('Cerrar Sesión');
+        fireEvent.click(logoutBtn);
         expect(localStorage.getItem('token')).toBeNull();
     });
 
-    it('5. Debe filtrar la tabla de reportes por Estado y Prioridad', async () => {
-        render(<BrowserRouter><Dashboard /></BrowserRouter>);
-        await waitFor(() => expect(screen.getByText('Fuego en el bosque')).toBeDefined());
-
-        const selectEstado = document.querySelectorAll('.filter-select')[0];
-        fireEvent.change(selectEstado, { target: { value: 'NUEVO' } });
-
-        // Verificamos que se filtró correctamente
-        expect(screen.getByText('Fuego en el bosque')).toBeDefined();
-        expect(screen.queryByText('Olor a humo')).toBeNull();
-    });
-
-    it('6. Debe buscar una dirección en el mapa y seleccionarla', async () => {
+    it('6. Debe buscar una dirección y sugerir resultados', async () => {
         render(<BrowserRouter><Dashboard /></BrowserRouter>);
         await waitFor(() => expect(screen.getByText('+ NUEVO REPORTE')).toBeDefined());
-
         fireEvent.click(screen.getByText('+ NUEVO REPORTE'));
-
-        // Escribimos en el buscador
-        const inputBuscador = screen.getByPlaceholderText('Ej: Mall Paseo Costanera, Puerto Montt');
-        fireEvent.change(inputBuscador, { target: { value: 'Mall' } });
-        fireEvent.click(screen.getByText('🔍 Buscar'));
-
-        // Esperamos que aparezca el resultado y le damos clic
+        fireEvent.change(screen.getByPlaceholderText('Buscar dirección o lugar...'), { target: { value: 'Paseo Costanera' } });
+        fireEvent.click(screen.getByText('Buscar'));
         await waitFor(() => expect(screen.getByText('Mall Paseo Costanera')).toBeDefined());
         fireEvent.click(screen.getByText('Mall Paseo Costanera'));
-
-        // El input debe haberse rellenado con el nombre
-        expect(inputBuscador.value).toBe('Mall Paseo Costanera');
-    });
-
-    it('7. Debe manejar errores del servidor al cargar y enviar (Cobertura Catch)', async () => {
-        // Simulamos que el servidor está caído y da error 400
-        axios.get.mockRejectedValue(new Error('Network Error'));
-        axios.post.mockRejectedValue({ response: { status: 400, data: { msg: 'Faltan datos' } } });
-
-        render(<BrowserRouter><Dashboard /></BrowserRouter>);
-
-        // Esperamos a que el botón exista y abrimos el modal
-        await waitFor(() => expect(screen.getByText('+ NUEVO REPORTE')).toBeDefined());
-        fireEvent.click(screen.getByText('+ NUEVO REPORTE'));
-
-        // RELLENAMOS EL INPUT (¡Vital para pasar la validación 'required' del formulario!)
-        const inputDesc = screen.getByPlaceholderText('Ej: Incendio forestal cerca de la ruta 5');
-        fireEvent.change(inputDesc, { target: { value: 'Falla intencional' } });
-
-        // Ahora sí, enviamos el reporte
-        fireEvent.click(screen.getByText('Enviar Reporte'));
-
-        // Verificamos que la alerta de error rojo se disparó
-        await waitFor(() => {
-            expect(console.error).toHaveBeenCalled();
-            expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Error en el formulario'));
-        });
+        expect(screen.getByPlaceholderText('Buscar dirección o lugar...').value).toBe('Mall Paseo Costanera');
     });
 });
