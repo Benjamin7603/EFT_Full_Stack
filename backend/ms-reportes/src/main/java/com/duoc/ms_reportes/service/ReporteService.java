@@ -16,7 +16,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -221,7 +222,7 @@ public class ReporteService {
 
             String[] columnas = {
                     "ID",
-                    "Fecha",
+                    "Fecha(CL)",
                     "Descripción",
                     "Tipo usuario",
                     "Prioridad",
@@ -238,6 +239,7 @@ public class ReporteService {
             }
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            ZoneId zonaChile = ZoneId.of("America/Santiago");
 
             for (Reporte reporte : reportes) {
                 Row row = sheet.createRow(rowIndex++);
@@ -245,7 +247,10 @@ public class ReporteService {
                 row.createCell(0).setCellValue(reporte.getId() != null ? reporte.getId() : 0);
                 row.createCell(1).setCellValue(
                         reporte.getFechaReporte() != null
-                                ? reporte.getFechaReporte().format(formatter)
+                                ? reporte.getFechaReporte()
+                                .atZone(ZoneOffset.UTC)
+                                .withZoneSameInstant(zonaChile)
+                                .format(formatter)
                                 : "Sin fecha"
                 );
                 row.createCell(2).setCellValue(reporte.getDescripcion() != null ? reporte.getDescripcion() : "");

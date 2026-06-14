@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "reportes")
@@ -41,9 +42,20 @@ public class Reporte implements Serializable {
 
     private String estado = "NUEVO";
 
-    @Column(name = "fecha_reporte")
-    private LocalDateTime fechaReporte = LocalDateTime.now();
+    @Column(name = "fecha_reporte", nullable = false, updatable = false)
+    private LocalDateTime fechaReporte;
 
     @NotNull(message = "El ID del usuario es obligatorio")
     private Long usuarioId;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaReporte == null) {
+            this.fechaReporte = LocalDateTime.now(ZoneOffset.UTC);
+        }
+
+        if (this.estado == null || this.estado.isBlank()) {
+            this.estado = "NUEVO";
+        }
+    }
 }
