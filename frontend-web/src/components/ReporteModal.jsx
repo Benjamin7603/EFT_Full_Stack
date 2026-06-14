@@ -1,3 +1,4 @@
+// src/components/ReporteModal.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -38,7 +39,8 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
             );
         }
     };
-    const obtenerTipoUsuario = () => {
+
+    const obtenerRolSesion = () => {
         let rol = localStorage.getItem("rol");
 
         if (!rol) {
@@ -55,7 +57,15 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
             }
         }
 
-        const rolNormalizado = rol ? rol.trim().toUpperCase() : "USER";
+        return rol ? rol.trim().toUpperCase() : "USER";
+    };
+
+    const esUsuarioOperativo = () => {
+        return ["ADMIN", "BOMBERO", "BRIGADISTA", "FUNCIONARIO"].includes(obtenerRolSesion());
+    };
+
+    const obtenerTipoUsuario = () => {
+        const rolNormalizado = obtenerRolSesion();
 
         if (rolNormalizado === "USER") {
             return "CIUDADANO";
@@ -63,11 +73,12 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
 
         return rolNormalizado;
     };
+
     const [nuevoReporte, setNuevoReporte] = useState({
         descripcion: "",
         latitud: null,
         longitud: null,
-        prioridad: "MEDIA",
+        prioridad: esUsuarioOperativo() ? "MEDIA" : "BAJA",
         tipoUsuario: obtenerTipoUsuario(),
         usuarioId: obtenerUsuarioId() ? Number(obtenerUsuarioId()) : null
     });
@@ -210,6 +221,7 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
                 ...nuevoReporte,
                 descripcion: nuevoReporte.descripcion.trim(),
                 tipoUsuario: obtenerTipoUsuario(),
+                prioridad: esUsuarioOperativo() ? nuevoReporte.prioridad : "BAJA",
                 urlMedia: "",
                 usuarioId: Number(usuarioIdActual)
             };
@@ -352,27 +364,29 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
                         )}
                     </div>
 
-                    <div className="input-group">
-                        <label>Prioridad</label>
+                    {esUsuarioOperativo() && (
+                        <div className="input-group">
+                            <label>Prioridad</label>
 
-                        <select
-                            className="input-field"
-                            value={nuevoReporte.prioridad}
-                            disabled={enviando}
-                            onChange={(e) => {
-                                setNuevoReporte((prev) => ({
-                                    ...prev,
-                                    prioridad: e.target.value
-                                }));
+                            <select
+                                className="input-field"
+                                value={nuevoReporte.prioridad}
+                                disabled={enviando}
+                                onChange={(e) => {
+                                    setNuevoReporte((prev) => ({
+                                        ...prev,
+                                        prioridad: e.target.value
+                                    }));
 
-                                setErrorModal("");
-                            }}
-                        >
-                            <option value="ALTA">Alta</option>
-                            <option value="MEDIA">Media</option>
-                            <option value="BAJA">Baja</option>
-                        </select>
-                    </div>
+                                    setErrorModal("");
+                                }}
+                            >
+                                <option value="ALTA">Alta</option>
+                                <option value="MEDIA">Media</option>
+                                <option value="BAJA">Baja</option>
+                            </select>
+                        </div>
+                    )}
 
                     <div className="modal-actions">
                         <button

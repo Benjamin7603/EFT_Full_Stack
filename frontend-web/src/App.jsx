@@ -8,6 +8,8 @@ import Perfil from "./pages/Perfil";
 import Admin from "./pages/Admin";
 import Notificaciones from "./pages/Notificaciones";
 import RutasProtegidas from "./components/RutasProtegidas";
+import Reportes from "./pages/Reportes.jsx";
+
 function App() {
     return (
         <Router>
@@ -19,6 +21,7 @@ function App() {
                 <Route path="/perfil" element={<RutasProtegidas><Perfil /></RutasProtegidas>}/>
                 <Route path="/notificaciones" element={<RutasProtegidas><Notificaciones /></RutasProtegidas>}/>
                 <Route path="/admin" element={<RutasProtegidas rolesPermitidos={["ADMIN"]}><Admin /></RutasProtegidas>}/>
+                <Route path="/reportes" element={<RutasProtegidas rolesPermitidos={["ADMIN", "BOMBERO", "BRIGADISTA", "FUNCIONARIO"]}><Reportes /></RutasProtegidas>}/>
             </Routes>
         </Router>
     );

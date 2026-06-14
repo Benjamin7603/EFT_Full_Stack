@@ -14,11 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Servicio encargado de la gestión y procesamiento de reportes de incendios.
- * Coordina la persistencia de incidentes, el uso de caché Redis y la comunicación
- * inter-servicio con los microservicios geográfico y de notificaciones.
- */
 @Service
 public class ReporteService {
 
@@ -26,13 +21,6 @@ public class ReporteService {
     private final GeograficoClient geograficoClient;
     private final NotificacionClient notificacionClient;
 
-    /**
-     * Constructor para la inyección de dependencias requeridas por el servicio de reportes.
-     *
-     * @param reporteRepository Repositorio para el acceso a datos y persistencia de reportes.
-     * @param geograficoClient Cliente de comunicación para el microservicio geográfico.
-     * @param notificacionClient Cliente de comunicación para el microservicio de notificaciones.
-     */
     public ReporteService(ReporteRepository reporteRepository,
                           GeograficoClient geograficoClient,
                           NotificacionClient notificacionClient) {
@@ -41,18 +29,15 @@ public class ReporteService {
         this.notificacionClient = notificacionClient;
     }
 
-    /**
-     * Procesa y crea un nuevo reporte de incendio en el sistema.
-     * Al crear un nuevo reporte se limpian los cachés de listados, ya que el dashboard
-     * y el historial deben reflejar el nuevo incidente.
-     *
-     * @param datosEntrada Objeto {@link ReporteDTO} con la información del incidente enviado por el usuario.
-     * @return Entidad {@link Reporte} guardada en la base de datos con su ID asignado.
-     */
     @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
     public Reporte crearReporteProcesado(ReporteDTO datosEntrada) {
+        return crearReporteProcesado(datosEntrada, null);
+    }
 
+    @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
+    public Reporte crearReporteProcesado(ReporteDTO datosEntrada, String rolSesion) {
         Reporte nuevoReporte = new Reporte();
+
         nuevoReporte.setLatitud(datosEntrada.getLatitud());
         nuevoReporte.setLongitud(datosEntrada.getLongitud());
         nuevoReporte.setDescripcion(datosEntrada.getDescripcion());
@@ -60,12 +45,12 @@ public class ReporteService {
         nuevoReporte.setTipoUsuario(datosEntrada.getTipoUsuario());
         nuevoReporte.setUsuarioId(datosEntrada.getUsuarioId());
 
-        String prioridad = datosEntrada.getPrioridad() == null
-                ? ""
-                : datosEntrada.getPrioridad().trim().toUpperCase();
+        String prioridad;
 
-        if (!prioridad.equals("ALTA") && !prioridad.equals("MEDIA") && !prioridad.equals("BAJA")) {
-            throw new IllegalArgumentException("La prioridad debe ser ALTA, MEDIA o BAJA");
+        if (esRolOperativo(rolSesion)) {
+            prioridad = normalizarPrioridad(datosEntrada.getPrioridad());
+        } else {
+            prioridad = "BAJA";
         }
 
         nuevoReporte.setEstado("NUEVO");
@@ -97,44 +82,78 @@ public class ReporteService {
         return reporteGuardado;
     }
 
-    /**
-     * Obtiene el listado de todos los reportes registrados en el sistema.
-     * Se cachea en Redis porque es una consulta frecuente desde dashboard, perfil y panel admin.
-     *
-     * @return Una {@link List} que contiene todos los objetos de {@link Reporte}.
-     */
     @Cacheable(value = "reportesTodos", key = "'all'")
     public List<Reporte> listarTodos() {
         return reporteRepository.findAll();
     }
 
-    /**
-     * Obtiene los reportes que se encuentran actualmente activos.
-     * Se cachea en Redis porque alimenta el dashboard principal y el mapa de incidentes.
-     *
-     * @return Una {@link List} con los objetos {@link Reporte} en estado NUEVO o EN_PROGRESO.
-     */
     @Cacheable(value = "reportesActivos", key = "'active'")
     public List<Reporte> listarActivos() {
         return reporteRepository.findByEstadoIn(List.of("NUEVO", "EN_PROGRESO"));
     }
 
-    /**
-     * Actualiza el estado de un reporte específico.
-     * Al modificar el estado se limpian los cachés para evitar mostrar reportes obsoletos.
-     *
-     * @param id Identificador único del reporte a modificar.
-     * @param nuevoEstado Nueva etiqueta de estado a asignar.
-     * @return Objeto {@link Reporte} modificado con su nuevo estado.
-     * @throws EntityNotFoundException Si no se encuentra un reporte asociado al identificador provisto.
-     */
     @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
     public Reporte actualizarEstado(Long id, String nuevoEstado) {
-        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+        String estadoNormalizado = normalizarEstado(nuevoEstado);
+
+        return reporteRepository.findById(id).map(reporte -> {
+            reporte.setEstado(estadoNormalizado);
+            return reporteRepository.save(reporte);
+        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
+    }
+
+    @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
+    public Reporte actualizarPrioridad(Long id, String nuevaPrioridad) {
+        String prioridadNormalizada = normalizarPrioridad(nuevaPrioridad);
+
+        return reporteRepository.findById(id).map(reporte -> {
+            reporte.setPrioridad(prioridadNormalizada);
+            return reporteRepository.save(reporte);
+        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
+    }
+
+    public Reporte obtenerPorId(Long id) {
+        return reporteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
+    }
+
+    private boolean esRolOperativo(String rol) {
+        if (rol == null || rol.isBlank()) {
+            return false;
+        }
+
+        String rolNormalizado = rol.trim().toUpperCase();
+
+        return rolNormalizado.equals("ADMIN")
+                || rolNormalizado.equals("BOMBERO")
+                || rolNormalizado.equals("BRIGADISTA")
+                || rolNormalizado.equals("FUNCIONARIO");
+    }
+
+    private String normalizarPrioridad(String prioridad) {
+        if (prioridad == null || prioridad.isBlank()) {
+            throw new IllegalArgumentException("La prioridad es obligatoria para usuarios operativos.");
+        }
+
+        String prioridadNormalizada = prioridad.trim().toUpperCase();
+
+        if (
+                !prioridadNormalizada.equals("ALTA") &&
+                        !prioridadNormalizada.equals("MEDIA") &&
+                        !prioridadNormalizada.equals("BAJA")
+        ) {
+            throw new IllegalArgumentException("La prioridad debe ser ALTA, MEDIA o BAJA");
+        }
+
+        return prioridadNormalizada;
+    }
+
+    private String normalizarEstado(String estado) {
+        if (estado == null || estado.isBlank()) {
             throw new IllegalArgumentException("El estado del reporte es obligatorio.");
         }
 
-        String estadoNormalizado = nuevoEstado.trim().toUpperCase();
+        String estadoNormalizado = estado.trim().toUpperCase();
 
         if (
                 !estadoNormalizado.equals("NUEVO") &&
@@ -144,22 +163,6 @@ public class ReporteService {
             throw new IllegalArgumentException("El estado debe ser NUEVO, EN_PROGRESO o RESUELTO.");
         }
 
-        return reporteRepository.findById(id).map(reporte -> {
-            reporte.setEstado(estadoNormalizado);
-            return reporteRepository.save(reporte);
-        }).orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
+        return estadoNormalizado;
     }
-
-    /**
-     * Obtiene un reporte en base a su identificador único de registro.
-     *
-     * @param id Identificador único del reporte a consultar.
-     * @return Objeto {@link Reporte} correspondiente al ID suministrado.
-     * @throws EntityNotFoundException Si el reporte buscado no existe en los registros.
-     */
-    public Reporte obtenerPorId(Long id) {
-        return reporteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("El reporte con ID " + id + " no existe."));
-    }
-
 }

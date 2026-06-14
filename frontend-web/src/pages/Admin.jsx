@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    BarChart3,
     Edit,
     Flame,
     Plus,
@@ -21,7 +20,7 @@ import "./Dashboard.css";
 import "./Admin.css";
 import "../App.css";
 import Navbar from "../components/Navbar.jsx";
-
+import TablaGestionReportes from "../components/TablaGestionReportes.jsx";
 const rolesDisponibles = [
     "ADMIN",
     "FUNCIONARIO",
@@ -77,11 +76,7 @@ export default function Admin() {
         (reporte) => reporte.estado !== "RESUELTO"
     );
 
-    const ultimosReportes = useMemo(() => {
-        return [...reportes]
-            .sort((a, b) => new Date(b.fechaReporte) - new Date(a.fechaReporte))
-            .slice(0, 8);
-    }, [reportes]);
+
 
     const ultimoAdministrador = (usuario) => {
         const admins = usuarios.filter((u) => u.rol === "ADMIN");
@@ -332,36 +327,7 @@ export default function Admin() {
         }
     };
 
-    const actualizarEstadoReporte = async (idReporte, nuevoEstado) => {
-        try {
-            await api.patch(`/api/reportes/${idReporte}/estado`, null, {
-                params: {
-                    nuevoEstado,
-                },
-            });
 
-            await cargarDatos();
-
-            Swal.fire({
-                icon: "success",
-                title: "Estado actualizado",
-                text: `El reporte #${idReporte} ahora está en estado ${nuevoEstado}.`,
-                confirmButtonColor: "#FF7043",
-            });
-        } catch (err) {
-            console.error("Error actualizando estado:", err);
-
-            Swal.fire({
-                icon: "error",
-                title: "Error al actualizar",
-                text:
-                    err.response?.data?.error ||
-                    err.response?.data?.mensaje ||
-                    "No se pudo actualizar el estado del reporte.",
-                confirmButtonColor: "#dc3545",
-            });
-        }
-    };
 
     const getRoleClass = (rol) => {
         switch (rol) {
@@ -378,17 +344,9 @@ export default function Admin() {
         }
     };
 
-    const getEstadoClass = (estado) => {
-        if (estado === "NUEVO") return "nuevo";
-        if (estado === "EN_PROGRESO") return "proceso";
-        return "resuelto";
-    };
 
-    const getPrioridadClass = (prioridad) => {
-        if (prioridad === "ALTA") return "proceso";
-        if (prioridad === "BAJA") return "resuelto";
-        return "nuevo";
-    };
+
+
 
     return (
         <div className="admin-container">
@@ -546,88 +504,15 @@ export default function Admin() {
                     )}
                 </section>
 
-                <section className="admin-card">
-                    <div className="admin-card-header">
-                        <div>
-                            <span className="admin-kicker">Operación</span>
-                            <h2>Gestión de reportes recientes</h2>
-                        </div>
-
-                        <div className="admin-mini-label">
-                            <BarChart3 size={17} />
-                            Últimos {ultimosReportes.length} reportes
-                        </div>
-                    </div>
-
-                    {loading ? (
-                        <p className="admin-empty">Cargando reportes...</p>
-                    ) : ultimosReportes.length === 0 ? (
-                        <p className="admin-empty">No hay reportes registrados.</p>
-                    ) : (
-                        <div className="admin-table-wrapper">
-                            <table className="admin-table">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha</th>
-                                    <th>Descripción</th>
-                                    <th>Prioridad</th>
-                                    <th>Estado</th>
-                                    <th>Cambiar estado</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-                                {ultimosReportes.map((reporte) => (
-                                    <tr key={reporte.id}>
-                                        <td>#{reporte.id}</td>
-                                        <td>
-                                            {reporte.fechaReporte
-                                                ? new Date(reporte.fechaReporte).toLocaleString("es-CL")
-                                                : "Sin fecha"}
-                                        </td>
-                                        <td>{reporte.descripcion}</td>
-                                        <td>
-                                                <span
-                                                    className={`badge-riesgo ${getPrioridadClass(
-                                                        reporte.prioridad
-                                                    )}`}
-                                                >
-                                                    {reporte.prioridad || "MEDIA"}
-                                                </span>
-                                        </td>
-                                        <td>
-                                                <span
-                                                    className={`badge-riesgo ${getEstadoClass(
-                                                        reporte.estado
-                                                    )}`}
-                                                >
-                                                    {reporte.estado || "NUEVO"}
-                                                </span>
-                                        </td>
-                                        <td>
-                                            <select
-                                                className="admin-status-select"
-                                                value={reporte.estado || "NUEVO"}
-                                                onChange={(e) =>
-                                                    actualizarEstadoReporte(
-                                                        reporte.id,
-                                                        e.target.value
-                                                    )
-                                                }
-                                            >
-                                                <option value="NUEVO">NUEVO</option>
-                                                <option value="EN_PROGRESO">EN_PROGRESO</option>
-                                                <option value="RESUELTO">RESUELTO</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </section>
+                <TablaGestionReportes
+                    titulo="Gestión de reportes recientes"
+                    kicker="Operación"
+                    limite={8}
+                    reportesExternos={reportes}
+                    loadingExterno={loading}
+                    onActualizarExterno={cargarDatos}
+                    mostrarBotonActualizar={false}
+                />
             </main>
 
             {mostrarModal && (

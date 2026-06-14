@@ -71,52 +71,86 @@ class ReporteServiceTest {
     // crearReporteProcesado
     // =========================================================
     @Test
-    void testCrearReporteProcesado_Exitoso() {
+    void testCrearReporteProcesado_RolOperativoExitoso() {
         ReporteDTO dto = crearDtoValido("MEDIA");
         Reporte reporteSimulado = crearReporteGuardado(100L, "MEDIA");
 
         when(reporteRepository.save(any(Reporte.class)))
                 .thenReturn(reporteSimulado);
 
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "BRIGADISTA");
 
         assertNotNull(resultado);
         assertEquals(100L, resultado.getId());
         assertEquals("NUEVO", resultado.getEstado());
         assertEquals("MEDIA", resultado.getPrioridad());
 
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
-
-        verify(geograficoClient, times(1))
-                .guardarUbicacion(any(UbicacionDTO.class));
-
-        verify(notificacionClient, times(1))
-                .enviarAlerta(any(NotificacionDTO.class));
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
-    void testCrearReporteProcesado_RespetaPrioridadAlta() {
+    void testCrearReporteProcesado_AdminRespetaPrioridadAlta() {
         ReporteDTO dto = crearDtoValido("ALTA");
         Reporte reporteSimulado = crearReporteGuardado(101L, "ALTA");
 
         when(reporteRepository.save(any(Reporte.class)))
                 .thenReturn(reporteSimulado);
 
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "ADMIN");
 
         assertNotNull(resultado);
         assertEquals(101L, resultado.getId());
         assertEquals("ALTA", resultado.getPrioridad());
 
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
-    void testCrearReporteProcesado_RespetaPrioridadBaja() {
+    void testCrearReporteProcesado_BomberoRespetaPrioridadBaja() {
         ReporteDTO dto = crearDtoValido("BAJA");
         Reporte reporteSimulado = crearReporteGuardado(102L, "BAJA");
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
+
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "BOMBERO");
+
+        assertNotNull(resultado);
+        assertEquals(102L, resultado.getId());
+        assertEquals("BAJA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_UserFuerzaPrioridadBajaAunqueEnvieAlta() {
+        ReporteDTO dto = crearDtoValido("ALTA");
+        Reporte reporteSimulado = crearReporteGuardado(103L, "BAJA");
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
+
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "USER");
+
+        assertNotNull(resultado);
+        assertEquals(103L, resultado.getId());
+        assertEquals("BAJA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_SinRolFuerzaPrioridadBaja() {
+        ReporteDTO dto = crearDtoValido("CRITICA");
+        Reporte reporteSimulado = crearReporteGuardado(104L, "BAJA");
 
         when(reporteRepository.save(any(Reporte.class)))
                 .thenReturn(reporteSimulado);
@@ -124,17 +158,84 @@ class ReporteServiceTest {
         Reporte resultado = reporteService.crearReporteProcesado(dto);
 
         assertNotNull(resultado);
-        assertEquals(102L, resultado.getId());
+        assertEquals(104L, resultado.getId());
         assertEquals("BAJA", resultado.getPrioridad());
 
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_RolOperativoPrioridadInvalida() {
+        ReporteDTO dto = crearDtoValido("CRITICA");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                reporteService.crearReporteProcesado(dto, "BRIGADISTA")
+        );
+
+        assertEquals("La prioridad debe ser ALTA, MEDIA o BAJA", ex.getMessage());
+
+        verify(reporteRepository, never()).save(any(Reporte.class));
+        verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_RolOperativoPrioridadVacia() {
+        ReporteDTO dto = crearDtoValido(" ");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                reporteService.crearReporteProcesado(dto, "FUNCIONARIO")
+        );
+
+        assertEquals("La prioridad es obligatoria para usuarios operativos.", ex.getMessage());
+
+        verify(reporteRepository, never()).save(any(Reporte.class));
+        verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_PrioridadMinusculaSeNormaliza() {
+        ReporteDTO dto = crearDtoValido("media");
+        Reporte reporteSimulado = crearReporteGuardado(105L, "MEDIA");
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
+
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "BRIGADISTA");
+
+        assertNotNull(resultado);
+        assertEquals("MEDIA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
+    }
+
+    @Test
+    void testCrearReporteProcesado_PrioridadConEspaciosSeNormaliza() {
+        ReporteDTO dto = crearDtoValido(" MEDIA ");
+        Reporte reporteSimulado = crearReporteGuardado(106L, "MEDIA");
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteSimulado);
+
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "FUNCIONARIO");
+
+        assertNotNull(resultado);
+        assertEquals("MEDIA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
     void testCrearReporteProcesado_FallaMsGeografico() {
         ReporteDTO dto = crearDtoValido("MEDIA");
-        Reporte reporteSimulado = crearReporteGuardado(100L, "MEDIA");
+        Reporte reporteSimulado = crearReporteGuardado(107L, "MEDIA");
 
         when(reporteRepository.save(any(Reporte.class)))
                 .thenReturn(reporteSimulado);
@@ -143,26 +244,21 @@ class ReporteServiceTest {
                 .when(geograficoClient)
                 .guardarUbicacion(any(UbicacionDTO.class));
 
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "ADMIN");
 
         assertNotNull(resultado);
-        assertEquals(100L, resultado.getId());
+        assertEquals(107L, resultado.getId());
         assertEquals("MEDIA", resultado.getPrioridad());
 
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
-
-        verify(geograficoClient, times(1))
-                .guardarUbicacion(any(UbicacionDTO.class));
-
-        verify(notificacionClient, times(1))
-                .enviarAlerta(any(NotificacionDTO.class));
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
     void testCrearReporteProcesado_FallaMsNotificaciones() {
         ReporteDTO dto = crearDtoValido("MEDIA");
-        Reporte reporteSimulado = crearReporteGuardado(100L, "MEDIA");
+        Reporte reporteSimulado = crearReporteGuardado(108L, "MEDIA");
 
         when(reporteRepository.save(any(Reporte.class)))
                 .thenReturn(reporteSimulado);
@@ -171,20 +267,15 @@ class ReporteServiceTest {
                 .when(notificacionClient)
                 .enviarAlerta(any(NotificacionDTO.class));
 
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
+        Reporte resultado = reporteService.crearReporteProcesado(dto, "ADMIN");
 
         assertNotNull(resultado);
-        assertEquals(100L, resultado.getId());
+        assertEquals(108L, resultado.getId());
         assertEquals("MEDIA", resultado.getPrioridad());
 
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
-
-        verify(geograficoClient, times(1))
-                .guardarUbicacion(any(UbicacionDTO.class));
-
-        verify(notificacionClient, times(1))
-                .enviarAlerta(any(NotificacionDTO.class));
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
+        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     // =========================================================
@@ -199,8 +290,7 @@ class ReporteServiceTest {
 
         assertEquals(1, lista.size());
 
-        verify(reporteRepository, times(1))
-                .findAll();
+        verify(reporteRepository, times(1)).findAll();
     }
 
     @Test
@@ -232,8 +322,7 @@ class ReporteServiceTest {
         assertNotNull(resultado);
         assertEquals(5L, resultado.getId());
 
-        verify(reporteRepository, times(1))
-                .findById(5L);
+        verify(reporteRepository, times(1)).findById(5L);
     }
 
     @Test
@@ -245,8 +334,7 @@ class ReporteServiceTest {
                 reporteService.obtenerPorId(99L)
         );
 
-        verify(reporteRepository, times(1))
-                .findById(99L);
+        verify(reporteRepository, times(1)).findById(99L);
     }
 
     // =========================================================
@@ -273,11 +361,8 @@ class ReporteServiceTest {
         assertNotNull(resultado);
         assertEquals("EN_PROGRESO", resultado.getEstado());
 
-        verify(reporteRepository, times(1))
-                .findById(1L);
-
-        verify(reporteRepository, times(1))
-                .save(any(Reporte.class));
+        verify(reporteRepository, times(1)).findById(1L);
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
     }
 
     @Test
@@ -289,12 +374,10 @@ class ReporteServiceTest {
                 reporteService.actualizarEstado(1L, "RESUELTO")
         );
 
-        verify(reporteRepository, times(1))
-                .findById(1L);
-
-        verify(reporteRepository, never())
-                .save(any(Reporte.class));
+        verify(reporteRepository, times(1)).findById(1L);
+        verify(reporteRepository, never()).save(any(Reporte.class));
     }
+
     @Test
     void testActualizarEstado_EstadoInvalido() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
@@ -306,54 +389,57 @@ class ReporteServiceTest {
         verify(reporteRepository, never()).findById(anyLong());
         verify(reporteRepository, never()).save(any(Reporte.class));
     }
-    @Test
-    void testCrearReporteProcesado_PrioridadInvalida() {
-        ReporteDTO dto = crearDtoValido("CRITICA");
 
+    // =========================================================
+    // actualizarPrioridad
+    // =========================================================
+    @Test
+    void testActualizarPrioridad_Exitoso() {
+        Reporte reporteOriginal = new Reporte();
+        reporteOriginal.setId(1L);
+        reporteOriginal.setPrioridad("BAJA");
+
+        Reporte reporteModificado = new Reporte();
+        reporteModificado.setId(1L);
+        reporteModificado.setPrioridad("ALTA");
+
+        when(reporteRepository.findById(1L))
+                .thenReturn(Optional.of(reporteOriginal));
+
+        when(reporteRepository.save(any(Reporte.class)))
+                .thenReturn(reporteModificado);
+
+        Reporte resultado = reporteService.actualizarPrioridad(1L, "ALTA");
+
+        assertNotNull(resultado);
+        assertEquals("ALTA", resultado.getPrioridad());
+
+        verify(reporteRepository, times(1)).findById(1L);
+        verify(reporteRepository, times(1)).save(any(Reporte.class));
+    }
+
+    @Test
+    void testActualizarPrioridad_NoEncontrado() {
+        when(reporteRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () ->
+                reporteService.actualizarPrioridad(1L, "MEDIA")
+        );
+
+        verify(reporteRepository, times(1)).findById(1L);
+        verify(reporteRepository, never()).save(any(Reporte.class));
+    }
+
+    @Test
+    void testActualizarPrioridad_Invalida() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                reporteService.crearReporteProcesado(dto)
+                reporteService.actualizarPrioridad(1L, "URGENTE")
         );
 
         assertEquals("La prioridad debe ser ALTA, MEDIA o BAJA", ex.getMessage());
 
+        verify(reporteRepository, never()).findById(anyLong());
         verify(reporteRepository, never()).save(any(Reporte.class));
-        verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
-    }
-
-    @Test
-    void testCrearReporteProcesado_PrioridadMinusculaSeNormaliza() {
-        ReporteDTO dto = crearDtoValido("media");
-        Reporte reporteSimulado = crearReporteGuardado(103L, "MEDIA");
-
-        when(reporteRepository.save(any(Reporte.class)))
-                .thenReturn(reporteSimulado);
-
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
-
-        assertNotNull(resultado);
-        assertEquals("MEDIA", resultado.getPrioridad());
-
-        verify(reporteRepository, times(1)).save(any(Reporte.class));
-        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
-    }
-
-    @Test
-    void testCrearReporteProcesado_PrioridadConEspaciosSeNormaliza() {
-        ReporteDTO dto = crearDtoValido(" MEDIA ");
-        Reporte reporteSimulado = crearReporteGuardado(104L, "MEDIA");
-
-        when(reporteRepository.save(any(Reporte.class)))
-                .thenReturn(reporteSimulado);
-
-        Reporte resultado = reporteService.crearReporteProcesado(dto);
-
-        assertNotNull(resultado);
-        assertEquals("MEDIA", resultado.getPrioridad());
-
-        verify(reporteRepository, times(1)).save(any(Reporte.class));
-        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 }
