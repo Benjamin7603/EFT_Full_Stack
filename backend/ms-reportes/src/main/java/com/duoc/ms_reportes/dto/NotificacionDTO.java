@@ -1,6 +1,7 @@
 package com.duoc.ms_reportes.dto;
+import java.io.Serializable;
 
-public class NotificacionDTO {
+public class NotificacionDTO implements Serializable {
 
     private String mensaje;
     private String destinatario;
