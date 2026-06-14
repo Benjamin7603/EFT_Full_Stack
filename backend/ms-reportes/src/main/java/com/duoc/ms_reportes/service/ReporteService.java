@@ -19,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ReporteService {
@@ -26,13 +28,16 @@ public class ReporteService {
     private final ReporteRepository reporteRepository;
     private final GeograficoClient geograficoClient;
     private final NotificacionClient notificacionClient;
+    private final RabbitTemplate rabbitTemplate; // <-- NUEVA VARIABLE
 
     public ReporteService(ReporteRepository reporteRepository,
                           GeograficoClient geograficoClient,
-                          NotificacionClient notificacionClient) {
+                          NotificacionClient notificacionClient,
+                          RabbitTemplate rabbitTemplate) {
         this.reporteRepository = reporteRepository;
         this.geograficoClient = geograficoClient;
         this.notificacionClient = notificacionClient;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @CacheEvict(value = {"reportesTodos", "reportesActivos"}, allEntries = true)
@@ -64,6 +69,7 @@ public class ReporteService {
 
         Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
 
+
         try {
             UbicacionDTO ubicacion = new UbicacionDTO(
                     reporteGuardado.getId(),
@@ -75,14 +81,25 @@ public class ReporteService {
             System.err.println("Atención: ms-geografico no está disponible en este momento.");
         }
 
+        // --- ¡AQUÍ ESTÁ LA MAGIA DE RABBITMQ CON JSON! ---
         try {
             NotificacionDTO alerta = new NotificacionDTO(
                     "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
                     "ADMIN"
             );
-            notificacionClient.enviarAlerta(alerta);
+
+            // 1. Instanciamos el transformador a JSON
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+            // 2. Transformamos el objeto a texto JSON
+            String jsonAlerta = mapper.writeValueAsString(alerta);
+
+            // 3. Enviamos el texto JSON en lugar del objeto Java
+            rabbitTemplate.convertAndSend("notificaciones.queue", jsonAlerta);
+
+            System.out.println("🐇 ¡Mensaje JSON enviado a RabbitMQ con éxito!");
         } catch (Exception e) {
-            System.err.println("Atención: ms-notificaciones no está disponible en este momento.");
+            System.err.println("⚠️ Atención: No se pudo enviar el mensaje a RabbitMQ en este momento: " + e.getMessage());
         }
 
         return reporteGuardado;

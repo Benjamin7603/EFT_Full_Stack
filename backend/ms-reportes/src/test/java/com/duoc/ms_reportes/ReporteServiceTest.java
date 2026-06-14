@@ -12,6 +12,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+// ¡NUEVO IMPORT PARA RABBITMQ!
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,7 @@ class ReporteServiceTest {
     private ReporteRepository reporteRepository;
     private GeograficoClient geograficoClient;
     private NotificacionClient notificacionClient;
+    private RabbitTemplate rabbitTemplate; // <-- NUEVO MOCK PARA LA PRUEBA
     private ReporteService reporteService;
 
     @BeforeEach
@@ -33,12 +36,10 @@ class ReporteServiceTest {
         reporteRepository = mock(ReporteRepository.class);
         geograficoClient = mock(GeograficoClient.class);
         notificacionClient = mock(NotificacionClient.class);
+        rabbitTemplate = mock(RabbitTemplate.class); // <-- INICIALIZAMOS EL MOCK
 
-        reporteService = new ReporteService(
-                reporteRepository,
-                geograficoClient,
-                notificacionClient
-        );
+        // ¡AQUÍ ESTABA EL ERROR! Ahora le pasamos los 4 argumentos, incluyendo rabbitTemplate
+        reporteService = new ReporteService(reporteRepository, geograficoClient, notificacionClient, rabbitTemplate);
     }
 
     private ReporteDTO crearDtoValido(String prioridad) {
