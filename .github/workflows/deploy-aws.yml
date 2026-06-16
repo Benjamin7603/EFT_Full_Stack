@@ -1,125 +1,78 @@
-name: Build and Deploy AWS ECS
+name: Build and Push GeoFire
 
 on:
   push:
     branches:
       - feature/devops-aws-deploy
-  workflow_dispatch:
-
-concurrency:
-  group: geofire-ecs-deploy
-  cancel-in-progress: false
-
-env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECS_CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME }}
 
 jobs:
   build-and-push:
-    name: Build and push Docker images
     runs-on: ubuntu-latest
-    env:
-      VITE_API_URL: ${{ secrets.VITE_API_URL }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image: geofire-frontend
-            context: ./frontend-web
-          - image: geofire-gateway
-            context: ./backend/ms-gateway
-          - image: geofire-bff
-            context: ./backend/ms-bff
-          - image: geofire-eureka
-            context: ./backend/ms-eureka-server
-          - image: geofire-usuarios
-            context: ./backend/ms-usuarios
-          - image: geofire-reportes
-            context: ./backend/ms-reportes
-          - image: geofire-geografico
-            context: ./backend/ms-geografico
-          - image: geofire-notificaciones
-            context: ./backend/ms-notificaciones
+
     steps:
-      - name: Checkout repository
+      - name: Repositorio
         uses: actions/checkout@v4
 
-      - name: Login to DockerHub
+      - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build image
-        run: |
-          build_args=()
-          if [ "${{ matrix.image }}" = "geofire-frontend" ]; then
-            build_args+=(--build-arg "VITE_API_URL=${VITE_API_URL}")
-          fi
-
-          docker build "${build_args[@]}" \
-            -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest \
-            ${{ matrix.context }}
-
-      - name: Push image
-        run: docker push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest
-
-  deploy:
-    name: Force ECS services deployment
-    runs-on: ubuntu-latest
-    needs: build-and-push
-    env:
-      ECS_SERVICE_FRONTEND: geofire-frontend
-      ECS_SERVICE_GATEWAY: geofire-gateway
-      ECS_SERVICE_BFF: geofire-bff
-      ECS_SERVICE_EUREKA: geofire-eureka
-      ECS_SERVICE_USUARIOS: geofire-usuarios
-      ECS_SERVICE_REPORTES: geofire-reportes
-      ECS_SERVICE_GEOGRAFICO: geofire-geografico
-      ECS_SERVICE_NOTIFICACIONES: geofire-notificaciones
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Build y push frontend
+        uses: docker/build-push-action@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          context: ./frontend-web
+          push: true
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-frontend:latest
 
-      - name: Update ECS services
-        run: |
-          services=(
-            "$ECS_SERVICE_EUREKA"
-            "$ECS_SERVICE_USUARIOS"
-            "$ECS_SERVICE_GEOGRAFICO"
-            "$ECS_SERVICE_NOTIFICACIONES"
-            "$ECS_SERVICE_REPORTES"
-            "$ECS_SERVICE_BFF"
-            "$ECS_SERVICE_GATEWAY"
-            "$ECS_SERVICE_FRONTEND"
-          )
+      - name: Build y push gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-gateway
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-gateway:latest
 
-          for service in "${services[@]}"; do
-            aws ecs update-service \
-              --cluster "$ECS_CLUSTER_NAME" \
-              --service "$service" \
-              --force-new-deployment
-          done
+      - name: Build y push bff
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-bff
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-bff:latest
 
-      - name: Wait for ECS services stability
-        run: |
-          services=(
-            "$ECS_SERVICE_EUREKA"
-            "$ECS_SERVICE_USUARIOS"
-            "$ECS_SERVICE_GEOGRAFICO"
-            "$ECS_SERVICE_NOTIFICACIONES"
-            "$ECS_SERVICE_REPORTES"
-            "$ECS_SERVICE_BFF"
-            "$ECS_SERVICE_GATEWAY"
-            "$ECS_SERVICE_FRONTEND"
-          )
+      - name: Build y push eureka
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-eureka-server
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-eureka:latest
 
-          for service in "${services[@]}"; do
-            aws ecs wait services-stable \
-              --cluster "$ECS_CLUSTER_NAME" \
-              --services "$service"
-          done
+      - name: Build y push usuarios
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-usuarios
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-usuarios:latest
+
+      - name: Build y push reportes
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-reportes
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-reportes:latest
+
+      - name: Build y push geografico
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-geografico
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-geografico:latest
+
+      - name: Build y push notificaciones
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/ms-notificaciones
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-notificaciones:latest
