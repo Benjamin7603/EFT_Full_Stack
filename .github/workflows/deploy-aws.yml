@@ -24,6 +24,12 @@ jobs:
       - name: Login en Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Build y push PostgreSQL DB
+        run: |
+          docker build -t geofire-postgres-db ./database
+          docker tag geofire-postgres-db:latest ${{ secrets.ECR_REPO_POSTGRES_DB }}:latest
+          docker push ${{ secrets.ECR_REPO_POSTGRES_DB }}:latest
+
       - name: Build y push Eureka Server
         run: |
           docker build -t geofire-eureka-server ./backend/ms-eureka-server
