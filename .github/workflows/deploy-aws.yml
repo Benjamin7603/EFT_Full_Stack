@@ -1,85 +1,75 @@
-name: Build and Push GeoFire
+name: Build and Push Deploy
 
 on:
   push:
     branches:
-      - feature/devops-aws-deploy
+      - deploy
 
 jobs:
-  build-and-push:
+  build-push-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Repositorio
         uses: actions/checkout@v4
 
-      - name: Login Docker Hub
-        uses: docker/login-action@v3
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Build y push postgres
-        uses: docker/build-push-action@v6
-        with:
-          context: ./database
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-postgres:latest
+      - name: Login en Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build y push frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend-web
-          push: true
-          build-args: |
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-frontend:latest
+      - name: Build y push Eureka Server
+        run: |
+          docker build -t geofire-eureka-server ./backend/ms-eureka-server
+          docker tag geofire-eureka-server:latest ${{ secrets.ECR_REPO_EUREKA_SERVER }}:latest
+          docker push ${{ secrets.ECR_REPO_EUREKA_SERVER }}:latest
 
-      - name: Build y push gateway
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-gateway
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-gateway:latest
+      - name: Build y push Gateway
+        run: |
+          docker build -t geofire-gateway ./backend/ms-gateway
+          docker tag geofire-gateway:latest ${{ secrets.ECR_REPO_GATEWAY }}:latest
+          docker push ${{ secrets.ECR_REPO_GATEWAY }}:latest
 
-      - name: Build y push bff
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-bff
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-bff:latest
+      - name: Build y push Usuarios
+        run: |
+          docker build -t geofire-usuarios ./backend/ms-usuarios
+          docker tag geofire-usuarios:latest ${{ secrets.ECR_REPO_USUARIOS }}:latest
+          docker push ${{ secrets.ECR_REPO_USUARIOS }}:latest
 
-      - name: Build y push eureka
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-eureka-server
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-eureka:latest
+      - name: Build y push Reportes
+        run: |
+          docker build -t geofire-reportes ./backend/ms-reportes
+          docker tag geofire-reportes:latest ${{ secrets.ECR_REPO_REPORTES }}:latest
+          docker push ${{ secrets.ECR_REPO_REPORTES }}:latest
 
-      - name: Build y push usuarios
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-usuarios
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-usuarios:latest
+      - name: Build y push Geografico
+        run: |
+          docker build -t geofire-geografico ./backend/ms-geografico
+          docker tag geofire-geografico:latest ${{ secrets.ECR_REPO_GEOGRAFICO }}:latest
+          docker push ${{ secrets.ECR_REPO_GEOGRAFICO }}:latest
 
-      - name: Build y push reportes
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-reportes
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-reportes:latest
+      - name: Build y push Notificaciones
+        run: |
+          docker build -t geofire-notificaciones ./backend/ms-notificaciones
+          docker tag geofire-notificaciones:latest ${{ secrets.ECR_REPO_NOTIFICACIONES }}:latest
+          docker push ${{ secrets.ECR_REPO_NOTIFICACIONES }}:latest
 
-      - name: Build y push geografico
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-geografico
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-geografico:latest
+      - name: Build y push BFF
+        run: |
+          docker build -t geofire-bff ./backend/ms-bff
+          docker tag geofire-bff:latest ${{ secrets.ECR_REPO_BFF }}:latest
+          docker push ${{ secrets.ECR_REPO_BFF }}:latest
 
-      - name: Build y push notificaciones
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend/ms-notificaciones
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/geofire-notificaciones:latest
+      - name: Build y push Frontend Web
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
+            -t geofire-frontend-web ./frontend-web
+          docker tag geofire-frontend-web:latest ${{ secrets.ECR_REPO_FRONTEND_WEB }}:latest
+          docker push ${{ secrets.ECR_REPO_FRONTEND_WEB }}:latest
