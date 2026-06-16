@@ -1,9 +1,9 @@
-name: Build and Push Deploy
+name: Build and Push Deploy AWS
 
 on:
   push:
     branches:
-      - deploy
+      - feature/devops-aws-deploy
 
 jobs:
   build-push-and-deploy:
