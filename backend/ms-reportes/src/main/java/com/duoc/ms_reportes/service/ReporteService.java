@@ -8,19 +8,19 @@ import com.duoc.ms_reportes.dto.UbicacionDTO;
 import com.duoc.ms_reportes.model.Reporte;
 import com.duoc.ms_reportes.repository.ReporteRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ReporteService {
@@ -28,7 +28,7 @@ public class ReporteService {
     private final ReporteRepository reporteRepository;
     private final GeograficoClient geograficoClient;
     private final NotificacionClient notificacionClient;
-    private final RabbitTemplate rabbitTemplate; // <-- NUEVA VARIABLE
+    private final RabbitTemplate rabbitTemplate;
 
     public ReporteService(ReporteRepository reporteRepository,
                           GeograficoClient geograficoClient,
@@ -69,32 +69,34 @@ public class ReporteService {
 
         Reporte reporteGuardado = reporteRepository.save(nuevoReporte);
 
-
         try {
             UbicacionDTO ubicacion = new UbicacionDTO(
                     reporteGuardado.getId(),
                     reporteGuardado.getLatitud(),
                     reporteGuardado.getLongitud()
             );
+
             geograficoClient.guardarUbicacion(ubicacion);
         } catch (Exception e) {
             System.err.println("Atención: ms-geografico no está disponible en este momento.");
         }
 
-        // --- ¡AQUÍ ESTÁ LA MAGIA DE RABBITMQ CON JSON! ---
+        NotificacionDTO alerta = new NotificacionDTO(
+                "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId()
+                        + " - Prioridad: " + reporteGuardado.getPrioridad(),
+                "ADMIN"
+        );
+
         try {
-            NotificacionDTO alerta = new NotificacionDTO(
-                    "¡NUEVO INCENDIO REPORTADO! ID: " + reporteGuardado.getId() + " - Prioridad: " + reporteGuardado.getPrioridad(),
-                    "ADMIN"
-            );
+            notificacionClient.enviarAlerta(alerta);
+        } catch (Exception e) {
+            System.err.println("Atención: ms-notificaciones no está disponible en este momento.");
+        }
 
-            // 1. Instanciamos el transformador a JSON
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        try {
+            String jsonAlerta = new com.fasterxml.jackson.databind.ObjectMapper()
+                    .writeValueAsString(alerta);
 
-            // 2. Transformamos el objeto a texto JSON
-            String jsonAlerta = mapper.writeValueAsString(alerta);
-
-            // 3. Enviamos el texto JSON en lugar del objeto Java
             rabbitTemplate.convertAndSend("notificaciones.queue", jsonAlerta);
 
             System.out.println("🐇 ¡Mensaje JSON enviado a RabbitMQ con éxito!");
@@ -160,11 +162,9 @@ public class ReporteService {
 
         String prioridadNormalizada = prioridad.trim().toUpperCase();
 
-        if (
-                !prioridadNormalizada.equals("ALTA") &&
-                        !prioridadNormalizada.equals("MEDIA") &&
-                        !prioridadNormalizada.equals("BAJA")
-        ) {
+        if (!prioridadNormalizada.equals("ALTA")
+                && !prioridadNormalizada.equals("MEDIA")
+                && !prioridadNormalizada.equals("BAJA")) {
             throw new IllegalArgumentException("La prioridad debe ser ALTA, MEDIA o BAJA");
         }
 
@@ -178,16 +178,15 @@ public class ReporteService {
 
         String estadoNormalizado = estado.trim().toUpperCase();
 
-        if (
-                !estadoNormalizado.equals("NUEVO") &&
-                        !estadoNormalizado.equals("EN_PROGRESO") &&
-                        !estadoNormalizado.equals("RESUELTO")
-        ) {
+        if (!estadoNormalizado.equals("NUEVO")
+                && !estadoNormalizado.equals("EN_PROGRESO")
+                && !estadoNormalizado.equals("RESUELTO")) {
             throw new IllegalArgumentException("El estado debe ser NUEVO, EN_PROGRESO o RESUELTO.");
         }
 
         return estadoNormalizado;
     }
+
     public byte[] generarExcelAuditoriaReportes() {
         List<Reporte> reportes = reporteRepository.findAll();
 
@@ -217,13 +216,25 @@ public class ReporteService {
             rowIndex++;
 
             long totalReportes = reportes.size();
-            long totalNuevo = reportes.stream().filter(r -> "NUEVO".equalsIgnoreCase(r.getEstado())).count();
-            long totalEnProgreso = reportes.stream().filter(r -> "EN_PROGRESO".equalsIgnoreCase(r.getEstado())).count();
-            long totalResuelto = reportes.stream().filter(r -> "RESUELTO".equalsIgnoreCase(r.getEstado())).count();
+            long totalNuevo = reportes.stream()
+                    .filter(r -> "NUEVO".equalsIgnoreCase(r.getEstado()))
+                    .count();
+            long totalEnProgreso = reportes.stream()
+                    .filter(r -> "EN_PROGRESO".equalsIgnoreCase(r.getEstado()))
+                    .count();
+            long totalResuelto = reportes.stream()
+                    .filter(r -> "RESUELTO".equalsIgnoreCase(r.getEstado()))
+                    .count();
 
-            long totalAlta = reportes.stream().filter(r -> "ALTA".equalsIgnoreCase(r.getPrioridad())).count();
-            long totalMedia = reportes.stream().filter(r -> "MEDIA".equalsIgnoreCase(r.getPrioridad())).count();
-            long totalBaja = reportes.stream().filter(r -> "BAJA".equalsIgnoreCase(r.getPrioridad())).count();
+            long totalAlta = reportes.stream()
+                    .filter(r -> "ALTA".equalsIgnoreCase(r.getPrioridad()))
+                    .count();
+            long totalMedia = reportes.stream()
+                    .filter(r -> "MEDIA".equalsIgnoreCase(r.getPrioridad()))
+                    .count();
+            long totalBaja = reportes.stream()
+                    .filter(r -> "BAJA".equalsIgnoreCase(r.getPrioridad()))
+                    .count();
 
             rowIndex = crearFilaResumen(sheet, rowIndex, "Total reportes", totalReportes);
             rowIndex = crearFilaResumen(sheet, rowIndex, "Reportes NUEVO", totalNuevo);

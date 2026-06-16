@@ -2,7 +2,7 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/api';
 import logoImg from '../assets/logo.png';
 import Swal from 'sweetalert2';
 import './Registro.css';
@@ -58,13 +58,13 @@ export default function Registro() {
         }
 
         try {
-            await axios.post('http://localhost:8000/api/usuarios', formData);
+            await api.post('/api/usuarios', formData);
 
             localStorage.setItem('userNombre', formData.nombre);
             localStorage.setItem('userUsername', formData.username);
 
             try {
-                const loginResponse = await axios.post('http://localhost:8000/api/auth/login', {
+                const loginResponse = await api.post('/api/auth/login', {
                     username: formData.username,
                     password: formData.password
                 });

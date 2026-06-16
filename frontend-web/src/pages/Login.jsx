@@ -3,7 +3,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect } from "react";
-import axios from 'axios';
+import api from '../api/api';
 import logoImg from '../assets/logo.png';
 import Swal from 'sweetalert2';
 import './Login.css';
@@ -29,7 +29,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8000/api/auth/login', {
+            const response = await api.post('/api/auth/login', {
                 username: username,
                 password: password
             });
