@@ -13,6 +13,14 @@ export default function Landing() {
             background: 'rgba(255, 255, 255, 0.95)',
             backdrop: `rgba(255, 112, 67, 0.15) blur(4px)`
         });
+        const link = document.createElement('a');
+        link.href = '/geofire.apk'; // Debe coincidir con el nombre del archivo en tu carpeta public
+        link.setAttribute('download', 'GeoFire-App.apk'); // El nombre con el que se le guardará al usuario
+        document.body.appendChild(link);
+        link.click();
+
+        // 3. Limpiar el elemento creado
+        document.body.removeChild(link);
     };
 
     return (
