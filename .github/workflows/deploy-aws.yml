@@ -5,6 +5,10 @@ on:
     branches:
       - feature/devops-aws-deployy
 
+concurrency:
+  group: geofire-aws-deploy
+  cancel-in-progress: true
+
 jobs:
   build-push-and-deploy:
     runs-on: ubuntu-latest
@@ -22,7 +26,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login en Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build y push PostgreSQL DB
         run: |
@@ -79,3 +83,39 @@ jobs:
             -t geofire-frontend-web ./frontend-web
           docker tag geofire-frontend-web:latest ${{ secrets.ECR_REPO_FRONTEND_WEB }}:latest
           docker push ${{ secrets.ECR_REPO_FRONTEND_WEB }}:latest
+
+      - name: Desplegar backend en ECS
+        run: |
+          aws ecs update-service \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --service ${{ secrets.ECS_BACKEND_SERVICE_NAME }} \
+            --force-new-deployment
+
+      - name: Esperar estabilidad del backend
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --services ${{ secrets.ECS_BACKEND_SERVICE_NAME }}
+
+      - name: Desplegar frontend en ECS
+        run: |
+          aws ecs update-service \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --service ${{ secrets.ECS_FRONTEND_SERVICE_NAME }} \
+            --force-new-deployment
+
+      - name: Esperar estabilidad del frontend
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --services ${{ secrets.ECS_FRONTEND_SERVICE_NAME }}
+
+      - name: Mostrar estado de servicios ECS
+        run: |
+          aws ecs describe-services \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --services \
+              ${{ secrets.ECS_BACKEND_SERVICE_NAME }} \
+              ${{ secrets.ECS_FRONTEND_SERVICE_NAME }} \
+            --query "services[*].{Servicio:serviceName,Estado:status,Deseadas:desiredCount,Ejecutando:runningCount,Pendientes:pendingCount}" \
+            --output table
