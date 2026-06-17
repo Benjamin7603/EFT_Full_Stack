@@ -7,13 +7,14 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -23,158 +24,212 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Pruebas Unitarias - JwtAuthFilter")
 class JwtAuthFilterTest {
 
-    private JwtAuthFilterTestHelper jwtAuthFilterHelper;
-    private ServerWebExchange exchange;
+    private JwtAuthFilterTestHelper filtro;
     private GatewayFilterChain chain;
-    private ServerHttpRequest request;
-    private ServerHttpResponse response;
-    private HttpHeaders headers;
-    private String secretVal = "mi_clave_secreta_super_segura_para_el_filtro_jwt_123456";
+    private final String secretVal =
+            "mi_clave_secreta_super_segura_para_el_filtro_jwt_123456";
 
     @BeforeEach
     void setUp() {
-        jwtAuthFilterHelper = new JwtAuthFilterTestHelper();
-        ReflectionTestUtils.setField(jwtAuthFilterHelper, "secret", secretVal);
-
-        exchange = mock(ServerWebExchange.class);
+        filtro = new JwtAuthFilterTestHelper();
+        ReflectionTestUtils.setField(filtro, "secret", secretVal);
         chain = mock(GatewayFilterChain.class);
-
-        // El truco definitivo: RETURNS_DEEP_STUBS permite encadenar métodos mockeados sin declarar sus clases intermedias
-        request = mock(ServerHttpRequest.class, Mockito.RETURNS_DEEP_STUBS);
-        response = mock(ServerHttpResponse.class);
-        headers = new HttpHeaders();
-
-        when(exchange.getRequest()).thenReturn(request);
-        when(exchange.getResponse()).thenReturn(response);
-        when(response.getHeaders()).thenReturn(headers);
+        when(chain.filter(any())).thenReturn(Mono.empty());
     }
 
-    private void configurarMockPath(String pathStr) {
-        // Al usar RETURNS_DEEP_STUBS arriba, podemos simular la cadena completa de métodos en una sola línea
-        when(request.getPath().value()).thenReturn(pathStr);
+    /** Crea un exchange real con MockServerHttpRequest (sin mocks de clases finales). */
+    private MockServerWebExchange exchange(HttpMethod method, String path, String authHeader) {
+        MockServerHttpRequest.BaseBuilder<?> builder =
+                MockServerHttpRequest.method(method, path);
+        if (authHeader != null) {
+            builder.header(HttpHeaders.AUTHORIZATION, authHeader);
+        }
+        return MockServerWebExchange.from(builder.build());
     }
 
-    // =========================================================
-    // Orden de Ejecución del Filtro
-    // =========================================================
-    @Test
-    void testGetOrder() {
-        int order = jwtAuthFilterHelper.getOrder();
-        assertEquals(-1, order);
-    }
-
-    // =========================================================
-    // Verificación de Rutas Públicas (Filtro Exitoso)
-    // =========================================================
-    @Test
-    void testRutasPublicas() {
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/api/auth/login", HttpMethod.POST));
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/api/auth/register", HttpMethod.POST));
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/api/usuarios", HttpMethod.POST));
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/swagger-ui/index.html", HttpMethod.GET));
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/v3/api-docs", HttpMethod.GET));
-        assertTrue(jwtAuthFilterHelper.esRutaPublicaPublica("/actuator/health", HttpMethod.GET));
-    }
-
-    // =========================================================
-    // Verificación de Rutas Privadas (Bloqueo Requerido)
-    // =========================================================
-    @Test
-    void testRutasPrivadas() {
-        assertFalse(jwtAuthFilterHelper.esRutaPublicaPublica("/api/usuarios", HttpMethod.GET));
-        assertFalse(jwtAuthFilterHelper.esRutaPublicaPublica("/api/incendios/reporte", HttpMethod.POST));
-    }
-
-    // =========================================================
-    // Flujo del Filtro: Ruta Pública Completa
-    // =========================================================
-    @Test
-    void testFilter_RutaPublica_PasaDirecto() {
-        configurarMockPath("/api/auth/login");
-        when(request.getMethod()).thenReturn(HttpMethod.POST);
-        when(chain.filter(exchange)).thenReturn(Mono.empty());
-
-        Mono<Void> result = jwtAuthFilterHelper.filter(exchange, chain);
-        assertTrue(result != null);
-    }
-
-    // =========================================================
-    // Flujo del Filtro: Ruta Privada sin Token (Rechazo 401)
-    // =========================================================
-    @Test
-    void testFilter_RutaPrivadaSinToken_RetornaUnauthorized() {
-        configurarMockPath("/api/incendios");
-        when(request.getMethod()).thenReturn(HttpMethod.GET);
-        when(request.getHeaders()).thenReturn(HttpHeaders.EMPTY);
-        when(response.setComplete()).thenReturn(Mono.empty());
-
-        jwtAuthFilterHelper.filter(exchange, chain);
-        verify(response, times(1)).setStatusCode(HttpStatus.UNAUTHORIZED);
-    }
-
-    // =========================================================
-    // Flujo del Filtro: Token Mal Formado (Bloque catch)
-    // =========================================================
-    @Test
-    void testFilter_TokenInvalido_ExcepcionCatch() {
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer token_incorrecto");
-        configurarMockPath("/api/incendios");
-        when(request.getMethod()).thenReturn(HttpMethod.GET);
-        when(request.getHeaders()).thenReturn(headers);
-        when(response.setComplete()).thenReturn(Mono.empty());
-
-        jwtAuthFilterHelper.filter(exchange, chain);
-        verify(response, times(1)).setStatusCode(HttpStatus.UNAUTHORIZED);
-    }
-
-    // =========================================================
-    // Flujo del Filtro: TOKEN VÁLIDO REAL (Cubre mutación de Request)
-    // =========================================================
-    @Test
-    void testFilter_TokenValido_MutarPeticionYPasar() {
+    private String tokenValido(String subject, String rol, Long usuarioId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", "ADMIN");
-        claims.put("usuarioId", 123L);
-
-        String tokenReal = Jwts.builder()
+        claims.put("rol", rol);
+        claims.put("usuarioId", usuarioId);
+        return Jwts.builder()
                 .setClaims(claims)
-                .setSubject("admin@incendios.cl")
+                .setSubject(subject)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                .signWith(Keys.hmacShaKeyFor(secretVal.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + 3_600_000))
+                .signWith(
+                        Keys.hmacShaKeyFor(secretVal.getBytes(StandardCharsets.UTF_8)),
+                        SignatureAlgorithm.HS256)
                 .compact();
-
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenReal);
-        when(request.getHeaders()).thenReturn(headers);
-        configurarMockPath("/api/incendios/reporte");
-        when(request.getMethod()).thenReturn(HttpMethod.GET);
-
-        ServerHttpRequest.Builder builderMock = mock(ServerHttpRequest.Builder.class);
-        when(request.mutate()).thenReturn(builderMock);
-        when(builderMock.header(anyString(), anyString())).thenReturn(builderMock);
-        when(builderMock.build()).thenReturn(request);
-
-        ServerWebExchange.Builder exchangeBuilderMock = mock(ServerWebExchange.Builder.class);
-        when(exchange.mutate()).thenReturn(exchangeBuilderMock);
-        when(exchangeBuilderMock.request(any(ServerHttpRequest.class))).thenReturn(exchangeBuilderMock);
-        when(exchangeBuilderMock.build()).thenReturn(exchange);
-
-        when(chain.filter(any(ServerWebExchange.class))).thenReturn(Mono.empty());
-
-        jwtAuthFilterHelper.filter(exchange, chain);
-        verify(chain, times(1)).filter(any(ServerWebExchange.class));
     }
 
     // =========================================================
-    // Clase Helper para Evitar Lógica Reactiva
+    // Orden del filtro
+    // =========================================================
+    @Test
+    @DisplayName("getOrder() - retorna -1")
+    void testGetOrder() {
+        assertEquals(-1, filtro.getOrder());
+    }
+
+    // =========================================================
+    // esRutaPublica — todas las ramas
+    // =========================================================
+    @Test
+    @DisplayName("esRutaPublica - /api/auth/login POST es publica")
+    void testRutaPublica_AuthLogin() {
+        assertTrue(filtro.esRutaPublicaPublica("/api/auth/login", HttpMethod.POST));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /api/auth/* GET tambien es publica (startsWith)")
+    void testRutaPublica_AuthGet() {
+        assertTrue(filtro.esRutaPublicaPublica("/api/auth/register", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - POST /api/usuarios es registro, publica")
+    void testRutaPublica_UsuariosPost() {
+        assertTrue(filtro.esRutaPublicaPublica("/api/usuarios", HttpMethod.POST));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - GET /api/usuarios es privada")
+    void testRutaPrivada_UsuariosGet() {
+        assertFalse(filtro.esRutaPublicaPublica("/api/usuarios", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /swagger-ui/* es publica")
+    void testRutaPublica_SwaggerUi() {
+        assertTrue(filtro.esRutaPublicaPublica("/swagger-ui/index.html", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /v3/api-docs es publica")
+    void testRutaPublica_ApiDocs() {
+        assertTrue(filtro.esRutaPublicaPublica("/v3/api-docs", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /actuator/health es publica")
+    void testRutaPublica_Actuator() {
+        assertTrue(filtro.esRutaPublicaPublica("/actuator/health", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /api/incendios GET es privada")
+    void testRutaPrivada_Incendios() {
+        assertFalse(filtro.esRutaPublicaPublica("/api/incendios", HttpMethod.GET));
+    }
+
+    @Test
+    @DisplayName("esRutaPublica - /api/incendios/reporte POST es privada")
+    void testRutaPrivada_IncendiosPost() {
+        assertFalse(filtro.esRutaPublicaPublica("/api/incendios/reporte", HttpMethod.POST));
+    }
+
+    // =========================================================
+    // filter() — ruta publica pasa sin token
+    // =========================================================
+    @Test
+    @DisplayName("filter() - ruta publica pasa directamente al chain")
+    void testFilter_RutaPublica_PasaDirecto() {
+        MockServerWebExchange ex = exchange(HttpMethod.POST, "/api/auth/login", null);
+
+        filtro.filter(ex, chain).block();
+
+        verify(chain, times(1)).filter(any());
+    }
+
+    // =========================================================
+    // filter() — ruta privada sin header Authorization → 401
+    // =========================================================
+    @Test
+    @DisplayName("filter() - ruta privada sin token retorna 401 con X-Auth-Error")
+    void testFilter_SinToken_Unauthorized() {
+        MockServerWebExchange ex = exchange(HttpMethod.GET, "/api/incendios", null);
+
+        filtro.filter(ex, chain).block();
+
+        assertEquals(HttpStatus.UNAUTHORIZED, ex.getResponse().getStatusCode());
+        assertEquals("Token no proporcionado",
+                ex.getResponse().getHeaders().getFirst("X-Auth-Error"));
+        verify(chain, never()).filter(any());
+    }
+
+    // =========================================================
+    // filter() — header Authorization sin prefijo "Bearer " → 401
+    // =========================================================
+    @Test
+    @DisplayName("filter() - Authorization sin Bearer retorna 401")
+    void testFilter_AuthSinBearer_Unauthorized() {
+        MockServerWebExchange ex = exchange(HttpMethod.GET, "/api/incendios", "Basic dXNlcjpwYXNz");
+
+        filtro.filter(ex, chain).block();
+
+        assertEquals(HttpStatus.UNAUTHORIZED, ex.getResponse().getStatusCode());
+        assertEquals("Token no proporcionado",
+                ex.getResponse().getHeaders().getFirst("X-Auth-Error"));
+        verify(chain, never()).filter(any());
+    }
+
+    // =========================================================
+    // filter() — token mal formado → catch → 401
+    // =========================================================
+    @Test
+    @DisplayName("filter() - token invalido entra al catch y retorna 401")
+    void testFilter_TokenInvalido_CatchUnauthorized() {
+        MockServerWebExchange ex = exchange(HttpMethod.GET, "/api/incendios",
+                "Bearer token_malformado_incorrecto");
+
+        filtro.filter(ex, chain).block();
+
+        assertEquals(HttpStatus.UNAUTHORIZED, ex.getResponse().getStatusCode());
+        assertEquals("Token inv\u00e1lido o expirado",
+                ex.getResponse().getHeaders().getFirst("X-Auth-Error"));
+        verify(chain, never()).filter(any());
+    }
+
+    // =========================================================
+    // filter() — token valido → muta request con headers internos y pasa al chain
+    // =========================================================
+    @Test
+    @DisplayName("filter() - token valido muta la peticion y llama al chain")
+    void testFilter_TokenValido_MutarPeticionYPasar() {
+        String token = tokenValido("admin@incendios.cl", "ADMIN", 123L);
+        MockServerWebExchange ex = exchange(HttpMethod.GET, "/api/incendios/reporte",
+                "Bearer " + token);
+
+        // Necesitamos capturar el exchange mutado que llega al chain
+        // para verificar los headers internos propagados
+        final ServerWebExchange[] exchangeCapturado = new ServerWebExchange[1];
+        when(chain.filter(any())).thenAnswer(inv -> {
+            exchangeCapturado[0] = inv.getArgument(0);
+            return Mono.empty();
+        });
+
+        filtro.filter(ex, chain).block();
+
+        verify(chain, times(1)).filter(any());
+
+        // Verifica los 3 headers internos que el filtro propaga a los microservicios
+        ServerHttpRequest reqMutado = exchangeCapturado[0].getRequest();
+        assertEquals("admin@incendios.cl",
+                reqMutado.getHeaders().getFirst("X-Usuario-Username"));
+        assertEquals("ADMIN",
+                reqMutado.getHeaders().getFirst("X-Usuario-Rol"));
+        assertEquals("123",
+                reqMutado.getHeaders().getFirst("X-Usuario-Id"));
+    }
+
+    // =========================================================
+    // Clase helper para acceder al metodo privado esRutaPublica
     // =========================================================
     private static class JwtAuthFilterTestHelper extends JwtAuthFilter {
         public boolean esRutaPublicaPublica(String path, HttpMethod method) {

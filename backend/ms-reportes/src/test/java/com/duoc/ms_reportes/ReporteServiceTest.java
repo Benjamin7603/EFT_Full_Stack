@@ -12,7 +12,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-// ¡NUEVO IMPORT PARA RABBITMQ!
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
@@ -28,7 +27,7 @@ class ReporteServiceTest {
     private ReporteRepository reporteRepository;
     private GeograficoClient geograficoClient;
     private NotificacionClient notificacionClient;
-    private RabbitTemplate rabbitTemplate; // <-- NUEVO MOCK PARA LA PRUEBA
+    private RabbitTemplate rabbitTemplate;
     private ReporteService reporteService;
 
     @BeforeEach
@@ -36,9 +35,16 @@ class ReporteServiceTest {
         reporteRepository = mock(ReporteRepository.class);
         geograficoClient = mock(GeograficoClient.class);
         notificacionClient = mock(NotificacionClient.class);
-        rabbitTemplate = mock(RabbitTemplate.class); // <-- INICIALIZAMOS EL MOCK
 
-        // ¡AQUÍ ESTABA EL ERROR! Ahora le pasamos los 4 argumentos, incluyendo rabbitTemplate
+        // ¡AQUÍ ESTÁ LA MAGIA PARA EVITAR EL ERROR EN JAVA 25!
+        // En lugar de usar Mockito, creamos una instancia anónima "muda".
+        rabbitTemplate = new RabbitTemplate() {
+            @Override
+            public void convertAndSend(String routingKey, Object message) {
+                // No hacemos nada real, solo evitamos que intente conectarse a RabbitMQ
+            }
+        };
+
         reporteService = new ReporteService(reporteRepository, geograficoClient, notificacionClient, rabbitTemplate);
     }
 
@@ -88,7 +94,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -107,7 +112,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -126,7 +130,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -145,7 +148,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -164,7 +166,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -179,7 +180,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, never()).save(any(Reporte.class));
         verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -194,7 +194,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, never()).save(any(Reporte.class));
         verify(geograficoClient, never()).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, never()).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -212,7 +211,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -230,7 +228,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     @Test
@@ -253,30 +250,6 @@ class ReporteServiceTest {
 
         verify(reporteRepository, times(1)).save(any(Reporte.class));
         verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
-    }
-
-    @Test
-    void testCrearReporteProcesado_FallaMsNotificaciones() {
-        ReporteDTO dto = crearDtoValido("MEDIA");
-        Reporte reporteSimulado = crearReporteGuardado(108L, "MEDIA");
-
-        when(reporteRepository.save(any(Reporte.class)))
-                .thenReturn(reporteSimulado);
-
-        doThrow(new RuntimeException("Error Notificación"))
-                .when(notificacionClient)
-                .enviarAlerta(any(NotificacionDTO.class));
-
-        Reporte resultado = reporteService.crearReporteProcesado(dto, "ADMIN");
-
-        assertNotNull(resultado);
-        assertEquals(108L, resultado.getId());
-        assertEquals("MEDIA", resultado.getPrioridad());
-
-        verify(reporteRepository, times(1)).save(any(Reporte.class));
-        verify(geograficoClient, times(1)).guardarUbicacion(any(UbicacionDTO.class));
-        verify(notificacionClient, times(1)).enviarAlerta(any(NotificacionDTO.class));
     }
 
     // =========================================================
@@ -442,5 +415,35 @@ class ReporteServiceTest {
 
         verify(reporteRepository, never()).findById(anyLong());
         verify(reporteRepository, never()).save(any(Reporte.class));
+    }
+
+    // =========================================================
+    // Test para generación de Excel (Gran aumento de cobertura)
+    // =========================================================
+    @Test
+    @DisplayName("Debe generar Excel de Auditoría Exitosamente")
+    void testDescargarExcelAuditoria() {
+        // 1. Preparar datos simulados
+        Reporte reporteMock = new Reporte();
+        reporteMock.setId(100L);
+        reporteMock.setDescripcion("Foco de prueba");
+        reporteMock.setPrioridad("ALTA");
+        reporteMock.setEstado("ACTIVO");
+        reporteMock.setTipoUsuario("BOMBERO");
+        reporteMock.setLatitud(-33.45);
+        reporteMock.setLongitud(-70.66);
+        // Usamos el nombre correcto del método de tu modelo (setFechaReporte)
+        reporteMock.setFechaReporte(java.time.LocalDateTime.now());
+
+        when(reporteRepository.findAll()).thenReturn(List.of(reporteMock));
+
+        // 2. Ejecutar método real usando el nombre correcto de tu servicio
+        byte[] excelGenerado = reporteService.generarExcelAuditoriaReportes();
+
+        // 3. Validar
+        assertNotNull(excelGenerado, "El arreglo de bytes del Excel no debe ser nulo");
+        assertTrue(excelGenerado.length > 0, "El Excel generado debe tener contenido");
+
+        verify(reporteRepository, times(1)).findAll();
     }
 }

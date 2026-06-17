@@ -1,0 +1,29 @@
+# src/test/resources/application-test.yml
+# Perfil "test": reemplaza PostgreSQL por H2 en memoria y desactiva Eureka.
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    # Hibernate 6 (Spring Boot 4) detecta H2 automáticamente; no forzar dialecto.
+    show-sql: false
+    open-in-view: false
+  main:
+    banner-mode: off
+
+# Desactiva registro y descubrimiento en Eureka durante tests
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+logging:
+  level:
+    root: WARN
+    com.duoc: INFO

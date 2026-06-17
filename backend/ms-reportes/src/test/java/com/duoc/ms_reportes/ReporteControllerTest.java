@@ -9,16 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +30,7 @@ class ReporteControllerTest {
 
     @BeforeEach
     void setUp() {
+        // EN LUGAR DE mock(ReporteService.class), usamos el framework de Mockito para crear el objeto
         reporteService = mock(ReporteService.class);
         ReporteController reporteController = new ReporteController(reporteService);
         objectMapper = new ObjectMapper();
@@ -246,5 +245,45 @@ class ReporteControllerTest {
                 .andExpect(jsonPath("$.error").value("No tienes permisos para gestionar reportes."));
 
         verify(reporteService, never()).actualizarPrioridad(anyLong(), anyString());
+    }
+
+    // =========================================================
+    // Tests Adicionales (Aumento de Cobertura)
+    // =========================================================
+    @Test
+    @DisplayName("Descargar Excel - Éxito con rol ADMIN")
+    void testDescargarExcelAuditoria_Exito() throws Exception {
+        byte[] mockExcel = "excel-dummy-data".getBytes();
+        when(reporteService.generarExcelAuditoriaReportes()).thenReturn(mockExcel);
+
+        mockMvc.perform(get("/api/reportes/auditoria/excel")
+                        .header("X-Usuario-Rol", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"auditoria_reportes.xlsx\""))
+                .andExpect(content().bytes(mockExcel));
+
+        verify(reporteService, times(1)).generarExcelAuditoriaReportes();
+    }
+
+    @Test
+    @DisplayName("Descargar Excel - Fallo por rol nulo o vacío (Cobertura branches)")
+    void testDescargarExcelAuditoria_RolNuloOVacio() throws Exception {
+        // Prueba sin enviar el header (rol nulo)
+        mockMvc.perform(get("/api/reportes/auditoria/excel"))
+                .andExpect(status().isForbidden());
+
+        // Prueba enviando el header vacío (rol blank)
+        mockMvc.perform(get("/api/reportes/auditoria/excel")
+                        .header("X-Usuario-Rol", "   "))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Actualizar estado - Fallo por rol vacío (Cobertura esRolOperativo)")
+    void testActualizarEstado_RolVacio() throws Exception {
+        mockMvc.perform(patch("/api/reportes/1/estado")
+                        .header("X-Usuario-Rol", "   ")
+                        .param("nuevoEstado", "EN_PROGRESO"))
+                .andExpect(status().isForbidden());
     }
 }

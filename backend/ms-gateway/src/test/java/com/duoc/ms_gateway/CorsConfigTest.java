@@ -10,14 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DisplayName("Pruebas Unitarias - CorsConfig")
 class CorsConfigTest {
 
-    // =========================================================
-    // Verificación de Inicialización de Filtro CORS
-    // =========================================================
     @Test
+    @DisplayName("corsWebFilter() - retorna filtro CORS inicializado correctamente")
     void testCorsWebFilterInitialization() {
         CorsConfig corsConfig = new CorsConfig();
         CorsWebFilter filter = corsConfig.corsWebFilter();
-
         assertNotNull(filter);
     }
 }
