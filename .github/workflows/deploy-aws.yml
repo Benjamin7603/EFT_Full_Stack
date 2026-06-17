@@ -1,4 +1,4 @@
-name: Build and Push Deploy AWS v2
+name: Build and Push Deploy AWS v3
 
 on:
   push:
