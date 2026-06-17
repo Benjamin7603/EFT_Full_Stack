@@ -1,111 +1,280 @@
-# Plataforma Inteligente Para la Gestión y Prevención de Incendios
+# GeoFire - Plataforma de gestion y prevencion de incendios
 
-## 📖 Contexto del Proyecto
-Esta plataforma tecnológica está diseñada para la Subdirección de Gestión de Emergencias de la Municipalidad Valle del Sol. El sistema busca digitalizar, centralizar y automatizar la gestión de incendios en la comuna, reemplazando procesos manuales y canales de comunicación informales que dificultaban la detección y respuesta temprana ante catástrofes.
+GeoFire es una plataforma full stack para registrar, visualizar y gestionar reportes de incendio. El sistema centraliza avisos ciudadanos, ubicaciones geograficas, usuarios, notificaciones y paneles operativos para apoyar la respuesta temprana ante emergencias.
 
-## 🏗️ Arquitectura del Sistema
-El proyecto utiliza una **arquitectura de microservicios altamente desacoplada**. En lugar de un sistema monolítico tradicional, la solución se divide en servicios independientes desarrollados en Java con Spring Boot, implementando el patrón *Database per Service* para asegurar escalabilidad y tolerancia a fallos.
+El proyecto esta organizado con una arquitectura de microservicios Spring Boot, un frontend web en React/Vite y servicios de infraestructura levantados con Docker Compose.
 
-El cliente principal es una aplicación móvil nativa diseñada bajo el principio de "cliente ligero", delegando toda la complejidad, validaciones de seguridad y lógica de negocio al ecosistema backend.
+## Contenido
 
-### 🧩 Ecosistema de Microservicios Actual
-El backend está orquestado mediante los siguientes componentes principales:
+- [Arquitectura](#arquitectura)
+- [Servicios](#servicios)
+- [Tecnologias](#tecnologias)
+- [Requisitos](#requisitos)
+- [Ejecucion con Docker Compose](#ejecucion-con-docker-compose)
+- [Ejecucion local para desarrollo](#ejecucion-local-para-desarrollo)
+- [Variables de entorno](#variables-de-entorno)
+- [Endpoints principales](#endpoints-principales)
+- [Pruebas](#pruebas)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Flujo de trabajo Git](#flujo-de-trabajo-git)
 
-1. **Eureka Server (Service Discovery):** Servidor de registro que permite a los distintos microservicios registrarse, encontrarse y comunicarse dinámicamente dentro de la red, facilitando la escalabilidad.
-2. **API Gateway / BFF:** Construido con Spring Cloud Gateway. Actúa como el punto único de entrada que gestiona y enruta todas las solicitudes desde la app móvil hacia los microservicios correspondientes, simplificando la comunicación y desacoplando el frontend del backend.
-3. **Microservicio de Usuarios:** Gestiona la autenticación, perfiles y administración. Soporta 3 tipos de usuario principales ("ciudadanos, brigadas, funcionarios") y una "cuenta de invitado" con funciones limitadas. Expone endpoints RESTful (GET, POST, PUT, DELETE) documentados mediante Swagger.
-4. **Microservicio de Reportes de Incendios:** Encargado de procesar las alertas ciudadanas. Permite recibir reportes que incluyen la ubicación geográfica, fotos o videos del propio incendio para ser almacenados y procesados de manera estructurada.
+## Arquitectura
 
-*(Nota: La arquitectura completa proyecta la futura integración de un Microservicio Geográfico para mapeo en tiempo real y un Microservicio de Notificaciones).*
+La solucion usa microservicios independientes comunicados mediante HTTP, Eureka Service Discovery y, para eventos de notificaciones, RabbitMQ.
 
-## 🛠️ Tecnologías Utilizadas
+Flujo principal:
 
-**Frontend (Aplicación Móvil):**
-* **Lenguaje:** Kotlin.
-* **UI:** Jetpack Compose para la creación de interfaces de usuario nativas de forma declarativa.
-* **Networking:** Retrofit para consumo de APIs y comunicación asíncrona con el API Gateway.
+1. El usuario interactua con `frontend-web`.
+2. El frontend consume el `ms-gateway` en el puerto `8000`.
+3. El gateway valida JWT, aplica CORS y enruta hacia los microservicios.
+4. Los servicios de dominio persisten en PostgreSQL usando esquemas separados por servicio.
+5. `ms-reportes` registra reportes, guarda ubicaciones mediante `ms-geografico`, usa Redis para cache y publica alertas hacia RabbitMQ.
+6. `ms-notificaciones` consume la cola `notificaciones.queue` y mantiene el historial de alertas.
+7. `ms-bff` expone endpoints agregados para vistas que necesitan combinar datos de reportes y ubicacion.
 
-**Backend & Servicios:**
-* **Framework Core:** Java 17 & Spring Boot 3.
-* **Enrutamiento:** Spring Cloud Gateway.
-* **Base de Datos:** Supabase (PostgreSQL) con soporte para consultas geográficas (PostGIS).
+## Servicios
 
-**Calidad y Pruebas (QA):**
-* JUnit, Mockito y SonarQube para garantizar un mínimo del 60% de cobertura en pruebas unitarias y asegurar la limpieza del software.
+| Servicio | Puerto | Responsabilidad | README |
+| --- | ---: | --- | --- |
+| `ms-eureka-server` | `8761` | Registro y descubrimiento de servicios | [backend/ms-eureka-server/README.md](backend/ms-eureka-server/README.md) |
+| `ms-gateway` | `8000` | Entrada publica, CORS, JWT y ruteo | [backend/ms-gateway/README.md](backend/ms-gateway/README.md) |
+| `ms-usuarios` | `8082` | Usuarios, autenticacion y JWT | [backend/ms-usuarios/README.md](backend/ms-usuarios/README.md) |
+| `ms-reportes` | `8081` | Reportes de incendio, auditoria, cache y eventos | [backend/ms-reportes/README.md](backend/ms-reportes/README.md) |
+| `ms-geografico` | `8083` | Ubicaciones asociadas a reportes | [backend/ms-geografico/README.md](backend/ms-geografico/README.md) |
+| `ms-notificaciones` | `8084` | Alertas, historial y lectura de notificaciones | [backend/ms-notificaciones/README.md](backend/ms-notificaciones/README.md) |
+| `ms-bff` | `8085` | Endpoints agregados para frontend | [backend/ms-bff/README.md](backend/ms-bff/README.md) |
+| `frontend-web` | `80` en Docker, `5173` local | Aplicacion React | [frontend-web/README.md](frontend-web/README.md) |
 
-## ⚙️ Patrones de Diseño Implementados
-* **Repository Pattern:** Se utiliza en los microservicios para separar la lógica de negocio de las consultas a la base de datos, facilitando el mantenimiento.
-* **Factory Method:** Implementado en el Microservicio de Reportes para decidir qué tipo de objeto instanciar dependiendo de quién envía la alerta (ej. un ciudadano o un funcionario).
-* **Circuit Breaker:** Protege la comunicación entre servicios para evitar colapsos en cadena. Si un servicio experimenta alta demanda (como en un incendio masivo), el circuito se "abre" para evitar que todo el sistema colapse.
+Infraestructura:
 
-## 👨‍💻 Equipo de Desarrollo
-* **Benjamin García (Fullstack Developer):** Responsable del diseño e implementación de la arquitectura de microservicios, configuración de base de datos en la nube (Supabase) y redacción de la documentación técnica y arquitectónica.
-* **Carlos Moil (Backend & Software Architect):** Encargado de la creación de la interfaz de usuario móvil mediante Kotlin y Jetpack Compose, integración de APIs (Retrofit), validaciones de seguridad de datos y creación de pruebas unitarias.
+| Servicio | Puerto | Uso |
+| --- | ---: | --- |
+| PostgreSQL | `5432` | Base de datos `eft_incendios` |
+| Redis | `6379` | Cache de `ms-reportes` |
+| RabbitMQ | `5672` | Mensajeria entre reportes y notificaciones |
+| RabbitMQ Management | `15672` | Consola web de RabbitMQ |
 
----
+## Tecnologias
 
-## Flujo de trabajo GitFlow
-Para este proyecto se utiliza una metodología llamada GitFlow, para organizar el desarrollo del proyecto y mantener estabilidad en la rama principal.
-### 1. Actualizar la rama principal
-Antes de empezar a desarrollar el proyecto.
+- Java 17
+- Spring Boot 3
+- Spring Cloud Gateway
+- Spring Cloud Netflix Eureka
+- Spring Security con JWT
+- Spring Data JPA
+- PostgreSQL
+- Redis
+- RabbitMQ
+- OpenFeign
+- Springdoc OpenAPI / Swagger UI
+- React 19, Vite, Axios, React Router, Leaflet
+- Docker y Docker Compose
+- JUnit, Mockito, Vitest y Testing Library
+
+## Requisitos
+
+Para levantar todo con contenedores:
+
+- Docker
+- Docker Compose
+
+Para desarrollo local:
+
+- Java 17
+- Maven o los wrappers `mvnw` incluidos en cada microservicio
+- Node.js y npm
+- Docker para PostgreSQL, Redis, RabbitMQ y Eureka, o equivalentes locales
+
+## Ejecucion con Docker Compose
+
+Desde la raiz del repositorio:
+
+```bash
+docker compose up --build
+```
+
+URLs utiles:
+
+- Frontend: `http://localhost`
+- Gateway: `http://localhost:8000`
+- Eureka: `http://localhost:8761`
+- RabbitMQ Management: `http://localhost:15672` con usuario `guest` y password `guest`
+- PostgreSQL: `localhost:5432`, base `eft_incendios`, usuario `postgres`, password `root`
+
+Para detener los servicios:
+
+```bash
+docker compose down
+```
+
+Si necesitas limpiar volumenes/estado local de contenedores, revisa primero que no haya datos que quieras conservar.
+
+## Ejecucion local para desarrollo
+
+La forma mas simple es levantar dependencias con Docker Compose y correr el servicio que estas modificando con Maven.
+
+Ejemplo para `ms-reportes`:
+
+```bash
+cd backend/ms-reportes
+./mvnw spring-boot:run
+```
+
+En Windows PowerShell:
+
+```powershell
+cd backend/ms-reportes
+.\mvnw.cmd spring-boot:run
+```
+
+Frontend local:
+
+```bash
+cd frontend-web
+npm install
+npm run dev
+```
+
+Por defecto el frontend consume `http://localhost:8000`. Puedes cambiarlo con `VITE_API_URL`.
+
+## Variables de entorno
+
+| Variable | Usada por | Valor por defecto | Descripcion |
+| --- | --- | --- | --- |
+| `PORT` | Servicios Spring Boot | Depende del servicio | Puerto HTTP del microservicio |
+| `EUREKA_URL` | Gateway, usuarios, reportes, notificaciones | `http://eureka-server:8761/eureka/` | URL de Eureka |
+| `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE` | Eureka clients especificos | `http://eureka-server:8761/eureka/` | URL de Eureka en formato Spring |
+| `JWT_SECRET` | Gateway, usuarios, BFF | `geofire-super-secret-key-2024-incendios-eft` | Clave compartida para firmar/validar JWT |
+| `FRONTEND_ORIGIN` | Gateway | `http://localhost,http://localhost:80,http://localhost:5173` | Origenes permitidos por CORS |
+| `VITE_API_URL` | Frontend | `http://localhost:8000` | URL base del backend |
+| `MS_GEOGRAFICO_URL` | Reportes, BFF | `http://ms-geografico:8083` | URL del servicio geografico |
+| `MS_REPORTES_URL` | BFF | `http://ms-reportes:8081` | URL del servicio de reportes |
+| `MS_USUARIOS_URL` | BFF | `http://ms-usuarios:8082` | URL del servicio de usuarios |
+| `MS_NOTIFICACIONES_URL` | Reportes, BFF | `http://ms-notificaciones:8084` | URL del servicio de notificaciones |
+| `REDIS_HOST` | Reportes | `redis` | Host de Redis |
+| `REDIS_PORT` | Reportes | `6379` | Puerto de Redis |
+
+## Endpoints principales
+
+La API se consume preferentemente a traves del gateway `http://localhost:8000`.
+
+| Metodo | Ruta | Servicio | Uso |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/login` | `ms-usuarios` | Inicio de sesion |
+| `POST` | `/api/usuarios` | `ms-usuarios` | Registro publico |
+| `GET` | `/api/usuarios/me` | `ms-usuarios` | Perfil autenticado |
+| `GET` | `/api/reportes` | `ms-reportes` | Listar reportes |
+| `POST` | `/api/reportes` | `ms-reportes` | Crear reporte |
+| `GET` | `/api/reportes/activos` | `ms-reportes` | Reportes activos |
+| `PATCH` | `/api/reportes/{id}/estado` | `ms-reportes` | Cambiar estado operativo |
+| `PATCH` | `/api/reportes/{id}/prioridad` | `ms-reportes` | Cambiar prioridad |
+| `GET` | `/api/reportes/auditoria/excel` | `ms-reportes` | Descargar auditoria Excel |
+| `GET` | `/api/geografico/reporte/{idReporte}` | `ms-geografico` | Consultar ubicacion de un reporte |
+| `GET` | `/api/notificaciones` | `ms-notificaciones` | Historial de notificaciones |
+| `GET` | `/bff/incendio/{id}` | `ms-bff` | Vista agregada de reporte y ubicacion |
+
+Los endpoints protegidos reciben el token en:
+
+```http
+Authorization: Bearer <token>
+```
+
+El gateway propaga informacion del usuario hacia los servicios mediante headers internos como `X-Usuario-Id` y `X-Usuario-Rol`.
+
+## Documentacion Swagger
+
+Cuando los servicios estan levantados, puedes revisar Swagger UI directamente en cada servicio:
+
+- `http://localhost:8082/api/usuarios/swagger-ui.html`
+- `http://localhost:8081/api/reportes/swagger-ui.html`
+- `http://localhost:8083/api/geografico/swagger-ui.html`
+- `http://localhost:8084/api/notificaciones/swagger-ui.html`
+
+## Pruebas
+
+Backend, desde cada microservicio:
+
+```bash
+./mvnw test
+```
+
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd test
+```
+
+Frontend:
+
+```bash
+cd frontend-web
+npm test
+```
+
+## Estructura del repositorio
+
+```text
+.
+|-- backend/
+|   |-- ms-bff/
+|   |-- ms-eureka-server/
+|   |-- ms-gateway/
+|   |-- ms-geografico/
+|   |-- ms-notificaciones/
+|   |-- ms-reportes/
+|   `-- ms-usuarios/
+|-- database/
+|-- frontend-web/
+|-- docker-compose.yml
+|-- init.sql
+|-- README.md
+`-- README_DEVOPS.md
+```
+
+`init.sql` crea los esquemas logicos de PostgreSQL:
+
+- `usuarios_db`
+- `reportes_db`
+- `geografico_db`
+- `notificaciones_db`
+
+## Flujo de trabajo Git
+
+El proyecto usa una convencion basada en GitFlow:
+
+1. Actualizar `main`.
+
 ```bash
 git checkout main
 git pull origin main
 ```
-### 2. Crear nueva rama feature
-Ya desarrollado el proyecto crear la rama feature/cambio.
+
+2. Crear una rama de trabajo.
+
 ```bash
 git checkout -b feature/nombre-feature
 ```
-Ejemplo:
 
-```bash
-git checkout -b feature/cors-fix
-```
-### 3. Guardar cambios
-   Agregar cambios:
+3. Guardar cambios.
 
 ```bash
 git add .
+git commit -m "feat: descripcion breve del cambio"
 ```
 
-Crear commit:
+4. Subir la rama.
 
-```bash
-git commit -m "fix: configuración CORS para frontend dockerizado"
-```
-### 4. Subir rama al repositorio remoto
 ```bash
 git push -u origin feature/nombre-feature
 ```
-Ejemplo:
 
-```bash
-git push -u origin feature/cors-fix
-```
-### 5. Realizar Merge hacia main
-Ir al repositorio en github y presionar "Compare & pull request"
-1. Crear Pull Request desde `feature/nombre-feature` hacia `main`
-2. Revisar cambios
-3. Realizar merge
-### 6. Eliminar rama feature
-Eliminar rama local:
+5. Crear Pull Request hacia `main`, revisar y hacer merge.
 
-```bash
-git branch -d feature/nombre-feature
-```
+Tipos sugeridos de ramas:
 
-Eliminar rama remota:
-
-```bash
-git push origin --delete feature/nombre-feature
-```
-## Estructura de ramas utilizada
-
-| Tipo de rama | Propósito |
-|---|---|
-| `main` | Rama principal estable |
-| `feature/*` | Nuevas funcionalidades o mejoras |
-| `fix/*` | Corrección de errores |
-| `hotfix/*` | Correcciones urgentes en producción |
----
+| Tipo | Uso |
+| --- | --- |
+| `feature/*` | Nuevas funcionalidades |
+| `fix/*` | Correcciones |
+| `hotfix/*` | Correcciones urgentes |
+| `docs/*` | Cambios de documentacion |
