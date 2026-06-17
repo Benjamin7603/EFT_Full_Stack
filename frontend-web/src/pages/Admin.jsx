@@ -106,7 +106,7 @@ export default function Admin() {
         try {
             const [usuariosResponse, reportesResponse] = await Promise.all([
                 api.get("/api/usuarios"),
-                api.get("/api/reportes"),
+                api.get("/bff/reportes"),
             ]);
 
             setUsuarios(usuariosResponse.data || []);

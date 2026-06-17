@@ -243,4 +243,60 @@ class UsuarioControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Usuario no encontrado con ID: 99"));
     }
+    @Test
+    @DisplayName("POST /api/usuarios/admin - ADMIN crea usuario con rol personalizado")
+    void testAgregarDesdeAdmin_Exitoso() throws Exception {
+        Usuario bombero = new Usuario();
+        bombero.setId(3L);
+        bombero.setNombre("Pedro");
+        bombero.setApellido("Bombero");
+        bombero.setEmail("pedro.bombero@mail.com");
+        bombero.setTelefono("+56 9 3333 3333");
+        bombero.setUsername("pedrob");
+        bombero.setPassword("ClaveSegura123");
+        bombero.setRol("BOMBERO");
+        bombero.setActivo(true);
+
+        when(usuarioService.guardar(any(Usuario.class), eq("ADMIN")))
+                .thenReturn(bombero);
+
+        mockMvc.perform(post("/api/usuarios/admin")
+                        .header("X-Usuario-Rol", "ADMIN")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bombero)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.username").value("pedrob"))
+                .andExpect(jsonPath("$.rol").value("BOMBERO"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+
+        verify(usuarioService, times(1)).guardar(any(Usuario.class), eq("ADMIN"));
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/admin - USER no puede crear usuario con rol personalizado")
+    void testAgregarDesdeAdmin_UserRetornaBadRequest() throws Exception {
+        mockMvc.perform(post("/api/usuarios/admin")
+                        .header("X-Usuario-Rol", "USER")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioBase)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error")
+                        .value("Solo un administrador puede crear usuarios con rol personalizado."));
+
+        verify(usuarioService, never()).guardar(any(Usuario.class), any());
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/admin - sin rol retorna BadRequest")
+    void testAgregarDesdeAdmin_SinRolRetornaBadRequest() throws Exception {
+        mockMvc.perform(post("/api/usuarios/admin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioBase)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error")
+                        .value("Solo un administrador puede crear usuarios con rol personalizado."));
+
+        verify(usuarioService, never()).guardar(any(Usuario.class), any());
+    }
 }

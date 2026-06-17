@@ -7,13 +7,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Login from './Login';
 import Swal from 'sweetalert2';
 
-const mockAxiosInstance = {
+const mockAxiosInstance = vi.hoisted(() => ({
     interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
     get: vi.fn(() => Promise.resolve({ data: {} })),
     post: vi.fn(() => Promise.resolve({ data: {} })),
     put: vi.fn(() => Promise.resolve({ data: {} })),
     delete: vi.fn(() => Promise.resolve({ data: {} }))
-};
+}));
 
 vi.mock('axios', () => {
     return {
@@ -56,10 +56,9 @@ describe('Pruebas Unitarias - Componente Login', () => {
     });
 
     it('2. Debe iniciar sesión exitosamente, guardar Token y redirigir', async () => {
-        const axiosMock = await import('axios');
-        axiosMock.default.post.mockImplementationOnce(() => Promise.resolve({
+        mockAxiosInstance.post.mockResolvedValueOnce({
             data: { token: 'fake-jwt-token', username: 'benja', rol: 'ADMIN' }
-        }));
+        });
 
         render(<BrowserRouter><Login /></BrowserRouter>);
         fireEvent.change(screen.getByPlaceholderText('Ej: Benjamon'), { target: { value: 'benja' } });
@@ -75,8 +74,7 @@ describe('Pruebas Unitarias - Componente Login', () => {
     });
 
     it('3. Debe mostrar alerta SweetAlert si las credenciales son incorrectas', async () => {
-        const axiosMock = await import('axios');
-        axiosMock.default.post.mockImplementationOnce(() => Promise.reject(new Error('Credenciales inválidas')));
+        mockAxiosInstance.post.mockRejectedValueOnce(new Error('Credenciales inválidas'));
 
         render(<BrowserRouter><Login /></BrowserRouter>);
         fireEvent.change(screen.getByPlaceholderText('Ej: Benjamon'), { target: { value: 'falso' } });

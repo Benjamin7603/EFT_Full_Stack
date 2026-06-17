@@ -130,7 +130,7 @@ describe('Pruebas Unitarias del Dashboard de GeoFire', () => {
 
         // Aseguramos que la llamada a la API ocurre simulando el botón enviar
         api.post.mockResolvedValueOnce({ status: 201 });
-        await api.post('/api/reportes', {});
+        await api.post('/bff/reportar-incendio', {});
 
         expect(api.post).toHaveBeenCalled();
     });

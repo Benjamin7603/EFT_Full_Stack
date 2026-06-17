@@ -228,7 +228,7 @@ export default function ReporteModal({ onClose, onReporteCreado, getUsuarioIdSes
                 usuarioId: Number(usuarioIdActual)
             };
 
-            await api.post("/api/reportes", payload);
+            await api.post("/bff/reportar-incendio", payload);
 
             if (onReporteCreado) {
                 await onReporteCreado();

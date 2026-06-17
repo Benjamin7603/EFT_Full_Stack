@@ -38,7 +38,7 @@ export default function TablaGestionReportes({
         setLoadingInterno(true);
 
         try {
-            const response = await api.get("/api/reportes");
+            const response = await api.get("/bff/reportes");
             setReportesInternos(response.data || []);
         } catch (error) {
             console.error("Error cargando reportes:", error);

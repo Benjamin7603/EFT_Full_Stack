@@ -1,6 +1,7 @@
 package com.duoc.ms_bff.config;
 
 import feign.RequestInterceptor;
+import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,19 @@ public class FeignConfig {
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     requestTemplate.header("Authorization", authHeader);
                 }
+
+                copiarHeader(requestTemplate, request, "X-Usuario-Username");
+                copiarHeader(requestTemplate, request, "X-Usuario-Rol");
+                copiarHeader(requestTemplate, request, "X-Usuario-Id");
             }
         };
+    }
+
+    private void copiarHeader(RequestTemplate requestTemplate, HttpServletRequest request, String nombreHeader) {
+        String valor = request.getHeader(nombreHeader);
+
+        if (valor != null && !valor.isBlank()) {
+            requestTemplate.header(nombreHeader, valor);
+        }
     }
 }

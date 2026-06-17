@@ -448,4 +448,234 @@ class UsuarioServiceTest {
 
         verify(usuarioRepository, never()).delete(any(Usuario.class));
     }
+    @Test
+    @DisplayName("guardar() con password null no encripta y guarda correctamente")
+    void testGuardar_passwordNull_noEncripta() {
+        usuarioBase.setPassword(null);
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase);
+
+        assertNotNull(guardado);
+        assertNull(guardado.getPassword());
+        assertEquals("USER", guardado.getRol());
+
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("guardar() como ADMIN con rol solicitado null asigna USER")
+    void testGuardar_comoAdmin_rolNull_asignaUser() {
+        usuarioBase.setRol(null);
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, "ADMIN");
+
+        assertNotNull(guardado);
+        assertEquals("USER", guardado.getRol());
+
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("guardar() con rolSesion admin en minúscula respeta rol solicitado")
+    void testGuardar_adminMinuscula_respetaRolSolicitado() {
+        usuarioBase.setRol("funcionario");
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario guardado = usuarioService.guardar(usuarioBase, "admin");
+
+        assertNotNull(guardado);
+        assertEquals("FUNCIONARIO", guardado.getRol());
+
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("actualizar() como ADMIN con rol null mantiene rol actual")
+    void testActualizar_adminRolNull_mantieneRolActual() {
+        usuarioBase.setRol("BOMBERO");
+
+        Usuario datosNuevos = new Usuario();
+        datosNuevos.setNombre("Carlos");
+        datosNuevos.setApellido("Soto");
+        datosNuevos.setEmail("carlos@mail.com");
+        datosNuevos.setTelefono("+56 9 2222 3333");
+        datosNuevos.setRol(null);
+        datosNuevos.setPassword(null);
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario modificado = usuarioService.actualizar(1L, datosNuevos, 99L, "ADMIN");
+
+        assertNotNull(modificado);
+        assertEquals("Carlos", modificado.getNombre());
+        assertEquals("BOMBERO", modificado.getRol());
+        assertEquals("miPasswordSegura125", modificado.getPassword());
+
+        verify(usuarioRepository, times(1)).findById(1L);
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("actualizar() como ADMIN puede quitar rol ADMIN si hay más administradores")
+    void testActualizar_adminPuedeQuitarAdminSiHayMasAdministradores() {
+        usuarioBase.setRol("ADMIN");
+
+        Usuario datosNuevos = new Usuario();
+        datosNuevos.setNombre("Admin Modificado");
+        datosNuevos.setApellido("GeoFire");
+        datosNuevos.setEmail("admin.modificado@mail.com");
+        datosNuevos.setTelefono("+56 9 4444 4444");
+        datosNuevos.setRol("USER");
+        datosNuevos.setPassword(null);
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        when(usuarioRepository.countByRol("ADMIN"))
+                .thenReturn(2L);
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario modificado = usuarioService.actualizar(1L, datosNuevos, 99L, "ADMIN");
+
+        assertNotNull(modificado);
+        assertEquals("USER", modificado.getRol());
+        assertEquals("Admin Modificado", modificado.getNombre());
+
+        verify(usuarioRepository, times(1)).findById(1L);
+        verify(usuarioRepository, times(1)).countByRol("ADMIN");
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("actualizar() ADMIN actualizándose a sí mismo mantiene rol ADMIN sin error")
+    void testActualizar_adminMismoUsuarioMantieneAdmin() {
+        usuarioBase.setRol("ADMIN");
+
+        Usuario datosNuevos = new Usuario();
+        datosNuevos.setNombre("Admin Actualizado");
+        datosNuevos.setApellido("GeoFire");
+        datosNuevos.setEmail("admin.actualizado@mail.com");
+        datosNuevos.setTelefono("+56 9 5555 5555");
+        datosNuevos.setRol("ADMIN");
+        datosNuevos.setPassword("nuevaClaveAdmin");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario modificado = usuarioService.actualizar(1L, datosNuevos, 1L, "ADMIN");
+
+        assertNotNull(modificado);
+        assertEquals("ADMIN", modificado.getRol());
+        assertEquals("Admin Actualizado", modificado.getNombre());
+        assertTrue(passwordEncoder.matches("nuevaClaveAdmin", modificado.getPassword()));
+
+        verify(usuarioRepository, times(1)).findById(1L);
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("actualizar() usuario común con usuarioIdSesion null no puede actualizar")
+    void testActualizar_usuarioComunSinIdSesion_lanzaError() {
+        Usuario datosNuevos = new Usuario();
+        datosNuevos.setNombre("Sin sesión");
+        datosNuevos.setRol("USER");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                usuarioService.actualizar(1L, datosNuevos, null, "USER")
+        );
+
+        assertEquals("No tienes permisos para actualizar este usuario.", ex.getMessage());
+
+        verify(usuarioRepository, times(1)).findById(1L);
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("actualizar() con password blank mantiene password original")
+    void testActualizar_passwordBlank_mantieneOriginal() {
+        String passwordOriginal = usuarioBase.getPassword();
+
+        Usuario datosNuevos = new Usuario();
+        datosNuevos.setNombre("Carlos Blank");
+        datosNuevos.setApellido("Soto");
+        datosNuevos.setEmail("blank@mail.com");
+        datosNuevos.setTelefono("+56 9 6666 6666");
+        datosNuevos.setRol("USER");
+        datosNuevos.setPassword("   ");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuarioBase));
+
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario modificado = usuarioService.actualizar(1L, datosNuevos, 99L, "ADMIN");
+
+        assertNotNull(modificado);
+        assertEquals(passwordOriginal, modificado.getPassword());
+        assertEquals("Carlos Blank", modificado.getNombre());
+
+        verify(usuarioRepository, times(1)).findById(1L);
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("eliminar(id) sin usuario de sesión elimina usuario normal")
+    void testEliminar_sobrecargaSinUsuarioSesion() {
+        Usuario usuarioAEliminar = new Usuario();
+        usuarioAEliminar.setId(3L);
+        usuarioAEliminar.setRol("USER");
+
+        when(usuarioRepository.findById(3L))
+                .thenReturn(Optional.of(usuarioAEliminar));
+
+        boolean eliminado = usuarioService.eliminar(3L);
+
+        assertTrue(eliminado);
+
+        verify(usuarioRepository, times(1)).findById(3L);
+        verify(usuarioRepository, times(1)).delete(usuarioAEliminar);
+    }
+
+    @Test
+    @DisplayName("eliminar() permite eliminar ADMIN si hay más de un administrador")
+    void testEliminar_adminNoUltimo_eliminaCorrectamente() {
+        Usuario admin = new Usuario();
+        admin.setId(4L);
+        admin.setRol("ADMIN");
+
+        when(usuarioRepository.findById(4L))
+                .thenReturn(Optional.of(admin));
+
+        when(usuarioRepository.countByRol("ADMIN"))
+                .thenReturn(2L);
+
+        boolean eliminado = usuarioService.eliminar(4L, 1L);
+
+        assertTrue(eliminado);
+
+        verify(usuarioRepository, times(1)).findById(4L);
+        verify(usuarioRepository, times(1)).countByRol("ADMIN");
+        verify(usuarioRepository, times(1)).delete(admin);
+    }
 }

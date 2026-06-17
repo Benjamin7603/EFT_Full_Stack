@@ -11,8 +11,8 @@
 	<groupId>com.duoc</groupId>
 	<artifactId>ms-bff</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+    <name>ms-bff</name>
+    <description>Microservicio de bff</description>
 	<url/>
 	<licenses>
 		<license/>

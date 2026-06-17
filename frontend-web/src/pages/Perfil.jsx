@@ -179,7 +179,7 @@ export default function Perfil() {
                 localStorage.setItem("rol", usuarioEncontrado.rol || rolSesion || "USER");
 
                 try {
-                    const reportesResponse = await api.get("/api/reportes");
+                    const reportesResponse = await api.get("/bff/reportes");
                     const reportes = reportesResponse.data || [];
 
                     const reportesUsuario = reportes

@@ -71,7 +71,7 @@ export default function Dashboard() {
         try {
             const [activosResponse, todosResponse] = await Promise.all([
                 api.get("/api/reportes/activos"),
-                api.get("/api/reportes")
+                api.get("/bff/reportes")
             ]);
 
             setReportes(activosResponse.data || []);

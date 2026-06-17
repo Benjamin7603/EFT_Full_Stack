@@ -8,13 +8,13 @@ import Registro from './Registro';
 import Swal from 'sweetalert2';
 
 // Simulador Definitivo de Axios
-const mockAxiosInstance = {
+const mockAxiosInstance = vi.hoisted(() => ({
     interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
     get: vi.fn().mockResolvedValue({ data: {} }),
     post: vi.fn().mockResolvedValue({ data: {} }),
     put: vi.fn().mockResolvedValue({ data: {} }),
     delete: vi.fn().mockResolvedValue({ data: {} })
-};
+}));
 
 vi.mock('axios', () => {
     return {
@@ -51,8 +51,6 @@ describe('Pruebas Unitarias - Componente Registro', () => {
     });
 
     it('2. Debe bloquear el envío si el nombre tiene menos de 3 caracteres', async () => {
-        const axiosMock = await import('axios');
-
         render(<BrowserRouter><Registro /></BrowserRouter>);
         fireEvent.change(screen.getByPlaceholderText('Ej: Juan'), { target: { value: 'Ju' } });
         fireEvent.change(screen.getByPlaceholderText('Ej: García'), { target: { value: 'Garcia' } });
@@ -62,15 +60,24 @@ describe('Pruebas Unitarias - Componente Registro', () => {
         fireEvent.click(screen.getByText('🚀 Registrarse'));
 
         await waitFor(() => {
-            expect(axiosMock.default.post).not.toHaveBeenCalled();
+            expect(mockAxiosInstance.post).not.toHaveBeenCalled();
             // Evitamos que los emojis rompan el test buscando solo una fracción del texto
             expect(screen.getByText((content) => content.includes('al menos 3 caracteres'))).toBeDefined();
         });
     });
 
-    it('3. Debe registrar y redirigir al login si todo es correcto', async () => {
-        const axiosMock = await import('axios');
-        axiosMock.default.post.mockResolvedValueOnce({ status: 201, data: {} });
+    it('3. Debe registrar, iniciar sesión y redirigir al dashboard si todo es correcto', async () => {
+        mockAxiosInstance.post
+            .mockResolvedValueOnce({ status: 201, data: {} })
+            .mockResolvedValueOnce({
+                data: {
+                    token: 'fake-jwt-token',
+                    username: 'juancito',
+                    rol: 'USER',
+                    usuarioId: 7,
+                    nombre: 'Juan Carlos'
+                }
+            });
 
         render(<BrowserRouter><Registro /></BrowserRouter>);
         fireEvent.change(screen.getByPlaceholderText('Ej: Juan'), { target: { value: 'Juan Carlos' } });
@@ -81,8 +88,12 @@ describe('Pruebas Unitarias - Componente Registro', () => {
         fireEvent.click(screen.getByText('🚀 Registrarse'));
 
         await waitFor(() => {
-            expect(axiosMock.default.post).toHaveBeenCalled();
-            expect(mockNavigate).toHaveBeenCalledWith('/login');
+            expect(mockAxiosInstance.post).toHaveBeenCalledWith('/api/usuarios', expect.any(Object));
+            expect(mockAxiosInstance.post).toHaveBeenCalledWith('/api/auth/login', {
+                username: 'juancito',
+                password: '12345678'
+            });
+            expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
         });
     });
 });

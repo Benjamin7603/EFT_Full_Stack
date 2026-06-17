@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,8 +31,8 @@ class ReporteControllerTest {
 
     @BeforeEach
     void setUp() {
-        // EN LUGAR DE mock(ReporteService.class), usamos el framework de Mockito para crear el objeto
         reporteService = mock(ReporteService.class);
+
         ReporteController reporteController = new ReporteController(reporteService);
         objectMapper = new ObjectMapper();
 
@@ -41,10 +42,8 @@ class ReporteControllerTest {
                 .build();
     }
 
-    // =========================================================
-    // POST /api/reportes
-    // =========================================================
     @Test
+    @DisplayName("POST /api/reportes - crea reporte con rol operativo")
     void testCrear_Exitoso_RolOperativo() throws Exception {
         ReporteDTO dto = new ReporteDTO();
         dto.setLatitud(-33.45);
@@ -77,6 +76,7 @@ class ReporteControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/reportes - crea reporte con rol USER sin prioridad")
     void testCrear_Exitoso_UserSinPrioridad() throws Exception {
         ReporteDTO dto = new ReporteDTO();
         dto.setLatitud(-33.45);
@@ -107,10 +107,8 @@ class ReporteControllerTest {
                 .crearReporteProcesado(any(ReporteDTO.class), eq("USER"));
     }
 
-    // =========================================================
-    // GET /api/reportes
-    // =========================================================
     @Test
+    @DisplayName("GET /api/reportes - lista reportes")
     void testListar_Exitoso() throws Exception {
         Reporte r1 = new Reporte();
         r1.setId(1L);
@@ -125,10 +123,8 @@ class ReporteControllerTest {
         verify(reporteService, times(1)).listarTodos();
     }
 
-    // =========================================================
-    // GET /api/reportes/activos
-    // =========================================================
     @Test
+    @DisplayName("GET /api/reportes/activos - lista reportes activos")
     void testObtenerActivos_Exitoso() throws Exception {
         Reporte activo = new Reporte();
         activo.setId(10L);
@@ -143,10 +139,8 @@ class ReporteControllerTest {
         verify(reporteService, times(1)).listarActivos();
     }
 
-    // =========================================================
-    // GET /api/reportes/{id}
-    // =========================================================
     @Test
+    @DisplayName("GET /api/reportes/{id} - obtiene reporte por ID")
     void testObtenerPorId_Exitoso() throws Exception {
         Reporte reporte = new Reporte();
         reporte.setId(5L);
@@ -162,10 +156,8 @@ class ReporteControllerTest {
         verify(reporteService, times(1)).obtenerPorId(5L);
     }
 
-    // =========================================================
-    // PATCH /api/reportes/{id}/estado
-    // =========================================================
     @Test
+    @DisplayName("PATCH /api/reportes/{id}/estado - actualiza estado con ADMIN")
     void testActualizarEstado_Exitoso_Admin() throws Exception {
         Reporte reporteActualizado = new Reporte();
         reporteActualizado.setId(1L);
@@ -185,6 +177,27 @@ class ReporteControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/reportes/{id}/estado - actualiza estado con BOMBERO")
+    void testActualizarEstado_Exitoso_Bombero() throws Exception {
+        Reporte reporteActualizado = new Reporte();
+        reporteActualizado.setId(2L);
+        reporteActualizado.setEstado("EN_PROGRESO");
+
+        when(reporteService.actualizarEstado(eq(2L), eq("EN_PROGRESO")))
+                .thenReturn(reporteActualizado);
+
+        mockMvc.perform(patch("/api/reportes/2/estado")
+                        .header("X-Usuario-Rol", "BOMBERO")
+                        .param("nuevoEstado", "EN_PROGRESO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("EN_PROGRESO"));
+
+        verify(reporteService, times(1))
+                .actualizarEstado(2L, "EN_PROGRESO");
+    }
+
+    @Test
+    @DisplayName("PATCH /api/reportes/{id}/estado - actualiza estado con BRIGADISTA")
     void testActualizarEstado_Exitoso_Brigadista() throws Exception {
         Reporte reporteActualizado = new Reporte();
         reporteActualizado.setId(1L);
@@ -204,6 +217,7 @@ class ReporteControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/reportes/{id}/estado - USER retorna forbidden")
     void testActualizarEstado_UserRetornaForbidden() throws Exception {
         mockMvc.perform(patch("/api/reportes/1/estado")
                         .header("X-Usuario-Rol", "USER")
@@ -214,10 +228,20 @@ class ReporteControllerTest {
         verify(reporteService, never()).actualizarEstado(anyLong(), anyString());
     }
 
-    // =========================================================
-    // PATCH /api/reportes/{id}/prioridad
-    // =========================================================
     @Test
+    @DisplayName("PATCH /api/reportes/{id}/estado - rol vacío retorna forbidden")
+    void testActualizarEstado_RolVacio() throws Exception {
+        mockMvc.perform(patch("/api/reportes/1/estado")
+                        .header("X-Usuario-Rol", "   ")
+                        .param("nuevoEstado", "EN_PROGRESO"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("No tienes permisos para gestionar reportes."));
+
+        verify(reporteService, never()).actualizarEstado(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/reportes/{id}/prioridad - actualiza prioridad con FUNCIONARIO")
     void testActualizarPrioridad_Exitoso_Funcionario() throws Exception {
         Reporte reporteActualizado = new Reporte();
         reporteActualizado.setId(1L);
@@ -237,6 +261,7 @@ class ReporteControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /api/reportes/{id}/prioridad - USER retorna forbidden")
     void testActualizarPrioridad_UserRetornaForbidden() throws Exception {
         mockMvc.perform(patch("/api/reportes/1/prioridad")
                         .header("X-Usuario-Rol", "USER")
@@ -247,43 +272,81 @@ class ReporteControllerTest {
         verify(reporteService, never()).actualizarPrioridad(anyLong(), anyString());
     }
 
-    // =========================================================
-    // Tests Adicionales (Aumento de Cobertura)
-    // =========================================================
     @Test
-    @DisplayName("Descargar Excel - Éxito con rol ADMIN")
-    void testDescargarExcelAuditoria_Exito() throws Exception {
+    @DisplayName("PATCH /api/reportes/{id}/prioridad - sin rol retorna forbidden")
+    void testActualizarPrioridad_SinRolRetornaForbidden() throws Exception {
+        mockMvc.perform(patch("/api/reportes/1/prioridad")
+                        .param("nuevaPrioridad", "ALTA"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("No tienes permisos para gestionar reportes."));
+
+        verify(reporteService, never()).actualizarPrioridad(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("GET /api/reportes/auditoria/excel - descarga Excel con ADMIN")
+    void testDescargarExcelAuditoria_ExitoAdmin() throws Exception {
         byte[] mockExcel = "excel-dummy-data".getBytes();
+
         when(reporteService.generarExcelAuditoriaReportes()).thenReturn(mockExcel);
 
         mockMvc.perform(get("/api/reportes/auditoria/excel")
                         .header("X-Usuario-Rol", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"auditoria_reportes.xlsx\""))
+                .andExpect(header().string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        matchesPattern("attachment; filename=auditoria_reportes_geofire_\\d{8}_\\d{6}\\.xlsx")
+                ))
+                .andExpect(content().contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                ))
                 .andExpect(content().bytes(mockExcel));
 
         verify(reporteService, times(1)).generarExcelAuditoriaReportes();
     }
 
     @Test
-    @DisplayName("Descargar Excel - Fallo por rol nulo o vacío (Cobertura branches)")
-    void testDescargarExcelAuditoria_RolNuloOVacio() throws Exception {
-        // Prueba sin enviar el header (rol nulo)
-        mockMvc.perform(get("/api/reportes/auditoria/excel"))
-                .andExpect(status().isForbidden());
+    @DisplayName("GET /api/reportes/auditoria/excel - descarga Excel con FUNCIONARIO")
+    void testDescargarExcelAuditoria_ExitoFuncionario() throws Exception {
+        byte[] mockExcel = "excel-funcionario".getBytes();
 
-        // Prueba enviando el header vacío (rol blank)
+        when(reporteService.generarExcelAuditoriaReportes()).thenReturn(mockExcel);
+
         mockMvc.perform(get("/api/reportes/auditoria/excel")
-                        .header("X-Usuario-Rol", "   "))
-                .andExpect(status().isForbidden());
+                        .header("X-Usuario-Rol", "FUNCIONARIO"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        matchesPattern("attachment; filename=auditoria_reportes_geofire_\\d{8}_\\d{6}\\.xlsx")
+                ))
+                .andExpect(content().bytes(mockExcel));
+
+        verify(reporteService, times(1)).generarExcelAuditoriaReportes();
     }
 
     @Test
-    @DisplayName("Actualizar estado - Fallo por rol vacío (Cobertura esRolOperativo)")
-    void testActualizarEstado_RolVacio() throws Exception {
-        mockMvc.perform(patch("/api/reportes/1/estado")
-                        .header("X-Usuario-Rol", "   ")
-                        .param("nuevoEstado", "EN_PROGRESO"))
-                .andExpect(status().isForbidden());
+    @DisplayName("GET /api/reportes/auditoria/excel - USER retorna forbidden")
+    void testDescargarExcelAuditoria_UserForbidden() throws Exception {
+        mockMvc.perform(get("/api/reportes/auditoria/excel")
+                        .header("X-Usuario-Rol", "USER"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("No tienes permisos para descargar auditoría de reportes."));
+
+        verify(reporteService, never()).generarExcelAuditoriaReportes();
+    }
+
+    @Test
+    @DisplayName("GET /api/reportes/auditoria/excel - sin rol o rol vacío retorna forbidden")
+    void testDescargarExcelAuditoria_RolNuloOVacio() throws Exception {
+        mockMvc.perform(get("/api/reportes/auditoria/excel"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("No tienes permisos para descargar auditoría de reportes."));
+
+        mockMvc.perform(get("/api/reportes/auditoria/excel")
+                        .header("X-Usuario-Rol", "   "))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("No tienes permisos para descargar auditoría de reportes."));
+
+        verify(reporteService, never()).generarExcelAuditoriaReportes();
     }
 }
