@@ -26,6 +26,11 @@ spring:
           predicates:
             - Path=/api/reportes/**
 
+        - id: ms-bff-route
+          uri: lb://MS-BFF
+          predicates:
+            - Path=/bff/**
+
         - id: ms-geografico-route
           uri: lb://MS-GEOGRAFICO
           predicates:
