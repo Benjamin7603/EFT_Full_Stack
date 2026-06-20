@@ -3,7 +3,7 @@ name: Build and Push Deploy AWS v3
 on:
   push:
     branches:
-      - feature/devops-aws-deploy
+      - feature/devops-aws-deployy
 
 concurrency:
   group: geofire-aws-deploy
