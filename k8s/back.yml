@@ -122,7 +122,7 @@ metadata:
   labels:
     app: rabbitmq
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: rabbitmq
@@ -170,7 +170,7 @@ metadata:
   labels:
     app: eureka-server
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: eureka-server
@@ -209,7 +209,7 @@ metadata:
   labels:
     app: ms-gateway
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-gateway
@@ -259,7 +259,7 @@ metadata:
   labels:
     app: ms-usuarios
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-usuarios
@@ -321,7 +321,7 @@ metadata:
   labels:
     app: ms-reportes
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-reportes
@@ -391,7 +391,7 @@ metadata:
   labels:
     app: ms-geografico
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-geografico
@@ -453,7 +453,7 @@ metadata:
   labels:
     app: ms-notificaciones
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-notificaciones
@@ -515,7 +515,7 @@ metadata:
   labels:
     app: ms-bff
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ms-bff
@@ -571,7 +571,7 @@ metadata:
   labels:
     app: frontend-web
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend-web
