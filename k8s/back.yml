@@ -1,14 +1,7 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: geofire
-
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: frontend-nginx-config
-  namespace: geofire
 data:
   default.conf: |
     server {
@@ -38,7 +31,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-db
-  namespace: geofire
+  labels:
+    app: postgres-db
 spec:
   replicas: 1
   selector:
@@ -51,7 +45,8 @@ spec:
     spec:
       containers:
         - name: postgres-db
-          image: ${ECR_REGISTRY}/geofire-postgres-db:${IMAGE_TAG}
+          image: ${ECR_REPO_POSTGRES_DB}:${IMAGE_TAG}
+          imagePullPolicy: Always
           args:
             - postgres
             - -c
@@ -71,13 +66,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: postgres-db
   ports:
-    - port: 5432
+    - name: postgres
+      protocol: TCP
+      port: 5432
       targetPort: 5432
 
 ---
@@ -85,7 +81,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: geofire
+  labels:
+    app: redis
 spec:
   replicas: 1
   selector:
@@ -107,13 +104,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: redis
   ports:
-    - port: 6379
+    - name: redis
+      protocol: TCP
+      port: 6379
       targetPort: 6379
 
 ---
@@ -121,7 +119,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rabbitmq
-  namespace: geofire
+  labels:
+    app: rabbitmq
 spec:
   replicas: 1
   selector:
@@ -149,16 +148,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: rabbitmq
   ports:
     - name: amqp
+      protocol: TCP
       port: 5672
       targetPort: 5672
     - name: management
+      protocol: TCP
       port: 15672
       targetPort: 15672
 
@@ -167,7 +167,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: eureka-server
-  namespace: geofire
+  labels:
+    app: eureka-server
 spec:
   replicas: 1
   selector:
@@ -180,7 +181,8 @@ spec:
     spec:
       containers:
         - name: eureka-server
-          image: ${ECR_REGISTRY}/geofire-eureka-server:${IMAGE_TAG}
+          image: ${ECR_REPO_EUREKA_SERVER}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8761
 
@@ -189,13 +191,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: eureka-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: eureka-server
   ports:
-    - port: 8761
+    - name: eureka
+      protocol: TCP
+      port: 8761
       targetPort: 8761
 
 ---
@@ -203,7 +206,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-gateway
-  namespace: geofire
+  labels:
+    app: ms-gateway
 spec:
   replicas: 1
   selector:
@@ -216,7 +220,8 @@ spec:
     spec:
       containers:
         - name: ms-gateway
-          image: ${ECR_REGISTRY}/geofire-gateway:${IMAGE_TAG}
+          image: ${ECR_REPO_GATEWAY}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
@@ -228,19 +233,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: gateway-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-gateway
   ports:
-    - port: 8000
+    - name: http
+      protocol: TCP
+      port: 8000
       targetPort: 8000
 
 ---
@@ -248,7 +256,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-usuarios
-  namespace: geofire
+  labels:
+    app: ms-usuarios
 spec:
   replicas: 1
   selector:
@@ -261,7 +270,8 @@ spec:
     spec:
       containers:
         - name: ms-usuarios
-          image: ${ECR_REGISTRY}/geofire-usuarios:${IMAGE_TAG}
+          image: ${ECR_REPO_USUARIOS}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:
@@ -285,19 +295,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: usuarios-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-usuarios
   ports:
-    - port: 8082
+    - name: http
+      protocol: TCP
+      port: 8082
       targetPort: 8082
 
 ---
@@ -305,7 +318,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-reportes
-  namespace: geofire
+  labels:
+    app: ms-reportes
 spec:
   replicas: 1
   selector:
@@ -318,7 +332,8 @@ spec:
     spec:
       containers:
         - name: ms-reportes
-          image: ${ECR_REGISTRY}/geofire-reportes:${IMAGE_TAG}
+          image: ${ECR_REPO_REPORTES}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           env:
@@ -350,19 +365,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: reportes-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-reportes
   ports:
-    - port: 8081
+    - name: http
+      protocol: TCP
+      port: 8081
       targetPort: 8081
 
 ---
@@ -370,7 +388,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-geografico
-  namespace: geofire
+  labels:
+    app: ms-geografico
 spec:
   replicas: 1
   selector:
@@ -383,7 +402,8 @@ spec:
     spec:
       containers:
         - name: ms-geografico
-          image: ${ECR_REGISTRY}/geofire-geografico:${IMAGE_TAG}
+          image: ${ECR_REPO_GEOGRAFICO}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8083
           env:
@@ -407,19 +427,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: geografico-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-geografico
   ports:
-    - port: 8083
+    - name: http
+      protocol: TCP
+      port: 8083
       targetPort: 8083
 
 ---
@@ -427,7 +450,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-notificaciones
-  namespace: geofire
+  labels:
+    app: ms-notificaciones
 spec:
   replicas: 1
   selector:
@@ -440,7 +464,8 @@ spec:
     spec:
       containers:
         - name: ms-notificaciones
-          image: ${ECR_REGISTRY}/geofire-notificaciones:${IMAGE_TAG}
+          image: ${ECR_REPO_NOTIFICACIONES}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8084
           env:
@@ -464,19 +489,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: notificaciones-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-notificaciones
   ports:
-    - port: 8084
+    - name: http
+      protocol: TCP
+      port: 8084
       targetPort: 8084
 
 ---
@@ -484,7 +512,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-bff
-  namespace: geofire
+  labels:
+    app: ms-bff
 spec:
   replicas: 1
   selector:
@@ -497,7 +526,8 @@ spec:
     spec:
       containers:
         - name: ms-bff
-          image: ${ECR_REGISTRY}/geofire-bff:${IMAGE_TAG}
+          image: ${ECR_REPO_BFF}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8085
           env:
@@ -515,19 +545,22 @@ spec:
               value: http://eureka-service:8761/eureka/
             - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
               value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: bff-service
-  namespace: geofire
 spec:
   type: ClusterIP
   selector:
     app: ms-bff
   ports:
-    - port: 8085
+    - name: http
+      protocol: TCP
+      port: 8085
       targetPort: 8085
 
 ---
@@ -535,7 +568,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-web
-  namespace: geofire
+  labels:
+    app: frontend-web
 spec:
   replicas: 1
   selector:
@@ -548,7 +582,8 @@ spec:
     spec:
       containers:
         - name: frontend-web
-          image: ${ECR_REGISTRY}/geofire-frontend-web:${IMAGE_TAG}
+          image: ${ECR_REPO_FRONTEND_WEB}:${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           volumeMounts:
@@ -565,12 +600,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
-  namespace: geofire
 spec:
   type: LoadBalancer
   selector:
     app: frontend-web
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 80

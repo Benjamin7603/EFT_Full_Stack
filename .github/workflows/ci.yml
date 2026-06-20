@@ -1,28 +1,18 @@
+
 name: GeoFire CI
 
 on:
   push:
     branches:
+      - master
+      - main
       - feature/**
       - docs/**
-      - main
 
 jobs:
-  backend-tests:
-    name: Backend Maven Tests
+  build-and-test:
+    name: Revision y pruebas GeoFire
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        service:
-          - backend/ms-eureka-server
-          - backend/ms-gateway
-          - backend/ms-usuarios
-          - backend/ms-reportes
-          - backend/ms-geografico
-          - backend/ms-notificaciones
-          - backend/ms-bff
 
     steps:
       - name: Checkout Code
@@ -35,27 +25,46 @@ jobs:
           distribution: "temurin"
           cache: "maven"
 
-      - name: Run Maven Tests
-        working-directory: ${{ matrix.service }}
+      - name: Test Eureka Server
         run: mvn clean test
+        working-directory: ./backend/ms-eureka-server
 
-  frontend-build:
-    name: Frontend Build
-    runs-on: ubuntu-latest
+      - name: Test Gateway
+        run: mvn clean test
+        working-directory: ./backend/ms-gateway
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Test Usuarios
+        run: mvn clean test
+        working-directory: ./backend/ms-usuarios
+
+      - name: Test Reportes
+        run: mvn clean test
+        working-directory: ./backend/ms-reportes
+
+      - name: Test Geografico
+        run: mvn clean test
+        working-directory: ./backend/ms-geografico
+
+      - name: Test Notificaciones
+        run: mvn clean test
+        working-directory: ./backend/ms-notificaciones
+
+      - name: Test BFF
+        run: mvn clean test
+        working-directory: ./backend/ms-bff
 
       - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install Dependencies
-        working-directory: ./frontend-web
+      - name: Install Frontend Dependencies
         run: npm install
+        working-directory: ./frontend-web
 
       - name: Build Frontend
-        working-directory: ./frontend-web
         run: npm run build
+        working-directory: ./frontend-web
+
+      - name: Completado
+        run: echo "Revision, pruebas y build de GeoFire finalizados correctamente"
