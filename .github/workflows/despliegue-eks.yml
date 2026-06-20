@@ -1,4 +1,4 @@
-name: Deploy GeoFire to Amazon EKS
+name: Deploy GeoFire to Amazon EKS v2
 
 on:
   push:
