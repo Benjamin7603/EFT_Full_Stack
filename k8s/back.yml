@@ -1,0 +1,640 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: geofire
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-nginx-config
+  namespace: geofire
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+    
+      root /usr/share/nginx/html;
+      index index.html;
+    
+      location /api/ {
+        proxy_pass http://gateway-service:8000/api/;
+        proxy_http_version 1.1;
+    
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
+    
+      location / {
+        try_files $uri $uri/ /index.html;
+      }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-db
+  namespace: geofire
+  labels:
+    app: postgres-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-db
+  template:
+    metadata:
+      labels:
+        app: postgres-db
+    spec:
+      containers:
+        - name: postgres-db
+          image: ${ECR_REPO_POSTGRES_DB}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          args:
+            - postgres
+            - -c
+            - max_connections=300
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: root
+            - name: POSTGRES_DB
+              value: eft_incendios
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-db
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: geofire
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: geofire
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: guest
+            - name: RABBITMQ_DEFAULT_PASS
+              value: guest
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: management
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+  namespace: geofire
+  labels:
+    app: eureka-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      containers:
+        - name: eureka-server
+          image: ${ECR_REPO_EUREKA_SERVER}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8761
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: eureka-server
+  ports:
+    - name: eureka
+      protocol: TCP
+      port: 8761
+      targetPort: 8761
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-gateway
+  namespace: geofire
+  labels:
+    app: ms-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-gateway
+  template:
+    metadata:
+      labels:
+        app: ms-gateway
+    spec:
+      containers:
+        - name: ms-gateway
+          image: ${ECR_REPO_GATEWAY}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: FRONTEND_ORIGIN
+              value: "*"
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-gateway
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-usuarios
+  namespace: geofire
+  labels:
+    app: ms-usuarios
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-usuarios
+  template:
+    metadata:
+      labels:
+        app: ms-usuarios
+    spec:
+      containers:
+        - name: ms-usuarios
+          image: ${ECR_REPO_USUARIOS}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/eft_incendios
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq-service
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: guest
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: guest
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: usuarios-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-usuarios
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-reportes
+  namespace: geofire
+  labels:
+    app: ms-reportes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-reportes
+  template:
+    metadata:
+      labels:
+        app: ms-reportes
+    spec:
+      containers:
+        - name: ms-reportes
+          image: ${ECR_REPO_REPORTES}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/eft_incendios
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: REDIS_HOST
+              value: redis-service
+            - name: REDIS_PORT
+              value: "6379"
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq-service
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: guest
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: guest
+            - name: MS_GEOGRAFICO_URL
+              value: http://geografico-service:8083
+            - name: MS_NOTIFICACIONES_URL
+              value: http://notificaciones-service:8084
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reportes-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-reportes
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-geografico
+  namespace: geofire
+  labels:
+    app: ms-geografico
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-geografico
+  template:
+    metadata:
+      labels:
+        app: ms-geografico
+    spec:
+      containers:
+        - name: ms-geografico
+          image: ${ECR_REPO_GEOGRAFICO}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/eft_incendios
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq-service
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: guest
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: guest
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geografico-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-geografico
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8083
+      targetPort: 8083
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-notificaciones
+  namespace: geofire
+  labels:
+    app: ms-notificaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-notificaciones
+  template:
+    metadata:
+      labels:
+        app: ms-notificaciones
+    spec:
+      containers:
+        - name: ms-notificaciones
+          image: ${ECR_REPO_NOTIFICACIONES}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/eft_incendios
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq-service
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: guest
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: guest
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificaciones-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-notificaciones
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8084
+      targetPort: 8084
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-bff
+  namespace: geofire
+  labels:
+    app: ms-bff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-bff
+  template:
+    metadata:
+      labels:
+        app: ms-bff
+    spec:
+      containers:
+        - name: ms-bff
+          image: ${ECR_REPO_BFF}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8085
+          env:
+            - name: MS_USUARIOS_URL
+              value: http://usuarios-service:8082
+            - name: MS_REPORTES_URL
+              value: http://reportes-service:8081
+            - name: MS_GEOGRAFICO_URL
+              value: http://geografico-service:8083
+            - name: MS_NOTIFICACIONES_URL
+              value: http://notificaciones-service:8084
+            - name: EUREKA_URL
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+              value: http://eureka-service:8761/eureka/
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff-service
+  namespace: geofire
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-bff
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8085
+      targetPort: 8085
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web
+  namespace: geofire
+  labels:
+    app: frontend-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-web
+  template:
+    metadata:
+      labels:
+        app: frontend-web
+    spec:
+      containers:
+        - name: frontend-web
+          image: ${ECR_REPO_FRONTEND_WEB}:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: frontend-nginx-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: geofire
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend-web
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80

@@ -1,0 +1,67 @@
+name: GeoFire CI
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  build-and-test:
+    name: Revision y pruebas GeoFire
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Test Eureka Server
+        run: mvn clean test
+        working-directory: ./backend/ms-eureka-server
+
+      - name: Test Gateway
+        run: mvn clean test
+        working-directory: ./backend/ms-gateway
+
+      - name: Test Usuarios
+        run: mvn clean test
+        working-directory: ./backend/ms-usuarios
+
+      - name: Test Reportes
+        run: mvn clean test
+        working-directory: ./backend/ms-reportes
+
+      - name: Test Geografico
+        run: mvn clean test
+        working-directory: ./backend/ms-geografico
+
+      - name: Test Notificaciones
+        run: mvn clean test
+        working-directory: ./backend/ms-notificaciones
+
+      - name: Test BFF
+        run: mvn clean test
+        working-directory: ./backend/ms-bff
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ./frontend-web
+
+      - name: Build Frontend
+        run: npm run build
+        working-directory: ./frontend-web
+
+      - name: Finalizacion Exitosa
+        run: echo "Revision, pruebas y build de GeoFire finalizados correctamente"

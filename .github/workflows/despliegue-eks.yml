@@ -1,0 +1,107 @@
+name: Deploy GeoFire to Amazon EKS
+
+on:
+  push:
+    branches:
+      - feature/devops-aws-deploy
+      # - main
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  deploy:
+    name: Build, Push and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Autenticarse en AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 2. Login en Amazon ECR
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 3. Construir imágenes Docker y subirlas a ECR
+      - name: Build, tag and push GeoFire images
+        run: |
+          docker build -t ${{ secrets.ECR_REPO_POSTGRES_DB }}:${{ env.IMAGE_TAG }} ./database
+          docker push ${{ secrets.ECR_REPO_POSTGRES_DB }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_EUREKA_SERVER }}:${{ env.IMAGE_TAG }} ./backend/ms-eureka-server
+          docker push ${{ secrets.ECR_REPO_EUREKA_SERVER }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_GATEWAY }}:${{ env.IMAGE_TAG }} ./backend/ms-gateway
+          docker push ${{ secrets.ECR_REPO_GATEWAY }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_USUARIOS }}:${{ env.IMAGE_TAG }} ./backend/ms-usuarios
+          docker push ${{ secrets.ECR_REPO_USUARIOS }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_REPORTES }}:${{ env.IMAGE_TAG }} ./backend/ms-reportes
+          docker push ${{ secrets.ECR_REPO_REPORTES }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_GEOGRAFICO }}:${{ env.IMAGE_TAG }} ./backend/ms-geografico
+          docker push ${{ secrets.ECR_REPO_GEOGRAFICO }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_NOTIFICACIONES }}:${{ env.IMAGE_TAG }} ./backend/ms-notificaciones
+          docker push ${{ secrets.ECR_REPO_NOTIFICACIONES }}:${{ env.IMAGE_TAG }}
+
+          docker build -t ${{ secrets.ECR_REPO_BFF }}:${{ env.IMAGE_TAG }} ./backend/ms-bff
+          docker push ${{ secrets.ECR_REPO_BFF }}:${{ env.IMAGE_TAG }}
+
+          docker build \
+            --build-arg VITE_API_URL=. \
+            -t ${{ secrets.ECR_REPO_FRONTEND_WEB }}:${{ env.IMAGE_TAG }} ./frontend-web
+          docker push ${{ secrets.ECR_REPO_FRONTEND_WEB }}:${{ env.IMAGE_TAG }}
+
+      # 4. Configurar kubectl para conectarse al cluster EKS
+      - name: Update Kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      # 5. Reemplazar variables del manifiesto y desplegar
+      - name: Deploy to EKS
+        env:
+          ECR_REPO_POSTGRES_DB: ${{ secrets.ECR_REPO_POSTGRES_DB }}
+          ECR_REPO_EUREKA_SERVER: ${{ secrets.ECR_REPO_EUREKA_SERVER }}
+          ECR_REPO_GATEWAY: ${{ secrets.ECR_REPO_GATEWAY }}
+          ECR_REPO_USUARIOS: ${{ secrets.ECR_REPO_USUARIOS }}
+          ECR_REPO_REPORTES: ${{ secrets.ECR_REPO_REPORTES }}
+          ECR_REPO_GEOGRAFICO: ${{ secrets.ECR_REPO_GEOGRAFICO }}
+          ECR_REPO_NOTIFICACIONES: ${{ secrets.ECR_REPO_NOTIFICACIONES }}
+          ECR_REPO_BFF: ${{ secrets.ECR_REPO_BFF }}
+          ECR_REPO_FRONTEND_WEB: ${{ secrets.ECR_REPO_FRONTEND_WEB }}
+        run: |
+          cp k8s/back.yml k8s/back-rendered.yml
+
+          sed -i "s|\${IMAGE_TAG}|${{ env.IMAGE_TAG }}|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_POSTGRES_DB}|$ECR_REPO_POSTGRES_DB|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_EUREKA_SERVER}|$ECR_REPO_EUREKA_SERVER|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_GATEWAY}|$ECR_REPO_GATEWAY|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_USUARIOS}|$ECR_REPO_USUARIOS|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_REPORTES}|$ECR_REPO_REPORTES|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_GEOGRAFICO}|$ECR_REPO_GEOGRAFICO|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_NOTIFICACIONES}|$ECR_REPO_NOTIFICACIONES|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_BFF}|$ECR_REPO_BFF|g" k8s/back-rendered.yml
+          sed -i "s|\${ECR_REPO_FRONTEND_WEB}|$ECR_REPO_FRONTEND_WEB|g" k8s/back-rendered.yml
+
+          kubectl apply -f k8s/back-rendered.yml
+
+      # 6. Mostrar estado final
+      - name: Show Kubernetes resources
+        run: |
+          kubectl get pods -n geofire
+          kubectl get services -n geofire
