@@ -1,13 +1,9 @@
-
 name: GeoFire CI
 
 on:
   push:
     branches:
-      - master
-      - main
-      - feature/**
-      - docs/**
+      - feature/devops-aws-deploy
 
 jobs:
   build-and-test:
